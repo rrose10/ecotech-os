@@ -6,5 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Attendance extends Model
 {
-    //
+    protected $fillable = [
+        'employee_id',
+        'date',
+        'status',
+        'check_in',
+        'check_out',
+        'remarks',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

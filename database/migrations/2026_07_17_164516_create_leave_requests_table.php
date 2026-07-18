@@ -11,16 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('incomes', function (Blueprint $table) {
-    $table->id();
-
-    $table->string('source');
-    $table->decimal('amount', 12, 2);
-    $table->date('income_date');
-    $table->text('description')->nullable();
-
-    $table->timestamps();
-});
+        Schema::create('leave_requests', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -28,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('incomes');
+        Schema::dropIfExists('leave_requests');
     }
 };

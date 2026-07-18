@@ -11,16 +11,46 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('expenses', function (Blueprint $table) {
-    $table->id();
+        Schema::create('expenses', function (Blueprint $table) {
 
-    $table->string('category');
-    $table->decimal('amount', 12, 2);
-    $table->date('expense_date');
-    $table->text('description')->nullable();
+            $table->id();
 
-    $table->timestamps();
-});
+            $table->foreignId('expense_category_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignId('bank_account_id')
+                ->constrained()
+                ->restrictOnDelete();
+
+            $table->foreignId('payroll_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
+            $table->string('title');
+
+            $table->decimal('amount', 12, 2);
+
+            $table->date('expense_date');
+
+            $table->enum('payment_method', [
+                'Cash',
+                'Bank',
+                'bKash',
+                'Nagad',
+                'Rocket',
+                'Card',
+            ]);
+
+            $table->text('remarks')->nullable();
+
+            $table->foreignId('created_by')
+                ->constrained('users')
+                ->cascadeOnDelete();
+
+            $table->timestamps();
+        });
     }
 
     /**
