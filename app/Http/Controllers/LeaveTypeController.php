@@ -37,14 +37,17 @@ class LeaveTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:leave_types,name',
+            'name' => 'required|max:100|unique:leave_types,name',
             'days_per_year' => 'required|integer|min:0',
+            'is_paid' => 'required|boolean',
+            'status' => 'required|boolean',
         ]);
 
         LeaveType::create([
             'name' => $request->name,
             'days_per_year' => $request->days_per_year,
-            'status' => $request->status ?? true,
+            'is_paid' => $request->is_paid,
+            'status' => $request->status,
         ]);
 
         return redirect()
@@ -74,13 +77,16 @@ class LeaveTypeController extends Controller
     public function update(Request $request, LeaveType $leaveType)
     {
         $request->validate([
-            'name' => 'required|unique:leave_types,name,' . $leaveType->id,
+            'name' => 'required|max:100|unique:leave_types,name,' . $leaveType->id,
             'days_per_year' => 'required|integer|min:0',
+            'is_paid' => 'required|boolean',
+            'status' => 'required|boolean',
         ]);
 
         $leaveType->update([
             'name' => $request->name,
             'days_per_year' => $request->days_per_year,
+            'is_paid' => $request->is_paid,
             'status' => $request->status,
         ]);
 
@@ -94,6 +100,14 @@ class LeaveTypeController extends Controller
      */
     public function destroy(LeaveType $leaveType)
     {
+        if ($leaveType->leaves()->exists()) {
+            return redirect()
+                ->route('leave-types.index')
+                ->withErrors([
+                    'error' => 'This Leave Type cannot be deleted because it is already in use.',
+                ]);
+        }
+
         $leaveType->delete();
 
         return redirect()

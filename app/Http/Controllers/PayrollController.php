@@ -149,49 +149,49 @@ class PayrollController extends Controller
         }
     }
 
-    /**
-     * Display payroll.
-     */
-    public function show(Payroll $payroll)
-    {
-        return view('payrolls.show', compact('payroll'));
-    }
+        /**
+         * Display payroll.
+         */
+        public function show(Payroll $payroll)
+        {
+            return view('payrolls.show', compact('payroll'));
+        }
 
-    /**
-     * Show edit form.
-     */
-    public function edit(Payroll $payroll)
-    {
-    $employees = Employee::where('status', true)
-        ->orderBy('name')
-        ->get();
+        /**
+         * Show edit form.
+         */
+        public function edit(Payroll $payroll)
+        {
+        $employees = Employee::where('status', true)
+            ->orderBy('name')
+            ->get();
 
-    $bankAccounts = BankAccount::where('is_active', true)
-        ->orderBy('account_name')
-        ->get();
+        $bankAccounts = BankAccount::where('is_active', true)
+            ->orderBy('account_name')
+            ->get();
 
-    return view('payrolls.edit', compact(
-        'payroll',
-        'employees',
-        'bankAccounts'
-    ));
-    }
+        return view('payrolls.edit', compact(
+            'payroll',
+            'employees',
+            'bankAccounts'
+        ));
+        }
 
-    /**
-     * Update payroll.
-     */
-    public function update(Request $request, Payroll $payroll)
+        /**
+         * Update payroll.
+         */
+        public function update(Request $request, Payroll $payroll)
     {
         $request->validate([
-        'employee_id'      => 'required|exists:employees,id',
-        'bank_account_id'  => 'required|exists:bank_accounts,id',
-        'month'            => 'required|integer|between:1,12',
-        'year'             => 'required|integer|min:2024|max:2100',
-        'bonus'            => 'nullable|numeric|min:0',
-        'payment_date'     => 'nullable|date',
-        'status'           => 'required|in:Pending,Paid',
-        'remarks'          => 'nullable|string',
-    ]);
+            'employee_id'      => 'required|exists:employees,id',
+            'bank_account_id'  => 'required|exists:bank_accounts,id',
+            'month'            => 'required|integer|between:1,12',
+            'year'             => 'required|integer|min:2024|max:2100',
+            'bonus'            => 'nullable|numeric|min:0',
+            'payment_date'     => 'nullable|date',
+            'status'           => 'required|in:Pending,Paid',
+            'remarks'          => 'nullable|string',
+        ]);
 
         $exists = Payroll::where('employee_id', $request->employee_id)
             ->where('month', $request->month)
@@ -207,48 +207,169 @@ class PayrollController extends Controller
                 ]);
         }
 
-        $employee = Employee::findOrFail($request->employee_id);
+        DB::beginTransaction();
 
-        $basicSalary = $employee->basic_salary;
-        $bonus = $request->bonus ?? 0;
+        try {
 
-        $payroll->update([
-        'employee_id'      => $employee->id,
-        'bank_account_id'  => $request->bank_account_id,
-        'month'            => $request->month,
-        'year'             => $request->year,
-        'basic_salary'     => $basicSalary,
-        'bonus'            => $bonus,
-        'total_salary'     => $basicSalary + $bonus,
-        'payment_date'     => $request->payment_date,
-        'status'           => $request->status,
-        'remarks'          => $request->remarks,
-    ]);
+            $employee = Employee::findOrFail($request->employee_id);
+
+            $basicSalary = $employee->basic_salary;
+            $bonus = $request->bonus ?? 0;
+            $totalSalary = $basicSalary + $bonus;
+
+            $oldStatus = $payroll->status;
+            $oldAmount = $payroll->total_salary;
+            $oldBankId = $payroll->bank_account_id;
+
+            $oldExpense = $payroll->expense;
+
+            $payroll->update([
+                'employee_id'      => $employee->id,
+                'bank_account_id'  => $request->bank_account_id,
+                'month'            => $request->month,
+                'year'             => $request->year,
+                'basic_salary'     => $basicSalary,
+                'bonus'            => $bonus,
+                'total_salary'     => $totalSalary,
+                'payment_date'     => $request->payment_date,
+                'status'           => $request->status,
+                'remarks'          => $request->remarks,
+            ]);
+
+            $salaryCategory = ExpenseCategory::where('name', 'Salary')->firstOrFail();
+
+            $newBank = BankAccount::findOrFail($request->bank_account_id);
+            /*
+        |--------------------------------------------------------------------------
+        | Pending -> Paid
+        |--------------------------------------------------------------------------
+        */
+        if ($oldStatus == 'Pending' && $request->status == 'Paid') {
+
+            if ($newBank->current_balance < $totalSalary) {
+                throw new \Exception('Insufficient bank balance.');
+            }
+
+            $payroll->expense()->create([
+                'expense_category_id' => $salaryCategory->id,
+                'bank_account_id'     => $newBank->id,
+                'title'               => 'Salary - ' . $employee->name,
+                'amount'              => $totalSalary,
+                'expense_date'        => $request->payment_date ?? now(),
+                'payment_method'      => $newBank->type === 'Cash' ? 'Cash' : 'Bank',
+                'remarks'             => $request->remarks,
+                'created_by'          => Auth::id(),
+            ]);
+
+            $newBank->decrement('current_balance', $totalSalary);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Paid -> Pending
+        |--------------------------------------------------------------------------
+        */
+        elseif ($oldStatus == 'Paid' && $request->status == 'Pending') {
+
+            if ($oldExpense) {
+
+                BankAccount::find($oldBankId)
+                    ?->increment('current_balance', $oldAmount);
+
+                $oldExpense->delete();
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Paid -> Paid
+        |--------------------------------------------------------------------------
+        */
+        elseif ($oldStatus == 'Paid' && $request->status == 'Paid') {
+
+            $oldBank = BankAccount::findOrFail($oldBankId);
+
+            // Restore old amount
+            $oldBank->increment('current_balance', $oldAmount);
+
+            // Check new balance
+            if ($newBank->current_balance < $totalSalary) {
+                throw new \Exception('Insufficient bank balance.');
+            }
+
+            // Deduct new amount
+            $newBank->decrement('current_balance', $totalSalary);
+
+            if ($oldExpense) {
+
+                $oldExpense->update([
+                    'expense_category_id' => $salaryCategory->id,
+                    'bank_account_id'     => $newBank->id,
+                    'title'               => 'Salary - ' . $employee->name,
+                    'amount'              => $totalSalary,
+                    'expense_date'        => $request->payment_date ?? now(),
+                    'payment_method'      => $newBank->type === 'Cash' ? 'Cash' : 'Bank',
+                    'remarks'             => $request->remarks,
+                ]);
+            }
+        }        
+            DB::commit();
 
         return redirect()
             ->route('payrolls.index')
             ->with('success', 'Payroll Updated Successfully.');
-    }
 
-    /**
-     * Delete payroll.
-     */
-    public function destroy(Payroll $payroll)
-    {
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()
+            ->withInput()
+            ->withErrors([
+                'error' => $e->getMessage(),
+            ]);
+    }
+}
+
+/**
+ * Delete payroll.
+ */
+public function destroy(Payroll $payroll)
+{
+    DB::beginTransaction();
+
+    try {
+
+        if ($payroll->status === 'Paid' && $payroll->expense) {
+
+            $bank = $payroll->expense->bankAccount;
+
+            if ($bank) {
+                $bank->increment(
+                    'current_balance',
+                    $payroll->expense->amount
+                );
+            }
+
+            $payroll->expense->delete();
+        }
+
         $payroll->delete();
+
+        DB::commit();
 
         return redirect()
             ->route('payrolls.index')
             ->with('success', 'Payroll Deleted Successfully.');
-    }
 
-    /**
-     * Return employee basic salary (AJAX)
-     */
-    public function employeeSalary(Employee $employee)
-    {
-        return response()->json([
-            'basic_salary' => $employee->basic_salary,
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+
+        return back()->withErrors([
+            'error' => $e->getMessage(),
         ]);
     }
+}
+
 }

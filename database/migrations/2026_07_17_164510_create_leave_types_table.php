@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
 
-            $table->string('name');
+            $table->string('name', 100)->unique();
             $table->unsignedInteger('days_per_year')->default(0);
-
+            $table->boolean('is_paid')->default(true);
             $table->boolean('status')->default(true);
 
             $table->timestamps();

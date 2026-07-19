@@ -19,7 +19,7 @@
             </p>
         </div>
 
-        <form action="{{ route('leave-types.update',$leaveType) }}" method="POST">
+        <form action="{{ route('leave-types.update', $leaveType) }}" method="POST">
 
             @csrf
             @method('PUT')
@@ -34,7 +34,7 @@
                     <input
                         type="text"
                         name="name"
-                        value="{{ old('name',$leaveType->name) }}"
+                        value="{{ old('name', $leaveType->name) }}"
                         class="w-full rounded-lg border-gray-300"
                         required>
 
@@ -51,12 +51,38 @@
                     <input
                         type="number"
                         name="days_per_year"
-                        value="{{ old('days_per_year',$leaveType->days_per_year) }}"
+                        value="{{ old('days_per_year', $leaveType->days_per_year) }}"
                         min="0"
                         class="w-full rounded-lg border-gray-300"
                         required>
 
                     @error('days_per_year')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-medium">
+                        Paid Leave
+                    </label>
+
+                    <select
+                        name="is_paid"
+                        class="w-full rounded-lg border-gray-300">
+
+                        <option value="1"
+                            {{ old('is_paid', $leaveType->is_paid) == 1 ? 'selected' : '' }}>
+                            Yes
+                        </option>
+
+                        <option value="0"
+                            {{ old('is_paid', $leaveType->is_paid) == 0 ? 'selected' : '' }}>
+                            No
+                        </option>
+
+                    </select>
+
+                    @error('is_paid')
                         <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -71,17 +97,20 @@
                         class="w-full rounded-lg border-gray-300">
 
                         <option value="1"
-                            {{ $leaveType->status ? 'selected' : '' }}>
+                            {{ old('status', $leaveType->status) == 1 ? 'selected' : '' }}>
                             Active
                         </option>
 
                         <option value="0"
-                            {{ !$leaveType->status ? 'selected' : '' }}>
+                            {{ old('status', $leaveType->status) == 0 ? 'selected' : '' }}>
                             Inactive
                         </option>
 
                     </select>
 
+                    @error('status')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
             </div>

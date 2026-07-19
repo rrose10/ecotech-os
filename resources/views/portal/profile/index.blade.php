@@ -1,0 +1,136 @@
+@extends('layouts.portal')
+
+@section('title', 'My Profile')
+
+@section('page_title', 'My Profile')
+
+@section('content')
+
+<div class="space-y-6">
+
+    <!-- Profile Header -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-8">
+
+        <div class="flex flex-col items-center text-center">
+
+            @if($employee->photo)
+                <img src="{{ asset('storage/' . $employee->photo) }}"
+                     alt="{{ $employee->name }}"
+                     class="h-32 w-32 rounded-full object-cover border-4 border-slate-200 shadow">
+            @else
+                <div class="flex h-32 w-32 items-center justify-center rounded-full bg-slate-100 border-4 border-slate-200 text-5xl font-bold text-slate-500">
+                    {{ strtoupper(substr($employee->name,0,1)) }}
+                </div>
+            @endif
+
+            <h2 class="mt-5 text-3xl font-bold text-slate-900">
+                {{ $employee->name }}
+            </h2>
+
+            <p class="mt-1 text-slate-600">
+                {{ $employee->designation ?? '--' }}
+            </p>
+
+            <span class="mt-3 inline-flex rounded-full bg-blue-100 px-4 py-1 text-sm font-medium text-blue-700">
+                {{ $employee->department?->name ?? 'No Department' }}
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- Personal Information -->
+    <div class="bg-white rounded-2xl border border-slate-200">
+
+        <div class="border-b border-slate-200 px-6 py-4">
+            <h3 class="text-lg font-semibold text-slate-900">
+                Personal Information
+            </h3>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+
+            <div>
+                <p class="text-sm text-slate-500">Employee ID</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->employee_id }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Email</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->email }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Phone</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->phone ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Gender</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->gender ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Blood Group</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->blood_group ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Date of Birth</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->date_of_birth?->format('d M Y') ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Designation</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->designation ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Department</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->department?->name ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Joining Date</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->joining_date?->format('d M Y') ?? '--' }}
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">Emergency Contact</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->emergency_contact ?? '--' }}
+                </p>
+            </div>
+
+            <div class="md:col-span-2">
+                <p class="text-sm text-slate-500">Address</p>
+                <p class="mt-1 font-semibold text-slate-900">
+                    {{ $employee->address ?? '--' }}
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@endsection
