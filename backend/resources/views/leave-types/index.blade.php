@@ -55,6 +55,14 @@
 
     @endif
 
+    @if($errors->has('error'))
+
+        <div class="rounded-lg border border-red-300 bg-red-100 px-4 py-3 text-red-700">
+            {{ $errors->first('error') }}
+        </div>
+
+    @endif
+
     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
 
         @if($leaveTypes->count())
@@ -65,10 +73,16 @@
 
                 <tr>
 
-                    <th class="px-6 py-4 text-left">Leave Type</th>
+                    <th class="px-6 py-4 text-left">
+                        Leave Type
+                    </th>
 
                     <th class="px-6 py-4 text-left">
                         Days / Year
+                    </th>
+
+                    <th class="px-6 py-4 text-left">
+                        Paid
                     </th>
 
                     <th class="px-6 py-4 text-left">
@@ -84,8 +98,7 @@
             </thead>
 
             <tbody>
-
-            @foreach($leaveTypes as $leaveType)
+                            @foreach($leaveTypes as $leaveType)
 
                 <tr class="border-b hover:bg-gray-50">
 
@@ -95,6 +108,24 @@
 
                     <td class="px-6 py-4">
                         {{ $leaveType->days_per_year }}
+                    </td>
+
+                    <td class="px-6 py-4">
+
+                        @if($leaveType->is_paid)
+
+                            <span class="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
+                                Yes
+                            </span>
+
+                        @else
+
+                            <span class="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
+                                No
+                            </span>
+
+                        @endif
+
                     </td>
 
                     <td class="px-6 py-4">
@@ -119,13 +150,13 @@
 
                         <div class="flex justify-center gap-2">
 
-                            <a href="{{ route('leave-types.edit',$leaveType) }}"
+                            <a href="{{ route('leave-types.edit', $leaveType) }}"
                                class="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700">
                                 ✏ Edit
                             </a>
 
                             <form
-                                action="{{ route('leave-types.destroy',$leaveType) }}"
+                                action="{{ route('leave-types.destroy', $leaveType) }}"
                                 method="POST"
                                 onsubmit="return confirm('Delete this leave type?')">
 

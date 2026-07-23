@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Employee extends Model
 {
     protected $fillable = [
+
+        'user_id',
         'department_id',
         'employee_id',
         'name',
@@ -24,14 +26,33 @@ class Employee extends Model
         'address',
         'photo',
         'status',
+
     ];
 
+
+
     protected $casts = [
+
         'basic_salary' => 'decimal:2',
         'joining_date' => 'date',
         'date_of_birth' => 'date',
         'status' => 'boolean',
+
     ];
+
+
+
+
+    /**
+     * Employee belongs to User
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+
+
 
     /**
      * Employee belongs to Department
@@ -41,6 +62,10 @@ class Employee extends Model
         return $this->belongsTo(Department::class);
     }
 
+
+
+
+
     /**
      * Employee has many Attendances
      */
@@ -49,6 +74,10 @@ class Employee extends Model
         return $this->hasMany(Attendance::class);
     }
 
+
+
+
+
     /**
      * Employee has many Payrolls
      */
@@ -56,4 +85,29 @@ class Employee extends Model
     {
         return $this->hasMany(Payroll::class);
     }
+
+
+
+
+
+    /**
+     * Employee has many Leaves
+     */
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
+    }
+
+
+
+
+
+    /**
+     * Employee has many Leave Balances
+     */
+    public function leaveBalances(): HasMany
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
 }

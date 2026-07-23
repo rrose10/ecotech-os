@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveType;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class LeaveTypeController extends Controller
@@ -20,7 +21,10 @@ class LeaveTypeController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('leave-types.index', compact('leaveTypes', 'search'));
+        return view('leave-types.index', compact(
+            'leaveTypes',
+            'search'
+        ));
     }
 
     /**
@@ -37,15 +41,26 @@ class LeaveTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|unique:leave_types,name',
+            'name' => 'required|max:100|unique:leave_types,name',
             'days_per_year' => 'required|integer|min:0',
+            'is_paid' => 'required|boolean',
+            'status' => 'required|boolean',
         ]);
 
-        LeaveType::create([
+        $leaveType = LeaveType::create([
             'name' => $request->name,
             'days_per_year' => $request->days_per_year,
-            'status' => $request->status ?? true,
+            'is_paid' => $request->is_paid,
+            'status' => $request->status,
         ]);
+
+        ActivityLogger::log(
+            'Leave Type',
+            'Created',
+            'Created leave type: ' . $leaveType->name,
+            null,
+            $leaveType->toArray()
+        );
 
         return redirect()
             ->route('leave-types.index')
@@ -74,15 +89,29 @@ class LeaveTypeController extends Controller
     public function update(Request $request, LeaveType $leaveType)
     {
         $request->validate([
-            'name' => 'required|unique:leave_types,name,' . $leaveType->id,
+            'name' => 'required|max:100|unique:leave_types,name,' . $leaveType->id,
             'days_per_year' => 'required|integer|min:0',
+            'is_paid' => 'required|boolean',
+            'status' => 'required|boolean',
         ]);
+
+        // Old data for Activity Log
+        $oldData = $leaveType->toArray();
 
         $leaveType->update([
             'name' => $request->name,
             'days_per_year' => $request->days_per_year,
+            'is_paid' => $request->is_paid,
             'status' => $request->status,
         ]);
+
+        ActivityLogger::log(
+            'Leave Type',
+            'Updated',
+            'Updated leave type: ' . $leaveType->name,
+            $oldData,
+            $leaveType->fresh()->toArray()
+        );
 
         return redirect()
             ->route('leave-types.index')
@@ -94,6 +123,24 @@ class LeaveTypeController extends Controller
      */
     public function destroy(LeaveType $leaveType)
     {
+        if ($leaveType->leaves()->exists()) {
+
+            return redirect()
+                ->route('leave-types.index')
+                ->withErrors([
+                    'error' => 'This Leave Type cannot be deleted because it is already in use.',
+                ]);
+
+        }
+
+        ActivityLogger::log(
+            'Leave Type',
+            'Deleted',
+            'Deleted leave type: ' . $leaveType->name,
+            $leaveType->toArray(),
+            null
+        );
+
         $leaveType->delete();
 
         return redirect()

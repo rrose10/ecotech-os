@@ -7,6 +7,7 @@ use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\ActivityLogger;
 
 class LeaveRequestController extends Controller
 {
@@ -66,7 +67,15 @@ class LeaveRequestController extends Controller
 
         $validated['status'] = 'Pending';
 
-        LeaveRequest::create($validated);
+        $leaveRequest = LeaveRequest::create($validated);
+
+        ActivityLogger::log(
+            'Leave Request',
+            'Created',
+            'Created leave request.',
+            null,
+            $leaveRequest->toArray()
+        );
 
         return redirect()
             ->route('leave-requests.index')
@@ -115,6 +124,8 @@ class LeaveRequestController extends Controller
             'status'        => 'required|in:Pending,Approved,Rejected',
         ]);
 
+        $oldData = $leaveRequest->toArray();
+
         $validated['total_days'] = Carbon::parse($validated['from_date'])
             ->diffInDays(Carbon::parse($validated['to_date'])) + 1;
 
@@ -128,6 +139,14 @@ class LeaveRequestController extends Controller
 
         $leaveRequest->update($validated);
 
+        ActivityLogger::log(
+            'Leave Request',
+            'Updated',
+            'Updated leave request.',
+            $oldData,
+            $leaveRequest->fresh()->toArray()
+        );
+
         return redirect()
             ->route('leave-requests.index')
             ->with('success', 'Leave request updated successfully.');
@@ -138,6 +157,14 @@ class LeaveRequestController extends Controller
      */
     public function destroy(LeaveRequest $leaveRequest)
     {
+        ActivityLogger::log(
+            'Leave Request',
+            'Deleted',
+            'Deleted leave request.',
+            $leaveRequest->toArray(),
+            null
+        );
+
         $leaveRequest->delete();
 
         return redirect()

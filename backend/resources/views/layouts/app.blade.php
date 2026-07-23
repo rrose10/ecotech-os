@@ -73,95 +73,135 @@
                 📅 Leave Types
             </a>
 
-            <a href="{{ route('leave-requests.index') }}"
+            <a href="{{ route('leaves.index') }}"
                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('leave-requests.*')
+               {{ request()->routeIs('leaves.*')
                     ? 'bg-blue-600 text-white shadow'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📝 Leave Requests
+                📝 Leaves
+            </a>
+
+            <a href="{{ route('leave-balances.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('leave-balances.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                📊 Leave Balance
             </a>
 
             <hr class="my-5 border-slate-700">
 
-<p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-    Finance
-</p>
+            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
+                Finance
+            </p>
 
-<a href="{{ route('expense-categories.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('expense-categories.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    💰 Expense Categories
-</a>
+            <a href="{{ route('expense-categories.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('expense-categories.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💰 Expense Categories
+            </a>
 
-<a href="{{ route('expenses.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('expenses.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    💸 Expenses
-</a>
+            <a href="{{ route('expenses.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('expenses.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💸 Expenses
+            </a>
 
-<a href="{{ route('income-categories.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('income-categories.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    💵 Income Categories
-</a>
+            <a href="{{ route('income-categories.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('income-categories.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💵 Income Categories
+            </a>
 
-<a href="{{ route('incomes.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('incomes.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    💰 Incomes
-</a>
+            <a href="{{ route('incomes.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('incomes.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💰 Incomes
+            </a>
 
-<a href="{{ route('payrolls.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('payrolls.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    💼 Payroll
-</a>
+            <a href="{{ route('advance-salaries.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('advance-salaries.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💵 Advance Salary
+            </a>
 
-<a href="{{ route('bank-accounts.index') }}"
-   class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-   {{ request()->routeIs('bank-accounts.*')
-        ? 'bg-blue-600 text-white shadow'
-        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-    🏦 Cash & Bank
-</a>
+            <a href="{{ route('employee-loans.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('employee-loans.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💳 Employee Loans
+            </a>
 
-<hr class="my-5 border-slate-700">
+            <a href="{{ route('payrolls.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('payrolls.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💼 Payroll
+            </a>
 
-<p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-    Office
-</p>
+            <a href="{{ route('bank-accounts.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('bank-accounts.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                🏦 Cash & Bank
+            </a>
+                        <hr class="my-5 border-slate-700">
 
-<div class="px-6 py-2 text-slate-500">
-    💻 Assets
-</div>
+            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
+                Office
+            </p>
 
-<div class="px-6 py-2 text-slate-500">
-    📦 Inventory
-</div>
+            <a href="{{ route('notices.index') }}"
+               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+               {{ request()->routeIs('notices.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                📢 Notices
+            </a>
 
-<hr class="my-5 border-slate-700">
+            <a href="{{ route('activity-logs.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('activity-logs.*')
+                        ? 'bg-blue-600 text-white shadow'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                    📜 Activity Logs
+                </a>
 
-<p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-    Reports
-</p>
+            <div class="px-6 py-2 text-slate-500">
+                💻 Assets
+            </div>
 
-<div class="px-6 py-2 text-slate-500">
-    📊 Reports
-</div>
+            <div class="px-6 py-2 text-slate-500">
+                📦 Inventory
+            </div>
 
-<div class="px-6 py-2 text-slate-500">
-    ⚙️ Settings
-</div>
+            <hr class="my-5 border-slate-700">
+
+            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
+                Reports
+            </p>
+
+            <div class="px-6 py-2 text-slate-500">
+                📊 Reports
+            </div>
+
+            <div class="px-6 py-2 text-slate-500">
+                ⚙️ Settings
+            </div>
+
         </nav>
 
     </aside>
@@ -175,6 +215,7 @@
             <div class="flex justify-between items-center px-8 py-5">
 
                 <div>
+
                     <h2 class="text-2xl font-bold text-gray-800">
                         @yield('page_title', 'Dashboard')
                     </h2>
@@ -182,11 +223,13 @@
                     <p class="text-sm text-gray-500">
                         Welcome back, {{ Auth::user()->name }}
                     </p>
+
                 </div>
 
                 <div class="flex items-center gap-4">
 
                     <div class="text-right">
+
                         <p class="font-semibold text-gray-700">
                             {{ Auth::user()->name }}
                         </p>
@@ -194,9 +237,11 @@
                         <p class="text-sm text-gray-500">
                             {{ ucfirst(Auth::user()->role) }}
                         </p>
+
                     </div>
 
                     <form method="POST" action="{{ route('logout') }}">
+
                         @csrf
 
                         <button
@@ -213,13 +258,22 @@
         </header>
 
         <!-- Page Content -->
+
         <main class="flex-1 p-8">
+
             @yield('content')
-        </main>
+                    </main>
 
     </div>
 
 </div>
 
+@stack('scripts')
+
+<script>
+console.log('LAYOUT SCRIPT');
+</script>
+
 </body>
+
 </html>

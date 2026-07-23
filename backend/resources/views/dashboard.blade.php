@@ -256,7 +256,7 @@
                     Attendance
                 </a>
 
-                <a href="{{ route('leave-requests.create') }}"
+                <a href="{{ route('leaves.create') }}"
                     class="rounded-lg bg-amber-500 p-4 text-center font-semibold text-white hover:bg-amber-600 transition">
                     📝<br>
                     Apply Leave

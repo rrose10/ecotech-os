@@ -28,7 +28,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        // Employee Portal
+        if ($user->isEmployee()) {
+            return redirect()->intended(route('portal.dashboard'));
+        }
+
+        // Super Admin, Admin, HR
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

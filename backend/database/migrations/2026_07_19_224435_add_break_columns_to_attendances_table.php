@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('attendances', function (Blueprint $table) {
+
+            $table->timestamp('break_start')
+                ->nullable()
+                ->after('check_in');
+
+            $table->timestamp('break_end')
+                ->nullable()
+                ->after('break_start');
+
+            $table->integer('break_minutes')
+                ->default(0)
+                ->after('working_minutes');
+
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('attendances', function (Blueprint $table) {
+
+            $table->dropColumn([
+                'break_start',
+                'break_end',
+                'break_minutes',
+            ]);
+
+        });
+    }
+};

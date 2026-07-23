@@ -25,51 +25,73 @@
         <div class="grid grid-cols-2 gap-6">
 
             <div>
-                <label class="block mb-2 font-medium">Employee</label>
+                <label class="block mb-2 font-medium">
+                    Employee
+                </label>
 
-                <select name="employee_id" class="w-full border rounded p-3">
+                <select
+                    name="employee_id"
+                    class="w-full border rounded p-3"
+                    required>
 
                     <option value="">Select Employee</option>
 
                     @foreach($employees as $employee)
 
-                        <option value="{{ $employee->id }}">
+                        <option
+                            value="{{ $employee->id }}"
+                            {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+
                             {{ $employee->employee_id }} - {{ $employee->name }}
+
                         </option>
 
                     @endforeach
 
                 </select>
+
             </div>
 
             <div>
-                <label class="block mb-2 font-medium">Date</label>
+
+                <label class="block mb-2 font-medium">
+                    Date
+                </label>
 
                 <input
                     type="date"
-                    name="date"
-                    value="{{ date('Y-m-d') }}"
-                    class="w-full border rounded p-3">
+                    name="attendance_date"
+                    value="{{ old('attendance_date', date('Y-m-d')) }}"
+                    class="w-full border rounded p-3"
+                    required>
+
             </div>
 
             <div>
+
                 <label class="block mb-2 font-medium">
                     Status
                 </label>
 
                 <select
                     name="status"
-                    class="w-full border rounded p-3">
+                    class="w-full border rounded p-3"
+                    required>
 
-                    <option value="Present">Present</option>
-                    <option value="Late">Late</option>
-                    <option value="Absent">Absent</option>
-                    <option value="Leave">Leave</option>
+                    <option value="Present" {{ old('status') == 'Present' ? 'selected' : '' }}>Present</option>
+
+                    <option value="Late" {{ old('status') == 'Late' ? 'selected' : '' }}>Late</option>
+
+                    <option value="Absent" {{ old('status') == 'Absent' ? 'selected' : '' }}>Absent</option>
+
+                    <option value="Leave" {{ old('status') == 'Leave' ? 'selected' : '' }}>Leave</option>
 
                 </select>
+
             </div>
 
             <div>
+
                 <label class="block mb-2 font-medium">
                     Check In
                 </label>
@@ -77,10 +99,13 @@
                 <input
                     type="time"
                     name="check_in"
+                    value="{{ old('check_in') }}"
                     class="w-full border rounded p-3">
+
             </div>
 
             <div>
+
                 <label class="block mb-2 font-medium">
                     Check Out
                 </label>
@@ -88,7 +113,9 @@
                 <input
                     type="time"
                     name="check_out"
+                    value="{{ old('check_out') }}"
                     class="w-full border rounded p-3">
+
             </div>
 
         </div>
@@ -102,11 +129,12 @@
             <textarea
                 name="remarks"
                 rows="4"
-                class="w-full border rounded p-3"></textarea>
+                class="w-full border rounded p-3">{{ old('remarks') }}</textarea>
 
         </div>
 
         <button
+            type="submit"
             class="mt-8 bg-green-600 text-white px-8 py-3 rounded hover:bg-green-700">
 
             Save Attendance

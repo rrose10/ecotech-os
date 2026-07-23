@@ -62,6 +62,30 @@
 
                 <div>
                     <label class="block mb-2 font-medium">
+                        Paid Leave
+                    </label>
+
+                    <select
+                        name="is_paid"
+                        class="w-full rounded-lg border-gray-300">
+
+                        <option value="1" {{ old('is_paid', 1) == 1 ? 'selected' : '' }}>
+                            Yes
+                        </option>
+
+                        <option value="0" {{ old('is_paid') == 0 ? 'selected' : '' }}>
+                            No
+                        </option>
+
+                    </select>
+
+                    @error('is_paid')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block mb-2 font-medium">
                         Status
                     </label>
 
@@ -69,15 +93,19 @@
                         name="status"
                         class="w-full rounded-lg border-gray-300">
 
-                        <option value="1" selected>
+                        <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>
                             Active
                         </option>
 
-                        <option value="0">
+                        <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>
                             Inactive
                         </option>
 
                     </select>
+
+                    @error('status')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
 
                 </div>
 

@@ -2,42 +2,44 @@
 
     {{-- Employee --}}
     <div>
-        <label class="block mb-2 font-medium">
-            Employee
+        <label for="employee_id" class="block text-sm font-medium text-gray-700 mb-2">
+            Employee <span class="text-red-500">*</span>
         </label>
 
         <select
             id="employee_id"
             name="employee_id"
-            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
             <option value="">Select Employee</option>
 
             @foreach($employees as $employee)
                 <option
                     value="{{ $employee->id }}"
-                    data-salary="{{ $employee->basic_salary }}"
                     {{ old('employee_id', $payroll->employee_id ?? '') == $employee->id ? 'selected' : '' }}>
+
                     {{ $employee->employee_id }} - {{ $employee->name }}
+
                 </option>
             @endforeach
 
         </select>
 
         @error('employee_id')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
 
-    {{-- Bank Account --}}
+    {{-- Payment Account --}}
     <div>
-        <label class="block mb-2 font-medium">
-            Payment Account
+        <label for="bank_account_id" class="block text-sm font-medium text-gray-700 mb-2">
+            Payment Account <span class="text-red-500">*</span>
         </label>
 
         <select
+            id="bank_account_id"
             name="bank_account_id"
-            class="w-full border rounded px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
             <option value="">Select Account</option>
 
@@ -47,7 +49,6 @@
                     {{ old('bank_account_id', $payroll->bank_account_id ?? '') == $account->id ? 'selected' : '' }}>
 
                     {{ $account->account_name }}
-
                     @if($account->type == 'Bank')
                         ({{ $account->bank_name }})
                     @endif
@@ -58,70 +59,65 @@
         </select>
 
         @error('bank_account_id')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
 
     {{-- Month --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="month" class="block text-sm font-medium text-gray-700 mb-2">
             Month
         </label>
 
         <select
+            id="month"
             name="month"
-            class="w-full border rounded px-4 py-2">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
             @foreach(range(1,12) as $month)
                 <option
                     value="{{ $month }}"
                     {{ old('month', $payroll->month ?? date('n')) == $month ? 'selected' : '' }}>
+
                     {{ date('F', mktime(0,0,0,$month,1)) }}
+
                 </option>
             @endforeach
 
         </select>
-
-        @error('month')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-        @enderror
     </div>
 
     {{-- Year --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="year" class="block text-sm font-medium text-gray-700 mb-2">
             Year
         </label>
 
         <input
             type="number"
+            id="year"
             name="year"
             value="{{ old('year', $payroll->year ?? date('Y')) }}"
-            class="w-full border rounded px-4 py-2">
-
-        @error('year')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-        @enderror
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
     </div>
 
     {{-- Basic Salary --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
             Basic Salary
         </label>
 
         <input
-            type="number"
+            type="text"
             id="basic_salary"
-            class="w-full border rounded px-4 py-2 bg-gray-100"
-            value="{{ old('basic_salary', $payroll->basic_salary ?? 0) }}"
             readonly
-            tabindex="-1">
+            value="{{ old('basic_salary', $payroll->basic_salary ?? '0.00') }}"
+            class="w-full rounded-lg bg-gray-100 border-gray-300">
     </div>
 
     {{-- Bonus --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="bonus" class="block text-sm font-medium text-gray-700 mb-2">
             Bonus
         </label>
 
@@ -131,54 +127,96 @@
             id="bonus"
             name="bonus"
             value="{{ old('bonus', $payroll->bonus ?? 0) }}"
-            class="w-full border rounded px-4 py-2">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
         @error('bonus')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
-
-    {{-- Total Salary --}}
+        {{-- Gross Salary --}}
     <div>
-        <label class="block mb-2 font-medium">
-            Total Salary
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Gross Salary
         </label>
 
         <input
-            type="number"
-            id="total_salary"
-            class="w-full border rounded px-4 py-2 bg-gray-100"
-            value="{{ old('total_salary', $payroll->total_salary ?? 0) }}"
+            type="text"
+            id="gross_salary"
             readonly
-            tabindex="-1">
+            value="{{ old('total_salary', $payroll->total_salary ?? '0.00') }}"
+            class="w-full rounded-lg bg-gray-100 border-gray-300">
+    </div>
+
+    {{-- Advance Deduction --}}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Advance Deduction
+        </label>
+
+        <input
+            type="text"
+            id="advance_amount"
+            readonly
+            value="{{ old('advance_amount', $payroll->advance_amount ?? '0.00') }}"
+            class="w-full rounded-lg bg-gray-100 border-gray-300">
+    </div>
+
+    {{-- Loan Deduction --}}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Loan Deduction
+        </label>
+
+        <input
+            type="text"
+            id="loan_amount"
+            readonly
+            value="{{ old('loan_amount', $payroll->loan_amount ?? '0.00') }}"
+            class="w-full rounded-lg bg-gray-100 border-gray-300">
+    </div>
+
+    {{-- Net Salary --}}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Net Salary
+        </label>
+
+        <input
+            type="text"
+            id="net_salary"
+            readonly
+            value="{{ old('net_salary', $payroll->net_salary ?? '0.00') }}"
+            class="w-full rounded-lg bg-gray-100 border-gray-300">
     </div>
 
     {{-- Payment Date --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="payment_date" class="block text-sm font-medium text-gray-700 mb-2">
             Payment Date
         </label>
 
         <input
             type="date"
+            id="payment_date"
             name="payment_date"
             value="{{ old('payment_date', isset($payroll) ? optional($payroll->payment_date)->format('Y-m-d') : '') }}"
-            class="w-full border rounded px-4 py-2">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
         @error('payment_date')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
 
     {{-- Status --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
             Status
         </label>
 
         <select
+            id="status"
             name="status"
-            class="w-full border rounded px-4 py-2">
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
             <option value="Pending"
                 {{ old('status', $payroll->status ?? 'Pending') == 'Pending' ? 'selected' : '' }}>
@@ -193,31 +231,32 @@
         </select>
 
         @error('status')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
 
     {{-- Remarks --}}
     <div>
-        <label class="block mb-2 font-medium">
+        <label for="remarks" class="block text-sm font-medium text-gray-700 mb-2">
             Remarks
         </label>
 
         <textarea
+            id="remarks"
             name="remarks"
             rows="4"
-            class="w-full border rounded px-4 py-2">{{ old('remarks', $payroll->remarks ?? '') }}</textarea>
+            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">{{ old('remarks', $payroll->remarks ?? '') }}</textarea>
 
         @error('remarks')
-            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
         @enderror
     </div>
 
     {{-- Submit --}}
-    <div>
+    <div class="pt-4">
         <button
             type="submit"
-            class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            class="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700">
 
             {{ isset($payroll) ? 'Update Payroll' : 'Save Payroll' }}
 
@@ -225,38 +264,86 @@
     </div>
 
 </div>
-
+|@push('scripts')
 <script>
+console.log('Payroll JS Loaded');
+
 document.addEventListener('DOMContentLoaded', function () {
 
     const employee = document.getElementById('employee_id');
-    const basicSalary = document.getElementById('basic_salary');
+    const month = document.getElementById('month');
+    const year = document.getElementById('year');
     const bonus = document.getElementById('bonus');
-    const totalSalary = document.getElementById('total_salary');
 
-    function calculateTotal() {
-        let basic = parseFloat(basicSalary.value) || 0;
-        let extra = parseFloat(bonus.value) || 0;
+    const basicSalary = document.getElementById('basic_salary');
+    const grossSalary = document.getElementById('gross_salary');
+    const advanceAmount = document.getElementById('advance_amount');
+    const loanAmount = document.getElementById('loan_amount');
+    const netSalary = document.getElementById('net_salary');
 
-        totalSalary.value = (basic + extra).toFixed(2);
-    }
+    console.log(basicSalary);
+    console.log(grossSalary);
+    console.log(advanceAmount);
+    console.log(loanAmount);
+    console.log(netSalary);
 
-    function updateSalary() {
-        const option = employee.options[employee.selectedIndex];
+    function calculatePayroll() {
 
-        if (option && option.dataset.salary) {
-            basicSalary.value = option.dataset.salary;
-        } else {
-            basicSalary.value = 0;
+        console.log('calculatePayroll() called');
+        console.log('Employee:', employee.value);
+
+        if (!employee.value) {
+            basicSalary.value = '0.00';
+            grossSalary.value = '0.00';
+            advanceAmount.value = '0.00';
+            loanAmount.value = '0.00';
+            netSalary.value = '0.00';
+            return;
         }
 
-        calculateTotal();
+        const url =
+            "{{ route('payrolls.calculate') }}"
+            + "?employee_id=" + employee.value
+            + "&month=" + month.value
+            + "&year=" + year.value
+            + "&bonus=" + (bonus.value || 0);
+
+        console.log("URL:", url);
+
+        fetch(url)
+            .then(response => {
+                console.log("Status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+
+                console.log("Response:", data);
+
+                basicSalary.value = parseFloat(data.basic_salary || 0).toFixed(2);
+                grossSalary.value = parseFloat(data.gross_salary || 0).toFixed(2);
+                advanceAmount.value = parseFloat(data.advance_amount || 0).toFixed(2);
+                loanAmount.value = parseFloat(data.loan_amount || 0).toFixed(2);
+                netSalary.value = parseFloat(data.net_salary || 0).toFixed(2);
+
+                console.log("Basic after:", basicSalary.value);
+                console.log("Gross after:", grossSalary.value);
+                console.log("Advance after:", advanceAmount.value);
+                console.log("Loan after:", loanAmount.value);
+                console.log("Net after:", netSalary.value);
+
+            })
+            .catch(error => {
+                console.error("Payroll Calculator Error:", error);
+            });
     }
 
-    employee.addEventListener('change', updateSalary);
-    bonus.addEventListener('input', calculateTotal);
+    employee.addEventListener('change', calculatePayroll);
+    month.addEventListener('change', calculatePayroll);
+    year.addEventListener('change', calculatePayroll);
+    bonus.addEventListener('input', calculatePayroll);
 
-    updateSalary();
+    calculatePayroll();
 
 });
 </script>
+@endpush
