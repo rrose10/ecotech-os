@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\ActivityLogger;
 
 class NoticeController extends Controller
 {
@@ -43,7 +44,15 @@ class NoticeController extends Controller
         $validated['created_by'] = Auth::id();
         $validated['is_published'] = $request->boolean('is_published');
 
-        Notice::create($validated);
+        $notice = Notice::create($validated);
+
+        ActivityLogger::log(
+            'Notice',
+            'Created',
+            'Created notice: ' . $notice->title,
+            null,
+            $notice->toArray()
+        );
 
         return redirect()
             ->route('notices.index')
@@ -80,9 +89,19 @@ class NoticeController extends Controller
             'is_published'   => 'nullable|boolean',
         ]);
 
+        $oldData = $notice->toArray();
+
         $validated['is_published'] = $request->boolean('is_published');
 
         $notice->update($validated);
+
+        ActivityLogger::log(
+            'Notice',
+            'Updated',
+            'Updated notice: ' . $notice->title,
+            $oldData,
+            $notice->fresh()->toArray()
+        );
 
         return redirect()
             ->route('notices.index')
@@ -94,6 +113,14 @@ class NoticeController extends Controller
      */
     public function destroy(Notice $notice)
     {
+        ActivityLogger::log(
+            'Notice',
+            'Deleted',
+            'Deleted notice: ' . $notice->title,
+            $notice->toArray(),
+            null
+        );
+
         $notice->delete();
 
         return redirect()

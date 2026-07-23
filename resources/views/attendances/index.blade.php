@@ -77,7 +77,7 @@
                     </td>
 
                     <td class="p-2">
-                        {{ $attendance->date->format('d M Y') }}
+                        {{ \Carbon\Carbon::parse($attendance->attendance_date)->format('d M Y') }}
                     </td>
 
                     <td class="p-2">
@@ -107,12 +107,12 @@
 
                     <td class="p-2 flex gap-2">
 
-                        <a href="{{ route('attendances.edit',$attendance) }}"
+                        <a href="{{ route('attendances.edit', $attendance) }}"
                            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
                             Edit
                         </a>
 
-                        <form action="{{ route('attendances.destroy',$attendance) }}"
+                        <form action="{{ route('attendances.destroy', $attendance) }}"
                               method="POST"
                               onsubmit="return confirm('Delete this attendance?')">
 

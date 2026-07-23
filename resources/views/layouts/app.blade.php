@@ -127,6 +127,22 @@
                 💰 Incomes
             </a>
 
+            <a href="{{ route('advance-salaries.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('advance-salaries.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💵 Advance Salary
+            </a>
+
+            <a href="{{ route('employee-loans.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('employee-loans.*')
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                💳 Employee Loans
+            </a>
+
             <a href="{{ route('payrolls.index') }}"
                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
                {{ request()->routeIs('payrolls.*')
@@ -155,6 +171,14 @@
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                 📢 Notices
             </a>
+
+            <a href="{{ route('activity-logs.index') }}"
+                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
+                {{ request()->routeIs('activity-logs.*')
+                        ? 'bg-blue-600 text-white shadow'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                    📜 Activity Logs
+                </a>
 
             <div class="px-6 py-2 text-slate-500">
                 💻 Assets
@@ -243,6 +267,12 @@
     </div>
 
 </div>
+
+@stack('scripts')
+
+<script>
+console.log('LAYOUT SCRIPT');
+</script>
 
 </body>
 

@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Leave;
 use App\Models\LeaveType;
 use App\Models\LeaveBalance;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -31,11 +32,11 @@ class LeaveController extends Controller
             ->latest()
             ->paginate(10);
 
-
-        return view('leaves.index', compact('leaves', 'search'));
+        return view('leaves.index', compact(
+            'leaves',
+            'search'
+        ));
     }
-
-
 
     public function create()
     {
@@ -43,19 +44,15 @@ class LeaveController extends Controller
             ->orderBy('name')
             ->get();
 
-
         $leaveTypes = LeaveType::where('status', true)
             ->orderBy('name')
             ->get();
-
 
         return view('leaves.create', compact(
             'employees',
             'leaveTypes'
         ));
     }
-
-
 
     public function store(Request $request)
     {
@@ -73,16 +70,12 @@ class LeaveController extends Controller
 
         ]);
 
-
-
         $totalDays = Carbon::parse($request->from_date)
             ->diffInDays(
                 Carbon::parse($request->to_date)
             ) + 1;
 
-
-
-        Leave::create([
+        $leave = Leave::create([
 
             'employee_id' => $request->employee_id,
 
@@ -100,15 +93,26 @@ class LeaveController extends Controller
 
         ]);
 
+        $leave->load([
+            'employee',
+            'leaveType'
+        ]);
 
+        ActivityLogger::log(
+            'Leave',
+            'Created',
+            'Created leave application for: ' . $leave->employee->name,
+            null,
+            $leave->toArray()
+        );
 
         return redirect()
             ->route('leaves.index')
-            ->with('success','Leave Application Submitted Successfully.');
+            ->with(
+                'success',
+                'Leave Application Submitted Successfully.'
+            );
     }
-
-
-
 
     public function show(Leave $leave)
     {
@@ -117,12 +121,11 @@ class LeaveController extends Controller
             'leaveType'
         ]);
 
-
-        return view('leaves.show', compact('leave'));
+        return view(
+            'leaves.show',
+            compact('leave')
+        );
     }
-
-
-
 
     public function edit(Leave $leave)
     {
@@ -130,26 +133,21 @@ class LeaveController extends Controller
             ->orderBy('name')
             ->get();
 
-
         $leaveTypes = LeaveType::where('status', true)
             ->orderBy('name')
             ->get();
 
-
-        return view('leaves.edit', compact(
-            'leave',
-            'employees',
-            'leaveTypes'
-        ));
+        return view(
+            'leaves.edit',
+            compact(
+                'leave',
+                'employees',
+                'leaveTypes'
+            )
+        );
     }
-
-
-
-
-
-    public function update(Request $request, Leave $leave)
+       public function update(Request $request, Leave $leave)
     {
-
         $request->validate([
 
             'employee_id' => 'required|exists:employees,id',
@@ -166,14 +164,13 @@ class LeaveController extends Controller
 
         ]);
 
-
+        // Old data for Activity Log
+        $oldData = $leave->toArray();
 
         $totalDays = Carbon::parse($request->from_date)
             ->diffInDays(
                 Carbon::parse($request->to_date)
             ) + 1;
-
-
 
         $leave->update([
 
@@ -201,23 +198,35 @@ class LeaveController extends Controller
 
         ]);
 
+        $leave->load([
+            'employee',
+            'leaveType'
+        ]);
 
+        ActivityLogger::log(
+            'Leave',
+            'Updated',
+            'Updated leave application for: ' . $leave->employee->name,
+            $oldData,
+            $leave->fresh()->toArray()
+        );
 
         return redirect()
             ->route('leaves.index')
-            ->with('success','Leave Updated Successfully.');
-
+            ->with(
+                'success',
+                'Leave Updated Successfully.'
+            );
     }
-
-
-
-
 
     public function approve(Leave $leave)
     {
+        $leave->load([
+            'employee',
+            'leaveType'
+        ]);
 
-        $leave->load('leaveType');
-
+        $oldData = $leave->toArray();
 
         $leave->update([
 
@@ -228,8 +237,6 @@ class LeaveController extends Controller
             'approved_at' => now(),
 
         ]);
-
-
 
         $balance = LeaveBalance::firstOrCreate(
 
@@ -255,33 +262,39 @@ class LeaveController extends Controller
 
         );
 
-
-
         $balance->increment(
             'used_days',
             $leave->total_days
         );
-
 
         $balance->decrement(
             'remaining_days',
             $leave->total_days
         );
 
-
+        ActivityLogger::log(
+            'Leave',
+            'Approved',
+            'Approved leave for: ' . $leave->employee->name,
+            $oldData,
+            $leave->fresh()->toArray()
+        );
 
         return redirect()
             ->route('leaves.index')
-            ->with('success','Leave Approved Successfully.');
-
-    }
-
-
-
-
-
-    public function reject(Request $request, Leave $leave)
+            ->with(
+                'success',
+                'Leave Approved Successfully.'
+            );
+    } 
+        public function reject(Request $request, Leave $leave)
     {
+        $oldData = $leave->toArray();
+
+        $leave->load([
+            'employee',
+            'leaveType'
+        ]);
 
         $leave->update([
 
@@ -295,28 +308,45 @@ class LeaveController extends Controller
 
         ]);
 
-
+        ActivityLogger::log(
+            'Leave',
+            'Rejected',
+            'Rejected leave for: ' . $leave->employee->name,
+            $oldData,
+            $leave->fresh()->toArray()
+        );
 
         return redirect()
             ->route('leaves.index')
-            ->with('success','Leave Rejected Successfully.');
-
+            ->with(
+                'success',
+                'Leave Rejected Successfully.'
+            );
     }
-
-
-
-
 
     public function destroy(Leave $leave)
     {
+        $leave->load([
+            'employee',
+            'leaveType'
+        ]);
+
+        ActivityLogger::log(
+            'Leave',
+            'Deleted',
+            'Deleted leave application for: ' . $leave->employee->name,
+            $leave->toArray(),
+            null
+        );
 
         $leave->delete();
 
-
         return redirect()
             ->route('leaves.index')
-            ->with('success','Leave Deleted Successfully.');
-
+            ->with(
+                'success',
+                'Leave Deleted Successfully.'
+            );
     }
 
 }

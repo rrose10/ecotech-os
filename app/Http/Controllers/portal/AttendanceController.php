@@ -22,9 +22,10 @@ class AttendanceController extends Controller
             ]);
         }
 
-        $todayAttendance = $employee->attendances()
-            ->whereDate('attendance_date', today())
-            ->first();
+            $todayAttendance = $employee->attendances()
+                ->whereDate('attendance_date', Carbon::today())
+                ->latest()
+                ->first();
 
         $attendances = $employee->attendances()
             ->latest('attendance_date')
@@ -67,8 +68,11 @@ class AttendanceController extends Controller
             'employee_id'     => $employee->id,
             'attendance_date' => today(),
             'check_in'        => $now,
+            'break_start'     => null,
+            'break_end'       => null,
             'check_out'       => null,
             'working_minutes' => 0,
+            'break_minutes'   => 0,
             'late_minutes'    => $lateMinutes,
             'status'          => $status,
             'shift'           => 'Night',
@@ -78,6 +82,73 @@ class AttendanceController extends Controller
         return redirect()
             ->route('portal.dashboard')
             ->with('success', 'Checked in successfully.');
+    }
+
+    public function startBreak(Request $request)
+    {
+        $employee = Auth::user()->employee;
+
+        if (!$employee) {
+            return back()->with('error', 'Employee profile not found.');
+        }
+
+        $attendance = $employee->attendances()
+            ->whereDate('attendance_date', today())
+            ->first();
+
+        if (!$attendance) {
+            return back()->with('error', 'Please check in first.');
+        }
+
+        if ($attendance->break_start) {
+            return back()->with('error', 'Dinner break already started.');
+        }
+
+        if ($attendance->check_out) {
+            return back()->with('error', 'You have already checked out.');
+        }
+
+        $attendance->update([
+            'break_start' => now(),
+        ]);
+
+        return back()->with('success', 'Dinner break started.');
+    }
+
+    public function endBreak(Request $request)
+    {
+        $employee = Auth::user()->employee;
+
+        if (!$employee) {
+            return back()->with('error', 'Employee profile not found.');
+        }
+
+        $attendance = $employee->attendances()
+            ->whereDate('attendance_date', today())
+            ->first();
+
+        if (!$attendance) {
+            return back()->with('error', 'Attendance not found.');
+        }
+
+        if (!$attendance->break_start) {
+            return back()->with('error', 'Dinner break has not started.');
+        }
+
+        if ($attendance->break_end) {
+            return back()->with('error', 'Dinner break already ended.');
+        }
+
+        $breakEnd = now();
+
+        $attendance->update([
+            'break_end'     => $breakEnd,
+            'break_minutes' => round(
+                $attendance->break_start->diffInMinutes($breakEnd)
+            ),
+        ]);
+
+        return back()->with('success', 'Dinner break ended.');
     }
 
     public function checkOut(Request $request)
@@ -102,9 +173,18 @@ class AttendanceController extends Controller
 
         $now = Carbon::now();
 
+        $totalMinutes = $attendance->check_in->diffInMinutes($now);
+
+        $breakMinutes = round($attendance->break_minutes ?? 0);
+
+        $workingMinutes = max(
+            0,
+            $totalMinutes - $breakMinutes
+        );
+
         $attendance->update([
-            'check_out' => $now,
-            'working_minutes' => $attendance->check_in->diffInMinutes($now),
+            'check_out'       => $now,
+            'working_minutes' => $workingMinutes,
         ]);
 
         return redirect()

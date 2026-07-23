@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
@@ -35,12 +36,20 @@ class DepartmentController extends Controller
             'code' => 'required|unique:departments',
         ]);
 
-        Department::create([
+        $department = Department::create([
             'name' => $request->name,
             'code' => $request->code,
             'description' => $request->description,
             'status' => true,
         ]);
+
+        ActivityLogger::log(
+            'Department',
+            'Created',
+            'Created department: ' . $department->name,
+            null,
+            $department->toArray()
+        );
 
         return redirect()
             ->route('departments.index')
@@ -73,11 +82,22 @@ class DepartmentController extends Controller
             'code' => 'required|unique:departments,code,' . $department->id,
         ]);
 
+        // Old data for Activity Log
+        $oldData = $department->toArray();
+
         $department->update([
             'name' => $request->name,
             'code' => $request->code,
             'description' => $request->description,
         ]);
+
+        ActivityLogger::log(
+            'Department',
+            'Updated',
+            'Updated department: ' . $department->name,
+            $oldData,
+            $department->fresh()->toArray()
+        );
 
         return redirect()
             ->route('departments.index')
@@ -89,6 +109,14 @@ class DepartmentController extends Controller
      */
     public function destroy(Department $department)
     {
+        ActivityLogger::log(
+            'Department',
+            'Deleted',
+            'Deleted department: ' . $department->name,
+            $department->toArray(),
+            null
+        );
+
         $department->delete();
 
         return redirect()

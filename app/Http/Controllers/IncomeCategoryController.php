@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\IncomeCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -23,7 +24,10 @@ class IncomeCategoryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('income_categories.index', compact('incomeCategories', 'search'));
+        return view('income_categories.index', compact(
+            'incomeCategories',
+            'search'
+        ));
     }
 
     /**
@@ -44,7 +48,15 @@ class IncomeCategoryController extends Controller
             'status' => 'required|boolean',
         ]);
 
-        IncomeCategory::create($validated);
+        $incomeCategory = IncomeCategory::create($validated);
+
+        ActivityLogger::log(
+            'Income Category',
+            'Created',
+            'Created income category: ' . $incomeCategory->name,
+            null,
+            $incomeCategory->toArray()
+        );
 
         return redirect()
             ->route('income-categories.index')
@@ -82,7 +94,18 @@ class IncomeCategoryController extends Controller
             'status' => 'required|boolean',
         ]);
 
+        // Old data for Activity Log
+        $oldData = $incomeCategory->toArray();
+
         $incomeCategory->update($validated);
+
+        ActivityLogger::log(
+            'Income Category',
+            'Updated',
+            'Updated income category: ' . $incomeCategory->name,
+            $oldData,
+            $incomeCategory->fresh()->toArray()
+        );
 
         return redirect()
             ->route('income-categories.index')
@@ -94,6 +117,14 @@ class IncomeCategoryController extends Controller
      */
     public function destroy(IncomeCategory $incomeCategory)
     {
+        ActivityLogger::log(
+            'Income Category',
+            'Deleted',
+            'Deleted income category: ' . $incomeCategory->name,
+            $incomeCategory->toArray(),
+            null
+        );
+
         $incomeCategory->delete();
 
         return redirect()

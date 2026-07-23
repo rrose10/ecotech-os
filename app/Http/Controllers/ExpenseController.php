@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BankAccount;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +27,10 @@ class ExpenseController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('expenses.index', compact('expenses', 'search'));
+        return view('expenses.index', compact(
+            'expenses',
+            'search'
+        ));
     }
 
     public function create()
@@ -59,13 +63,27 @@ class ExpenseController extends Controller
 
         DB::transaction(function () use ($validated) {
 
-            Expense::create([
+            $expense = Expense::create([
                 ...$validated,
                 'created_by' => auth()->id(),
             ]);
 
             BankAccount::find($validated['bank_account_id'])
                 ->decrement('current_balance', $validated['amount']);
+
+            $expense->load([
+                'expenseCategory',
+                'bankAccount',
+                'creator'
+            ]);
+
+            ActivityLogger::log(
+                'Expense',
+                'Created',
+                'Created expense: ' . $expense->title,
+                null,
+                $expense->toArray()
+            );
         });
 
         return redirect()
@@ -102,15 +120,33 @@ class ExpenseController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($expense, $validated) {
+        $oldData = $expense->toArray();
 
+        DB::transaction(function () use ($expense, $validated, $oldData) {
+
+            // Restore old balance
             BankAccount::find($expense->bank_account_id)
                 ->increment('current_balance', $expense->amount);
 
             $expense->update($validated);
 
+            // Deduct new balance
             BankAccount::find($expense->bank_account_id)
                 ->decrement('current_balance', $expense->amount);
+
+            $expense->load([
+                'expenseCategory',
+                'bankAccount',
+                'creator'
+            ]);
+
+            ActivityLogger::log(
+                'Expense',
+                'Updated',
+                'Updated expense: ' . $expense->title,
+                $oldData,
+                $expense->fresh()->toArray()
+            );
         });
 
         return redirect()
@@ -120,6 +156,20 @@ class ExpenseController extends Controller
 
     public function destroy(Expense $expense)
     {
+        $expense->load([
+            'expenseCategory',
+            'bankAccount',
+            'creator'
+        ]);
+
+        ActivityLogger::log(
+            'Expense',
+            'Deleted',
+            'Deleted expense: ' . $expense->title,
+            $expense->toArray(),
+            null
+        );
+
         DB::transaction(function () use ($expense) {
 
             BankAccount::find($expense->bank_account_id)

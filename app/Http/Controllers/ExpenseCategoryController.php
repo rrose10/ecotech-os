@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ExpenseCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -22,7 +23,10 @@ class ExpenseCategoryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('expense-categories.index', compact('expenseCategories', 'search'));
+        return view('expense-categories.index', compact(
+            'expenseCategories',
+            'search'
+        ));
     }
 
     /**
@@ -43,7 +47,15 @@ class ExpenseCategoryController extends Controller
             'status' => 'required|boolean',
         ]);
 
-        ExpenseCategory::create($validated);
+        $expenseCategory = ExpenseCategory::create($validated);
+
+        ActivityLogger::log(
+            'Expense Category',
+            'Created',
+            'Created expense category: ' . $expenseCategory->name,
+            null,
+            $expenseCategory->toArray()
+        );
 
         return redirect()
             ->route('expense-categories.index')
@@ -81,7 +93,18 @@ class ExpenseCategoryController extends Controller
             'status' => 'required|boolean',
         ]);
 
+        // Old data for Activity Log
+        $oldData = $expenseCategory->toArray();
+
         $expenseCategory->update($validated);
+
+        ActivityLogger::log(
+            'Expense Category',
+            'Updated',
+            'Updated expense category: ' . $expenseCategory->name,
+            $oldData,
+            $expenseCategory->fresh()->toArray()
+        );
 
         return redirect()
             ->route('expense-categories.index')
@@ -93,6 +116,14 @@ class ExpenseCategoryController extends Controller
      */
     public function destroy(ExpenseCategory $expenseCategory)
     {
+        ActivityLogger::log(
+            'Expense Category',
+            'Deleted',
+            'Deleted expense category: ' . $expenseCategory->name,
+            $expenseCategory->toArray(),
+            null
+        );
+
         $expenseCategory->delete();
 
         return redirect()

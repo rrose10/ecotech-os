@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BankAccount;
 use App\Models\Income;
 use App\Models\IncomeCategory;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class IncomeController extends Controller
@@ -28,7 +29,10 @@ class IncomeController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('incomes.index', compact('incomes', 'search'));
+        return view('incomes.index', compact(
+            'incomes',
+            'search'
+        ));
     }
 
     /**
@@ -37,7 +41,9 @@ class IncomeController extends Controller
     public function create()
     {
         $incomeCategories = IncomeCategory::active()->get();
-        $bankAccounts = BankAccount::where('is_active', true)->get();
+
+        $bankAccounts = BankAccount::where('is_active', true)
+            ->get();
 
         return view('incomes.create', compact(
             'incomeCategories',
@@ -85,6 +91,20 @@ class IncomeController extends Controller
                 ?->increment('current_balance', $income->amount_bdt);
         }
 
+        $income->load([
+            'incomeCategory',
+            'bankAccount',
+            'creator'
+        ]);
+
+        ActivityLogger::log(
+            'Income',
+            'Created',
+            'Created income: ' . $income->title,
+            null,
+            $income->toArray()
+        );
+
         return redirect()
             ->route('incomes.index')
             ->with('success', 'Income created successfully.');
@@ -104,7 +124,9 @@ class IncomeController extends Controller
     public function edit(Income $income)
     {
         $incomeCategories = IncomeCategory::active()->get();
-        $bankAccounts = BankAccount::where('is_active', true)->get();
+
+        $bankAccounts = BankAccount::where('is_active', true)
+            ->get();
 
         return view('incomes.edit', compact(
             'income',
@@ -143,6 +165,9 @@ class IncomeController extends Controller
                 ->withInput();
         }
 
+        // Old data for Activity Log
+        $oldData = $income->toArray();
+
         // Remove previous BDT amount from previous account
         if ($income->amount_bdt > 0) {
             BankAccount::find($income->bank_account_id)
@@ -157,6 +182,20 @@ class IncomeController extends Controller
                 ?->increment('current_balance', $income->amount_bdt);
         }
 
+        $income->load([
+            'incomeCategory',
+            'bankAccount',
+            'creator'
+        ]);
+
+        ActivityLogger::log(
+            'Income',
+            'Updated',
+            'Updated income: ' . $income->title,
+            $oldData,
+            $income->fresh()->toArray()
+        );
+
         return redirect()
             ->route('incomes.index')
             ->with('success', 'Income updated successfully.');
@@ -167,6 +206,20 @@ class IncomeController extends Controller
      */
     public function destroy(Income $income)
     {
+        $income->load([
+            'incomeCategory',
+            'bankAccount',
+            'creator'
+        ]);
+
+        ActivityLogger::log(
+            'Income',
+            'Deleted',
+            'Deleted income: ' . $income->title,
+            $income->toArray(),
+            null
+        );
+
         if ($income->amount_bdt > 0) {
             BankAccount::find($income->bank_account_id)
                 ?->decrement('current_balance', $income->amount_bdt);

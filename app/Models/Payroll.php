@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Payroll extends Model
@@ -15,7 +16,10 @@ class Payroll extends Model
         'year',
         'basic_salary',
         'bonus',
+        'advance_amount',
+        'loan_amount',
         'total_salary',
+        'net_salary',
         'payment_date',
         'status',
         'remarks',
@@ -23,10 +27,13 @@ class Payroll extends Model
     ];
 
     protected $casts = [
-        'basic_salary' => 'decimal:2',
-        'bonus' => 'decimal:2',
-        'total_salary' => 'decimal:2',
-        'payment_date' => 'date',
+        'basic_salary'    => 'decimal:2',
+        'bonus'           => 'decimal:2',
+        'advance_amount'  => 'decimal:2',
+        'loan_amount'     => 'decimal:2',
+        'total_salary'    => 'decimal:2',
+        'net_salary'      => 'decimal:2',
+        'payment_date'    => 'date',
     ];
 
     /**
@@ -46,11 +53,19 @@ class Payroll extends Model
     }
 
     /**
-     * Expense
+     * Salary Expense
      */
     public function expense(): HasOne
     {
         return $this->hasOne(Expense::class);
+    }
+
+    /**
+     * Advance Salaries deducted in this payroll
+     */
+    public function advanceSalaries(): HasMany
+    {
+        return $this->hasMany(AdvanceSalary::class);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BankAccount;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -16,17 +17,20 @@ class BankAccountController extends Controller
         $search = $request->search;
 
         $accounts = BankAccount::when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('account_name', 'like', "%{$search}%")
-                    ->orWhere('bank_name', 'like', "%{$search}%")
-                    ->orWhere('account_number', 'like', "%{$search}%");
-            });
-        })
-        ->latest()
-        ->paginate(10)
-        ->withQueryString();
+                $query->where(function ($q) use ($search) {
+                    $q->where('account_name', 'like', "%{$search}%")
+                        ->orWhere('bank_name', 'like', "%{$search}%")
+                        ->orWhere('account_number', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        return view('bank_accounts.index', compact('accounts', 'search'));
+        return view('bank_accounts.index', compact(
+            'accounts',
+            'search'
+        ));
     }
 
     /**
@@ -54,7 +58,15 @@ class BankAccountController extends Controller
 
         $validated['current_balance'] = $validated['opening_balance'];
 
-        BankAccount::create($validated);
+        $bankAccount = BankAccount::create($validated);
+
+        ActivityLogger::log(
+            'Bank Account',
+            'Created',
+            'Created bank account: ' . $bankAccount->account_name,
+            null,
+            $bankAccount->toArray()
+        );
 
         return redirect()
             ->route('bank-accounts.index')
@@ -97,11 +109,22 @@ class BankAccountController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Old data for Activity Log
+        $oldData = $bankAccount->toArray();
+
         $difference = $validated['opening_balance'] - $bankAccount->opening_balance;
 
         $validated['current_balance'] = $bankAccount->current_balance + $difference;
 
         $bankAccount->update($validated);
+
+        ActivityLogger::log(
+            'Bank Account',
+            'Updated',
+            'Updated bank account: ' . $bankAccount->account_name,
+            $oldData,
+            $bankAccount->fresh()->toArray()
+        );
 
         return redirect()
             ->route('bank-accounts.index')
@@ -122,6 +145,14 @@ class BankAccountController extends Controller
                 ->route('bank-accounts.index')
                 ->with('error', 'This bank account is already used and cannot be deleted.');
         }
+
+        ActivityLogger::log(
+            'Bank Account',
+            'Deleted',
+            'Deleted bank account: ' . $bankAccount->account_name,
+            $bankAccount->toArray(),
+            null
+        );
 
         $bankAccount->delete();
 

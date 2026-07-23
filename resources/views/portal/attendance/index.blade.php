@@ -26,23 +26,37 @@
             <div>
                 <p class="text-sm text-slate-500">Status</p>
 
-                @if($status === 'present')
-                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                        Present
-                    </span>
-                @elseif($status === 'absent')
-                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-                        Absent
-                    </span>
-                @elseif($status === 'leave')
-                    <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
-                        Leave
-                    </span>
-                @else
-                    <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                        No Record
-                    </span>
-                @endif
+            @if($status === 'present')
+
+                <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                    Present
+                </span>
+
+            @elseif($status === 'late')
+
+                <span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
+                    Late
+                </span>
+
+            @elseif($status === 'absent')
+
+                <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
+                    Absent
+                </span>
+
+            @elseif($status === 'leave')
+
+                <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
+                    Leave
+                </span>
+
+            @else
+
+                <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+                    No Record
+                </span>
+
+            @endif
             </div>
 
             <div>
@@ -86,7 +100,16 @@
                 <p class="text-sm text-slate-500">Late</p>
 
                 <p class="mt-2 font-semibold">
-                    {{ $todayAttendance->late_minutes ?? 0 }} min
+                    @if($todayAttendance && $todayAttendance->late_minutes)
+
+                        {{ floor($todayAttendance->late_minutes / 60) }}h
+                        {{ round($todayAttendance->late_minutes % 60) }}m
+
+                    @else
+
+                        --
+
+                    @endif
                 </p>
             </div>
 
@@ -180,7 +203,16 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ $attendance->late_minutes }} min
+                                @if($attendance->late_minutes)
+
+                                    {{ floor($attendance->late_minutes / 60) }}h
+                                    {{ round($attendance->late_minutes % 60) }}m
+
+                                @else
+
+                                    --
+
+                                @endif
                             </td>
 
                             <td class="px-6 py-4">

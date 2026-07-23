@@ -10,10 +10,16 @@ class Attendance extends Model
     protected $fillable = [
         'employee_id',
         'attendance_date',
+
         'check_in',
+        'break_start',
+        'break_end',
         'check_out',
+
         'working_minutes',
+        'break_minutes',
         'late_minutes',
+
         'status',
         'shift',
         'remarks',
@@ -21,8 +27,11 @@ class Attendance extends Model
 
     protected $casts = [
         'attendance_date' => 'date',
-        'check_in'        => 'datetime',
-        'check_out'       => 'datetime',
+
+        'check_in' => 'datetime',
+        'break_start' => 'datetime',
+        'break_end' => 'datetime',
+        'check_out' => 'datetime',
     ];
 
     public function employee(): BelongsTo

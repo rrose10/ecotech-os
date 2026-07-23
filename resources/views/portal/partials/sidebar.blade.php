@@ -1,25 +1,27 @@
 <aside class="flex h-screen w-64 flex-col bg-slate-900 text-white">
 
-    <!-- Logo -->
+    {{-- Logo --}}
     <div class="border-b border-slate-800 px-6 py-6">
+
         <h1 class="text-2xl font-bold tracking-wide">
             EcoTech OS
         </h1>
 
         <p class="mt-1 text-sm text-slate-400">
-            Employee Portal
+            Team Portal
         </p>
+
     </div>
 
-    <!-- Menu -->
+    {{-- Menu --}}
     <nav class="flex-1 space-y-2 px-4 py-6">
 
-        <!-- Dashboard -->
+        {{-- Dashboard --}}
         <a href="{{ route('portal.dashboard') }}"
            class="flex items-center rounded-xl px-4 py-3 transition
            {{ request()->routeIs('portal.dashboard')
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-200 hover:bg-slate-800 hover:text-white' }}">
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
             <span class="mr-3 text-lg">🏠</span>
 
@@ -27,12 +29,12 @@
 
         </a>
 
-        <!-- My Profile -->
+        {{-- My Profile --}}
         <a href="{{ route('portal.profile') }}"
            class="flex items-center rounded-xl px-4 py-3 transition
            {{ request()->routeIs('portal.profile')
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-200 hover:bg-slate-800 hover:text-white' }}">
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
             <span class="mr-3 text-lg">👤</span>
 
@@ -40,52 +42,63 @@
 
         </a>
 
-        <!-- Attendance -->
+        {{-- My Attendance --}}
         <a href="{{ route('portal.attendance') }}"
            class="flex items-center rounded-xl px-4 py-3 transition
            {{ request()->routeIs('portal.attendance')
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-200 hover:bg-slate-800 hover:text-white' }}">
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
             <span class="mr-3 text-lg">🕒</span>
 
-            Attendance
+            My Attendance
 
         </a>
 
-        <!-- Salary -->
+        {{-- My Payroll --}}
         <a href="{{ route('portal.salary') }}"
            class="flex items-center rounded-xl px-4 py-3 transition
            {{ request()->routeIs('portal.salary')
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-200 hover:bg-slate-800 hover:text-white' }}">
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
             <span class="mr-3 text-lg">💰</span>
 
-            Salary
+            My Payroll
 
         </a>
 
-        <!-- Notices -->
-        <a href="#"
-           class="flex items-center rounded-xl px-4 py-3 transition text-slate-200 hover:bg-slate-800 hover:text-white">
+        {{-- Team Notices --}}
+        <a href="{{ route('portal.notices') }}"
+           class="flex items-center rounded-xl px-4 py-3 transition
+           {{ request()->routeIs('portal.notices*')
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
 
             <span class="mr-3 text-lg">📢</span>
 
-            Notices
-
-        </a>
-
-        <!-- Settings -->
-        <a href="#"
-           class="flex items-center rounded-xl px-4 py-3 transition text-slate-200 hover:bg-slate-800 hover:text-white">
-
-            <span class="mr-3 text-lg">⚙️</span>
-
-            Settings
+            Team Notices
 
         </a>
 
     </nav>
+
+    {{-- Footer --}}
+    <div class="border-t border-slate-800 p-4">
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+
+            <button
+                type="submit"
+                class="flex w-full items-center justify-center rounded-xl bg-red-600 px-4 py-3 font-medium transition hover:bg-red-700">
+
+                🚪 Logout
+
+            </button>
+
+        </form>
+
+    </div>
 
 </aside>

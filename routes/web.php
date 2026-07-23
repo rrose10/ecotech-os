@@ -18,6 +18,9 @@ use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\NoticeController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AdvanceSalaryController;
+use App\Http\Controllers\EmployeeLoanController;
 
 
 /*
@@ -32,10 +35,6 @@ Route::get('/', function () {
 
 });
 
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
@@ -44,16 +43,11 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
 
-
-
     // Main Dashboard
 
     Route::get('/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');
-
-
-
 
     // Employee Dashboard
 
@@ -61,243 +55,234 @@ Route::middleware(['auth'])->group(function () {
         [EmployeeDashboardController::class, 'index']
     )->name('employee.dashboard');
 
-
-
-
-
     // Profile
 
     Route::get('/profile',
         [ProfileController::class, 'edit']
     )->name('profile.edit');
 
-
-
     Route::patch('/profile',
         [ProfileController::class, 'update']
     )->name('profile.update');
-
-
 
     Route::delete('/profile',
         [ProfileController::class, 'destroy']
     )->name('profile.destroy');
 
-
-
 });
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
-| Super Admin & Admin Routes
+| Super Admin Routes
 |--------------------------------------------------------------------------
 */
 
+Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
-Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Logs
+    |--------------------------------------------------------------------------
+    */
 
+    Route::resource(
+        'activity-logs',
+        ActivityLogController::class
+    )->only(['index']);
 
-
-    // Departments
+    /*
+    |--------------------------------------------------------------------------
+    | Departments
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'departments',
         DepartmentController::class
     );
 
-
-
-
-
-    // Employees
+    /*
+    |--------------------------------------------------------------------------
+    | Employees
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'employees',
         EmployeeController::class
     );
 
-
-
-
-
-
-
-    // Attendance
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'attendances',
         AttendanceController::class
     );
 
-
-
-
-
-
-
-
-    // Leave Types
+    /*
+    |--------------------------------------------------------------------------
+    | Leave Types
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'leave-types',
         LeaveTypeController::class
     );
 
-
-
-    // Leaves
+    /*
+    |--------------------------------------------------------------------------
+    | Leaves
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'leaves',
         LeaveController::class
     );
 
-
-
-
-    // Approve Leave
-
     Route::post(
         '/leaves/{leave}/approve',
         [LeaveController::class, 'approve']
     )->name('leaves.approve');
-
-
-
-
-
-    // Reject Leave
 
     Route::post(
         '/leaves/{leave}/reject',
         [LeaveController::class, 'reject']
     )->name('leaves.reject');
 
-
-
-
-
-
-
-
-    // Leave Balance
-
+    /*
+    |--------------------------------------------------------------------------
+    | Leave Balance
+    |--------------------------------------------------------------------------
+    */
 
     Route::get(
         '/leave-balances',
         [LeaveBalanceController::class, 'index']
     )->name('leave-balances.index');
 
-
-
     Route::get(
         '/leave-balances/{employee}',
         [LeaveBalanceController::class, 'show']
     )->name('leave-balances.show');
 
-
-
-
-
-
-
-
-
-
-    // Expenses
-
+    /*
+    |--------------------------------------------------------------------------
+    | Expenses
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'expense-categories',
         ExpenseCategoryController::class
     );
 
-
-
     Route::resource(
         'expenses',
         ExpenseController::class
     );
 
-
-
-
-
-
-
-
-
-    // Income
-
+    /*
+    |--------------------------------------------------------------------------
+    | Income
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'income-categories',
         IncomeCategoryController::class
     );
 
-
-
     Route::resource(
         'incomes',
         IncomeController::class
     );
 
-
-
-
-
-
-
-
-
-    // Payroll
-
+    /*
+    |--------------------------------------------------------------------------
+    | Payroll
+    |--------------------------------------------------------------------------
+    */
 
     Route::get(
         '/payrolls/employee/{employee}',
         [PayrollController::class, 'employeeSalary']
     )->name('payrolls.employee.salary');
 
-
+    // AJAX Payroll Calculator
+    Route::get(
+        '/payrolls/calculate',
+        [PayrollController::class, 'calculate']
+    )->name('payrolls.calculate');
 
     Route::resource(
         'payrolls',
         PayrollController::class
     );
 
+    /*
+    |--------------------------------------------------------------------------
+    | Advance Salary
+    |--------------------------------------------------------------------------
+    */
 
+    Route::resource(
+        'advance-salaries',
+        AdvanceSalaryController::class
+    );
 
+    /*
+    |--------------------------------------------------------------------------
+    | Employee Loans
+    |--------------------------------------------------------------------------
+    */
 
+    Route::resource(
+        'employee-loans',
+        EmployeeLoanController::class
+    );
 
-
-
-
-
-    // Bank Accounts
-
+        /*
+    |--------------------------------------------------------------------------
+    | Bank Accounts
+    |--------------------------------------------------------------------------
+    */
 
     Route::resource(
         'bank-accounts',
         BankAccountController::class
     );
 
+    /*
+    |--------------------------------------------------------------------------
+    | Notices
+    |--------------------------------------------------------------------------
+    */
 
-    Route::resource('notices', NoticeController::class);
-
-
+    Route::resource(
+        'notices',
+        NoticeController::class
+    );
 
 });
 
-
-
-
-
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 
 require __DIR__.'/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| Employee Portal Routes
+|--------------------------------------------------------------------------
+*/
+
 require __DIR__.'/portal.php';
