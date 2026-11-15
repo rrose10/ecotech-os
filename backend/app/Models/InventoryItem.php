@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class InventoryItem extends Model
+{
+    protected $fillable = ['sku', 'name', 'unit', 'quantity', 'reorder_level', 'notes'];
+
+    public function movements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class)->latest();
+    }
+
+    public function isLow(): bool
+    {
+        return $this->quantity <= $this->reorder_level;
+    }
+}

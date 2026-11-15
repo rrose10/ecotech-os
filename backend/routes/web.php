@@ -290,6 +290,39 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Assets, Inventory, Reports (Super Admin + Admin)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
+
+    Route::resource('assets', \App\Http\Controllers\AssetController::class)->except(['show']);
+
+    Route::post('/inventory-items/{inventory_item}/move', [\App\Http\Controllers\InventoryItemController::class, 'move'])
+        ->name('inventory-items.move');
+    Route::resource('inventory-items', \App\Http\Controllers\InventoryItemController::class);
+
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+        Route::get('/finance', [\App\Http\Controllers\ReportController::class, 'finance'])->name('finance');
+        Route::get('/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('attendance');
+        Route::get('/payroll', [\App\Http\Controllers\ReportController::class, 'payroll'])->name('payroll');
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Settings (Super Admin only)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/settings', [\App\Http\Controllers\SettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Authentication Routes
 |--------------------------------------------------------------------------
 */
