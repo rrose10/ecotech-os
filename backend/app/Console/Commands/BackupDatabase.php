@@ -36,15 +36,16 @@ class BackupDatabase extends Command
         } elseif (in_array($config['driver'], ['mysql', 'mariadb'], true)) {
 
             $target  = "{$dir}/ecotech_{$stamp}.sql";
-            $process = new Process([
+            $process = new Process(array_filter([
                 'mysqldump',
                 '--single-transaction',
+                env('DB_DUMP_SKIP_SSL') ? '--skip-ssl' : null,
                 '--host=' . $config['host'],
                 '--port=' . $config['port'],
                 '--user=' . $config['username'],
                 '--result-file=' . $target,
                 $config['database'],
-            ], null, ['MYSQL_PWD' => (string) $config['password']]);
+            ]), null, ['MYSQL_PWD' => (string) $config['password']]);
 
             $process->setTimeout(600)->run();
 

@@ -16,6 +16,12 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Force https:// links in production. Turn off (FORCE_HTTPS=false) only when
+    | the app is served over plain http on a trusted office network.
+    */
+    'force_https' => (bool) env('FORCE_HTTPS', true),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
