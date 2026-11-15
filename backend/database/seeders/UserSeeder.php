@@ -24,30 +24,21 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Admin 1
+        // Super Admin 2
         User::create([
             'name' => 'Rejwanul Islam',
             'email' => 'rejwanul@ecotech.com',
             'password' => Hash::make('12345678'),
-            'role' => 'admin',
+            'role' => 'super_admin',
             'email_verified_at' => now(),
         ]);
 
-        // Admin 2
+        // Super Admin 3
         User::create([
             'name' => 'Office Admin',
             'email' => 'manager@ecotech.com',
             'password' => Hash::make('12345678'),
-            'role' => 'admin',
-            'email_verified_at' => now(),
-        ]);
-
-        // HR
-        User::create([
-            'name' => 'HR Manager',
-            'email' => 'hr@ecotech.com',
-            'password' => Hash::make('12345678'),
-            'role' => 'hr',
+            'role' => 'super_admin',
             'email_verified_at' => now(),
         ]);
 
