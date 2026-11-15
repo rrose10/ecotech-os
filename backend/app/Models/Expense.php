@@ -55,4 +55,16 @@ class Expense extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /**
+     * Expenses created automatically by Payroll, Advance Salary or
+     * Employee Loan. They must be changed from their own module only,
+     * otherwise bank balances and payroll status go out of sync.
+     */
+    public function isSystemManaged(): bool
+    {
+        return $this->payroll_id !== null
+            || ($this->getAttribute('advance_salary_id') !== null)
+            || EmployeeLoan::where('expense_id', $this->id)->exists();
+    }
 }

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('employee_loans', 'paid_installments')) {
+            return; // column already created by an earlier migration
+        }
+
         Schema::table('employee_loans', function (Blueprint $table) {
 
             $table->integer('paid_installments')

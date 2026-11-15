@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('leave_types', 'is_paid')) {
+            return; // column already created by an earlier migration
+        }
+
         Schema::table('leave_types', function (Blueprint $table) {
 
             $table->boolean('is_paid')

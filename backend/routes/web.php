@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard',
         [DashboardController::class, 'index']
-    )->name('dashboard');
+    )->middleware('role:super_admin,admin')->name('dashboard');
 
     // Employee Dashboard
 
@@ -81,7 +81,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Activity Logs
+    | Activity Logs (Super Admin only)
     |--------------------------------------------------------------------------
     */
 
@@ -89,6 +89,16 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
         'activity-logs',
         ActivityLogController::class
     )->only(['index']);
+
+});
+
+/*
+|--------------------------------------------------------------------------
+| Management Routes (Super Admin + Admin)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------

@@ -17,7 +17,13 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        if (! in_array(auth()->user()->role, $roles)) {
+        if (! in_array(auth()->user()->role, $roles, true)) {
+
+            // Employees who open an admin URL go to their own portal
+            if (auth()->user()->isEmployee() && $request->isMethod('GET')) {
+                return redirect()->route('portal.dashboard');
+            }
+
             abort(403, 'Unauthorized Access');
         }
 
