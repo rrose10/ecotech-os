@@ -111,7 +111,7 @@
                 </button>
                 <div>
                     <h2 class="text-xl font-extrabold tracking-tight lg:text-2xl">
-                        @yield('page_title', 'Dashboard')
+                        @hasSection('page_title')@yield('page_title')@elseif(View::hasSection('title'))@yield('title')@else Dashboard @endif
                     </h2>
                     <p class="hidden text-sm text-gray-500 sm:block">
                         {{ now()->format('l, d F Y') }}
