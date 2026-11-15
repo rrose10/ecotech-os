@@ -94,11 +94,13 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Management Routes (Super Admin + Admin)
+| Management Routes (Super Admin + Admin + HR)
+| HR: people modules only (employees, attendance, leaves, notices).
+| Finance modules are nested below and stay Super Admin + Admin only.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
+Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
@@ -181,92 +183,97 @@ Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
         [LeaveBalanceController::class, 'show']
     )->name('leave-balances.show');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Expenses
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'expense-categories',
-        ExpenseCategoryController::class
-    );
-
-    Route::resource(
-        'expenses',
-        ExpenseController::class
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Income
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'income-categories',
-        IncomeCategoryController::class
-    );
-
-    Route::resource(
-        'incomes',
-        IncomeController::class
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Payroll
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/payrolls/employee/{employee}',
-        [PayrollController::class, 'employeeSalary']
-    )->name('payrolls.employee.salary');
-
-    // AJAX Payroll Calculator
-    Route::get(
-        '/payrolls/calculate',
-        [PayrollController::class, 'calculate']
-    )->name('payrolls.calculate');
-
-    Route::resource(
-        'payrolls',
-        PayrollController::class
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Advance Salary
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'advance-salaries',
-        AdvanceSalaryController::class
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | Employee Loans
-    |--------------------------------------------------------------------------
-    */
-
-    Route::resource(
-        'employee-loans',
-        EmployeeLoanController::class
-    );
+    // Finance (no HR access)
+    Route::middleware('role:super_admin,admin')->group(function () {
 
         /*
-    |--------------------------------------------------------------------------
-    | Bank Accounts
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Expenses
+        |--------------------------------------------------------------------------
+        */
 
-    Route::resource(
-        'bank-accounts',
-        BankAccountController::class
-    );
+        Route::resource(
+            'expense-categories',
+            ExpenseCategoryController::class
+        );
+
+        Route::resource(
+            'expenses',
+            ExpenseController::class
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Income
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'income-categories',
+            IncomeCategoryController::class
+        );
+
+        Route::resource(
+            'incomes',
+            IncomeController::class
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Payroll
+        |--------------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/payrolls/employee/{employee}',
+            [PayrollController::class, 'employeeSalary']
+        )->name('payrolls.employee.salary');
+
+        // AJAX Payroll Calculator
+        Route::get(
+            '/payrolls/calculate',
+            [PayrollController::class, 'calculate']
+        )->name('payrolls.calculate');
+
+        Route::resource(
+            'payrolls',
+            PayrollController::class
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Advance Salary
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'advance-salaries',
+            AdvanceSalaryController::class
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Employee Loans
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'employee-loans',
+            EmployeeLoanController::class
+        );
+
+            /*
+        |--------------------------------------------------------------------------
+        | Bank Accounts
+        |--------------------------------------------------------------------------
+        */
+
+        Route::resource(
+            'bank-accounts',
+            BankAccountController::class
+        );
+
+    });
 
     /*
     |--------------------------------------------------------------------------

@@ -35,7 +35,12 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('portal.dashboard'));
         }
 
-        // Super Admin, Admin, HR
+        // HR works from the people modules
+        if ($user->role === 'hr') {
+            return redirect()->intended(route('employees.index'));
+        }
+
+        // Super Admin, Admin
         return redirect()->intended(route('dashboard'));
     }
 

@@ -38,4 +38,19 @@ class RoleAccessTest extends TestCase
 
         $this->get('/activity-logs')->assertOk();
     }
+
+    public function test_hr_can_open_people_modules_but_not_finance(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'hr']));
+
+        $this->get('/employees')->assertOk();
+        $this->get('/attendances')->assertOk();
+        $this->get('/leaves')->assertOk();
+        $this->get('/notices')->assertOk();
+
+        $this->get('/payrolls')->assertRedirect(route('employees.index'));
+        $this->get('/expenses')->assertRedirect(route('employees.index'));
+        $this->get('/dashboard')->assertRedirect(route('employees.index'));
+        $this->post('/payrolls', [])->assertForbidden();
+    }
 }

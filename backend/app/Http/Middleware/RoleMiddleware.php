@@ -24,6 +24,11 @@ class RoleMiddleware
                 return redirect()->route('portal.dashboard');
             }
 
+            // HR users who open a finance/admin URL go back to their workspace
+            if (auth()->user()->role === 'hr' && $request->isMethod('GET')) {
+                return redirect()->route('employees.index');
+            }
+
             abort(403, 'Unauthorized Access');
         }
 

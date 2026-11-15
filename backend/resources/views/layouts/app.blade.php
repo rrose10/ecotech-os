@@ -30,6 +30,12 @@
             [null, null, 'Settings', 'settings'],
         ],
     ];
+    if (auth()->user()?->role === 'hr') {
+        $hrAllowed = ['employees.index','departments.index','attendances.index','leave-types.index','leaves.index','leave-balances.index','notices.index'];
+        $groups = collect($groups)
+            ->map(fn ($items) => array_values(array_filter($items, fn ($i) => in_array($i[0], $hrAllowed, true))))
+            ->filter()->all();
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
