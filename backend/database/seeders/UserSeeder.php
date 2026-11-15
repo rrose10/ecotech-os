@@ -42,6 +42,15 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
+        // HR
+        User::create([
+            'name' => 'HR Manager',
+            'email' => 'hr@ecotech.com',
+            'password' => Hash::make('12345678'),
+            'role' => 'hr',
+            'email_verified_at' => now(),
+        ]);
+
         // Employee 1
         User::create([
             'name' => 'Employee 1',
