@@ -31,10 +31,10 @@ class NoticeController extends Controller
     {
         if (
             !$notice->is_published ||
-            $notice->publish_date->isFuture() ||
+            $notice->publish_date->gt(today()) ||
             (
                 $notice->expiry_date &&
-                $notice->expiry_date->isPast()
+                $notice->expiry_date->lt(today())
             )
         ) {
             abort(404);
