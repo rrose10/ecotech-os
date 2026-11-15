@@ -22,14 +22,27 @@
         'Office' => [
             ['notices.index',    'notices.*',     'Notices',          'notice'],
             ['activity-logs.index','activity-logs.*','Activity logs', 'logs'],
-            [null, null, 'Assets',    'assets'],
-            [null, null, 'Inventory', 'inventory'],
+            ['assets.index', 'assets.*', 'Assets', 'assets'],
+            ['inventory-items.index', 'inventory-items.*', 'Inventory', 'inventory'],
         ],
         'Reports' => [
-            [null, null, 'Reports',  'reports'],
-            [null, null, 'Settings', 'settings'],
+            ['reports.index', 'reports.*', 'Reports', 'reports'],
+            ['settings.edit', 'settings.*', 'Settings', 'settings'],
         ],
     ];
+    // Settings is for super admins only
+    if (auth()->user()?->role !== 'super_admin') {
+        $groups['Reports'] = array_values(array_filter($groups['Reports'], fn ($i) => $i[0] !== 'settings.edit'));
+        $groups['Office'] = array_values(array_filter($groups['Office'], fn ($i) => $i[0] !== 'activity-logs.index'));
+    }
+    $brand = \App\Models\Setting::get('company_name', 'EcoTech');
+
+    if (auth()->user()?->role === 'hr') {
+        $hrAllowed = ['employees.index','departments.index','attendances.index','leave-types.index','leaves.index','leave-balances.index','notices.index'];
+        $groups = collect($groups)
+            ->map(fn ($items) => array_values(array_filter($items, fn ($i) => in_array($i[0], $hrAllowed, true))))
+            ->filter()->all();
+    }
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -55,9 +68,9 @@
            class="eco-sidebar eco-drawer flex w-64 shrink-0 flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
 
         <div class="flex items-center gap-3 px-5 pb-4 pt-6">
-            <span class="eco-brand-mark flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-extrabold">E</span>
+            <span class="eco-brand-mark flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-extrabold">{{ strtoupper(mb_substr($brand, 0, 1)) }}</span>
             <div>
-                <p class="text-lg font-extrabold leading-tight tracking-tight">EcoTech</p>
+                <p class="text-lg font-extrabold leading-tight tracking-tight">{{ $brand }}</p>
                 <p class="text-xs text-white/50">Office management</p>
             </div>
         </div>
@@ -98,7 +111,7 @@
                 </button>
                 <div>
                     <h2 class="text-xl font-extrabold tracking-tight lg:text-2xl">
-                        @yield('page_title', 'Dashboard')
+                        @hasSection('page_title')@yield('page_title')@elseif(View::hasSection('title'))@yield('title')@else Dashboard @endif
                     </h2>
                     <p class="hidden text-sm text-gray-500 sm:block">
                         {{ now()->format('l, d F Y') }}
