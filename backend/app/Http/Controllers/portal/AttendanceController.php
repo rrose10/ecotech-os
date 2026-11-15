@@ -7,7 +7,12 @@ use App\Models\Attendance;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * Night shift: 7:00 PM -> 6:00 AM (next day), Asia/Dhaka.
+ * attendance_date is always the date the shift STARTED on.
+ */
 class AttendanceController extends Controller
 {
     public function index()
@@ -22,10 +27,7 @@ class AttendanceController extends Controller
             ]);
         }
 
-            $todayAttendance = $employee->attendances()
-                ->whereDate('attendance_date', Carbon::today())
-                ->latest()
-                ->first();
+        $todayAttendance = Attendance::currentFor($employee->id);
 
         $attendances = $employee->attendances()
             ->latest('attendance_date')
@@ -46,38 +48,50 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee profile not found.');
         }
 
-        $todayAttendance = $employee->attendances()
-            ->whereDate('attendance_date', today())
-            ->first();
+        try {
 
-        if ($todayAttendance) {
-            return back()->with('error', 'You have already checked in today.');
+            DB::transaction(function () use ($employee) {
+
+                $existing = Attendance::currentFor($employee->id);
+
+                if ($existing) {
+                    throw new \RuntimeException(
+                        $existing->check_out
+                            ? 'Your attendance for this shift is already completed.'
+                            : 'You have already checked in for this shift.'
+                    );
+                }
+
+                $now        = Carbon::now();
+                $shiftDate  = Attendance::shiftDateFor($now);
+                $shiftStart = Attendance::shiftStartFor($shiftDate);
+
+                $lateMinutes = $now->gt($shiftStart)
+                    ? Attendance::minutesBetween($shiftStart, $now)
+                    : 0;
+
+                Attendance::create([
+                    'employee_id'     => $employee->id,
+                    'attendance_date' => $shiftDate->toDateString(),
+                    'check_in'        => $now,
+                    'break_start'     => null,
+                    'break_end'       => null,
+                    'check_out'       => null,
+                    'working_minutes' => 0,
+                    'break_minutes'   => 0,
+                    'late_minutes'    => $lateMinutes,
+                    'status'          => $lateMinutes > 0 ? 'Late' : 'Present',
+                    'shift'           => 'Night',
+                    'remarks'         => null,
+                ]);
+            });
+
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Illuminate\Database\QueryException $e) {
+            // unique (employee_id, attendance_date): double click / parallel request
+            return back()->with('error', 'You have already checked in for this shift.');
         }
-
-        $now = Carbon::now();
-
-        $shiftStart = Carbon::today()->setTime(19, 0); // 7:00 PM
-
-        $status = $now->gt($shiftStart) ? 'Late' : 'Present';
-
-        $lateMinutes = $status === 'Late'
-            ? $shiftStart->diffInMinutes($now)
-            : 0;
-
-        Attendance::create([
-            'employee_id'     => $employee->id,
-            'attendance_date' => today(),
-            'check_in'        => $now,
-            'break_start'     => null,
-            'break_end'       => null,
-            'check_out'       => null,
-            'working_minutes' => 0,
-            'break_minutes'   => 0,
-            'late_minutes'    => $lateMinutes,
-            'status'          => $status,
-            'shift'           => 'Night',
-            'remarks'         => null,
-        ]);
 
         return redirect()
             ->route('portal.dashboard')
@@ -92,24 +106,22 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee profile not found.');
         }
 
-        $attendance = $employee->attendances()
-            ->whereDate('attendance_date', today())
-            ->first();
+        $attendance = Attendance::currentFor($employee->id);
 
         if (!$attendance) {
             return back()->with('error', 'Please check in first.');
-        }
-
-        if ($attendance->break_start) {
-            return back()->with('error', 'Dinner break already started.');
         }
 
         if ($attendance->check_out) {
             return back()->with('error', 'You have already checked out.');
         }
 
+        if ($attendance->break_start) {
+            return back()->with('error', 'Dinner break already started.');
+        }
+
         $attendance->update([
-            'break_start' => now(),
+            'break_start' => Carbon::now(),
         ]);
 
         return back()->with('success', 'Dinner break started.');
@@ -123,12 +135,14 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee profile not found.');
         }
 
-        $attendance = $employee->attendances()
-            ->whereDate('attendance_date', today())
-            ->first();
+        $attendance = Attendance::currentFor($employee->id);
 
         if (!$attendance) {
             return back()->with('error', 'Attendance not found.');
+        }
+
+        if ($attendance->check_out) {
+            return back()->with('error', 'You have already checked out.');
         }
 
         if (!$attendance->break_start) {
@@ -139,13 +153,11 @@ class AttendanceController extends Controller
             return back()->with('error', 'Dinner break already ended.');
         }
 
-        $breakEnd = now();
+        $breakEnd = Carbon::now();
 
         $attendance->update([
             'break_end'     => $breakEnd,
-            'break_minutes' => round(
-                $attendance->break_start->diffInMinutes($breakEnd)
-            ),
+            'break_minutes' => Attendance::minutesBetween($attendance->break_start, $breakEnd),
         ]);
 
         return back()->with('success', 'Dinner break ended.');
@@ -159,11 +171,9 @@ class AttendanceController extends Controller
             return back()->with('error', 'Employee profile not found.');
         }
 
-        $attendance = $employee->attendances()
-            ->whereDate('attendance_date', today())
-            ->first();
+        $attendance = Attendance::currentFor($employee->id);
 
-        if (!$attendance) {
+        if (!$attendance || !$attendance->check_in) {
             return back()->with('error', 'Please check in first.');
         }
 
@@ -171,16 +181,15 @@ class AttendanceController extends Controller
             return back()->with('error', 'You have already checked out.');
         }
 
+        if ($attendance->break_start && !$attendance->break_end) {
+            return back()->with('error', 'Please end your dinner break before checking out.');
+        }
+
         $now = Carbon::now();
 
-        $totalMinutes = $attendance->check_in->diffInMinutes($now);
-
-        $breakMinutes = round($attendance->break_minutes ?? 0);
-
-        $workingMinutes = max(
-            0,
-            $totalMinutes - $breakMinutes
-        );
+        $totalMinutes   = Attendance::minutesBetween($attendance->check_in, $now);
+        $breakMinutes   = (int) ($attendance->break_minutes ?? 0);
+        $workingMinutes = max(0, $totalMinutes - $breakMinutes);
 
         $attendance->update([
             'check_out'       => $now,

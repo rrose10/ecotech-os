@@ -25,9 +25,8 @@ class DashboardController extends Controller
 
             // Today's Attendance
 
-            $todayAttendance = Attendance::where('employee_id', $employee->id)
-                ->whereDate('attendance_date', today())
-                ->first();
+            // (supports overnight shifts: finds the open record after midnight)
+            $todayAttendance = Attendance::currentFor($employee->id);
 
 
 

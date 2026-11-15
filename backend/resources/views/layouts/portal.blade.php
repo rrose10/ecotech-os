@@ -25,6 +25,7 @@
 
         {{-- Page Content --}}
         <main class="flex-1 p-8">
+            @include('partials.alerts')
             @yield('content')
         </main>
 

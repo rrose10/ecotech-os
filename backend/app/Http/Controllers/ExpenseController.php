@@ -61,15 +61,24 @@ class ExpenseController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        try {
+
         DB::transaction(function () use ($validated) {
+
+            $bank = BankAccount::whereKey($validated['bank_account_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ((float) $bank->current_balance < (float) $validated['amount']) {
+                throw new \RuntimeException('Insufficient balance in the selected account.');
+            }
 
             $expense = Expense::create([
                 ...$validated,
                 'created_by' => auth()->id(),
             ]);
 
-            BankAccount::find($validated['bank_account_id'])
-                ->decrement('current_balance', $validated['amount']);
+            $bank->decrement('current_balance', $validated['amount']);
 
             $expense->load([
                 'expenseCategory',
@@ -85,6 +94,10 @@ class ExpenseController extends Controller
                 $expense->toArray()
             );
         });
+
+        } catch (\RuntimeException $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
 
         return redirect()
             ->route('expenses.index')
@@ -120,19 +133,45 @@ class ExpenseController extends Controller
             'remarks' => 'nullable|string',
         ]);
 
+        if ($expense->isSystemManaged()) {
+            return back()->with(
+                'error',
+                'This expense was created by Payroll, Advance Salary or Loan. Please edit it from that module.'
+            );
+        }
+
         $oldData = $expense->toArray();
+
+        try {
 
         DB::transaction(function () use ($expense, $validated, $oldData) {
 
-            // Restore old balance
-            BankAccount::find($expense->bank_account_id)
-                ->increment('current_balance', $expense->amount);
+            $ids = array_unique([$expense->bank_account_id, (int) $validated['bank_account_id']]);
 
-            $expense->update($validated);
+            $banks = BankAccount::whereIn('id', $ids)
+                ->orderBy('id')
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            // Restore old balance
+            $oldBank = $banks[$expense->bank_account_id];
+            $oldBank->current_balance = round((float) $oldBank->current_balance + (float) $expense->amount, 2);
 
             // Deduct new balance
-            BankAccount::find($expense->bank_account_id)
-                ->decrement('current_balance', $expense->amount);
+            $newBank = $banks[(int) $validated['bank_account_id']];
+
+            if ((float) $newBank->current_balance < (float) $validated['amount']) {
+                throw new \RuntimeException('Insufficient balance in the selected account.');
+            }
+
+            $newBank->current_balance = round((float) $newBank->current_balance - (float) $validated['amount'], 2);
+
+            foreach ($banks as $bank) {
+                $bank->save();
+            }
+
+            $expense->update($validated);
 
             $expense->load([
                 'expenseCategory',
@@ -149,6 +188,10 @@ class ExpenseController extends Controller
             );
         });
 
+        } catch (\RuntimeException $e) {
+            return back()->withInput()->with('error', $e->getMessage());
+        }
+
         return redirect()
             ->route('expenses.index')
             ->with('success', 'Expense updated successfully.');
@@ -156,6 +199,13 @@ class ExpenseController extends Controller
 
     public function destroy(Expense $expense)
     {
+        if ($expense->isSystemManaged()) {
+            return back()->with(
+                'error',
+                'This expense was created by Payroll, Advance Salary or Loan. Please delete it from that module.'
+            );
+        }
+
         $expense->load([
             'expenseCategory',
             'bankAccount',

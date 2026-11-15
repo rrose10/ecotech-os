@@ -28,11 +28,14 @@ class DashboardController extends Controller
 
         $departments = Department::count();
 
-        $presentToday = Attendance::whereDate('date', $today)
-            ->where('status', 'Present')
+        // Night shift: attendance_date is the date the shift started on
+        $shiftDate = Attendance::shiftDateFor()->toDateString();
+
+        $presentToday = Attendance::whereDate('attendance_date', $shiftDate)
+            ->whereIn('status', ['Present', 'Late'])
             ->count();
 
-        $absentToday = Attendance::whereDate('date', $today)
+        $absentToday = Attendance::whereDate('attendance_date', $shiftDate)
             ->where('status', 'Absent')
             ->count();
 
@@ -142,10 +145,23 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
+        // Database independent (works on SQLite and MySQL)
         $upcomingBirthdays = Employee::whereNotNull('date_of_birth')
-            ->orderByRaw("strftime('%m-%d', date_of_birth)")
+            ->get()
+            ->sortBy(function ($employee) use ($today) {
+
+                $next = $employee->date_of_birth
+                    ->copy()
+                    ->year($today->year);
+
+                if ($next->lt($today)) {
+                    $next->addYear();
+                }
+
+                return $next->timestamp;
+            })
             ->take(5)
-            ->get();
+            ->values();
 
         return view('dashboard', compact(
             'employees',

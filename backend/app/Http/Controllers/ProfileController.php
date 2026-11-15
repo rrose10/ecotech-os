@@ -56,6 +56,9 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Employees and admins must not delete their own accounts
+        abort_unless($request->user()->isSuperAdmin(), 403);
+
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
