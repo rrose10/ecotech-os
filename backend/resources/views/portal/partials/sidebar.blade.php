@@ -1,104 +1,42 @@
-<aside class="flex h-screen w-64 flex-col bg-slate-900 text-white">
+@php
+    $items = [
+        ['portal.dashboard',  'portal.dashboard',  'Dashboard',   'home'],
+        ['portal.profile',    'portal.profile',    'My profile',  'profile'],
+        ['portal.attendance', 'portal.attendance', 'My attendance','attendance'],
+        ['portal.salary',     'portal.salary',     'My payroll',  'payroll'],
+        ['portal.notices',    'portal.notices*',   'Team notices','notice'],
+    ];
+@endphp
 
-    {{-- Logo --}}
-    <div class="border-b border-slate-800 px-6 py-6">
+<aside id="eco-sidebar"
+       class="eco-sidebar eco-drawer flex w-64 shrink-0 flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
 
-        <h1 class="text-2xl font-bold tracking-wide">
-            EcoTech OS
-        </h1>
-
-        <p class="mt-1 text-sm text-slate-400">
-            Team Portal
-        </p>
-
+    <div class="flex items-center gap-3 px-5 pb-4 pt-6">
+        <span class="eco-brand-mark flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-extrabold">E</span>
+        <div>
+            <p class="text-lg font-extrabold leading-tight tracking-tight">EcoTech</p>
+            <p class="text-xs text-white/50">Team portal</p>
+        </div>
     </div>
 
-    {{-- Menu --}}
-    <nav class="flex-1 space-y-2 px-4 py-6">
-
-        {{-- Dashboard --}}
-        <a href="{{ route('portal.dashboard') }}"
-           class="flex items-center rounded-xl px-4 py-3 transition
-           {{ request()->routeIs('portal.dashboard')
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-
-            <span class="mr-3 text-lg">🏠</span>
-
-            Dashboard
-
-        </a>
-
-        {{-- My Profile --}}
-        <a href="{{ route('portal.profile') }}"
-           class="flex items-center rounded-xl px-4 py-3 transition
-           {{ request()->routeIs('portal.profile')
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-
-            <span class="mr-3 text-lg">👤</span>
-
-            My Profile
-
-        </a>
-
-        {{-- My Attendance --}}
-        <a href="{{ route('portal.attendance') }}"
-           class="flex items-center rounded-xl px-4 py-3 transition
-           {{ request()->routeIs('portal.attendance')
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-
-            <span class="mr-3 text-lg">🕒</span>
-
-            My Attendance
-
-        </a>
-
-        {{-- My Payroll --}}
-        <a href="{{ route('portal.salary') }}"
-           class="flex items-center rounded-xl px-4 py-3 transition
-           {{ request()->routeIs('portal.salary')
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-
-            <span class="mr-3 text-lg">💰</span>
-
-            My Payroll
-
-        </a>
-
-        {{-- Team Notices --}}
-        <a href="{{ route('portal.notices') }}"
-           class="flex items-center rounded-xl px-4 py-3 transition
-           {{ request()->routeIs('portal.notices*')
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-
-            <span class="mr-3 text-lg">📢</span>
-
-            Team Notices
-
-        </a>
-
+    <nav class="eco-scroll flex-1 overflow-y-auto px-3 pt-2">
+        @foreach($items as [$route, $pattern, $text, $icon])
+            <a href="{{ route($route) }}"
+               class="eco-nav-link"
+               @if(request()->routeIs($pattern)) aria-current="page" @endif>
+                @include('partials.nav-icon', ['name' => $icon])
+                {{ $text }}
+            </a>
+        @endforeach
     </nav>
 
-    {{-- Footer --}}
-    <div class="border-t border-slate-800 p-4">
-
+    <div class="p-4">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-
-            <button
-                type="submit"
-                class="flex w-full items-center justify-center rounded-xl bg-red-600 px-4 py-3 font-medium transition hover:bg-red-700">
-
-                🚪 Logout
-
+            <button type="submit"
+                    class="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10">
+                Log out
             </button>
-
         </form>
-
     </div>
-
 </aside>

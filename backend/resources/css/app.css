@@ -6,7 +6,485 @@
 @source "../../storage/framework/views/*.php";
 
 @theme {
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+    --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji",
         "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/*
+|--------------------------------------------------------------------------
+| EcoTech OS – "Frosted aurora" theme
+|--------------------------------------------------------------------------
+| Everything below is scoped to body.eco so it restyles the existing
+| Tailwind markup of every page without touching each view.
+*/
+
+:root {
+    --ink: #0d2b2c;
+    --ink-soft: #17403f;
+    --text: #12292b;
+    --muted: #5a7274;
+    --lagoon: #0b7a78;
+    --lagoon-2: #12957f;
+    --jade: #34d3a3;
+    --sky: #5ad7e6;
+    --coral: #d4524f;
+    --amber: #e9a23b;
+
+    --glass: rgba(255, 255, 255, 0.58);
+    --glass-strong: rgba(255, 255, 255, 0.78);
+    --glass-edge: rgba(255, 255, 255, 0.85);
+    --hairline: rgba(13, 43, 44, 0.09);
+
+    --shadow-glass: 0 1px 0 rgba(255, 255, 255, 0.9) inset,
+        0 12px 32px -14px rgba(13, 60, 58, 0.28);
+}
+
+body.eco {
+    font-family: var(--font-sans);
+    color: var(--text);
+    background-color: #eaf3f0;
+    background-image:
+        radial-gradient(60rem 38rem at 8% -8%, #bdecd9 0%, transparent 62%),
+        radial-gradient(52rem 38rem at 100% 2%, #c3e3f0 0%, transparent 58%),
+        radial-gradient(46rem 34rem at 68% 112%, #f3e5c8 0%, transparent 62%);
+    background-attachment: fixed;
+    font-feature-settings: "tnum" 1, "cv11" 1;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Glass surfaces (every white card/panel) ---------- */
+
+.eco .bg-white {
+    background-color: var(--glass) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(165%);
+    backdrop-filter: blur(20px) saturate(165%);
+    border: 1px solid var(--glass-edge);
+    box-shadow: var(--shadow-glass);
+}
+
+.eco .bg-white.rounded-lg,
+.eco .bg-white.rounded-xl,
+.eco .bg-white.rounded-2xl,
+.eco .bg-white.rounded {
+    border-radius: 20px;
+}
+
+.eco .bg-gray-50,
+.eco .bg-slate-50 {
+    background-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.eco .bg-gray-100,
+.eco .bg-slate-100 {
+    background-color: rgba(13, 43, 44, 0.05) !important;
+}
+
+.eco .shadow,
+.eco .shadow-sm,
+.eco .shadow-md,
+.eco .shadow-lg,
+.eco .shadow-xl {
+    --tw-shadow: 0 12px 32px -14px rgba(13, 60, 58, 0.28);
+}
+
+.eco .border,
+.eco .border-gray-200,
+.eco .border-slate-200,
+.eco .border-gray-300 {
+    border-color: var(--hairline);
+}
+
+/* ---------- Text ---------- */
+
+.eco .text-gray-800,
+.eco .text-gray-900,
+.eco .text-slate-800,
+.eco .text-slate-900 {
+    color: var(--text);
+}
+
+.eco .text-gray-700,
+.eco .text-slate-700 {
+    color: #28484a;
+}
+
+.eco .text-gray-500,
+.eco .text-gray-600,
+.eco .text-slate-500,
+.eco .text-slate-600 {
+    color: var(--muted);
+}
+
+.eco .text-blue-600,
+.eco .text-blue-700,
+.eco .text-indigo-600 {
+    color: var(--lagoon);
+}
+
+.eco h1,
+.eco h2,
+.eco h3 {
+    letter-spacing: -0.015em;
+}
+
+/* ---------- Buttons (existing blue / green / red / gray classes) ---------- */
+
+.eco .bg-blue-600,
+.eco .bg-indigo-600 {
+    background-image: linear-gradient(135deg, var(--lagoon), var(--lagoon-2));
+    background-color: var(--lagoon) !important;
+    box-shadow: 0 8px 18px -8px rgba(11, 122, 120, 0.7);
+}
+
+.eco .bg-blue-600:hover,
+.eco .bg-blue-700,
+.eco .hover\:bg-blue-700:hover {
+    background-image: linear-gradient(135deg, #096966, #0e806d);
+    background-color: #096966 !important;
+}
+
+.eco .bg-green-600,
+.eco .bg-green-700,
+.eco .hover\:bg-green-700:hover {
+    background-image: linear-gradient(135deg, #0f8f6c, #19a97f);
+    background-color: #0f8f6c !important;
+    box-shadow: 0 8px 18px -8px rgba(15, 143, 108, 0.7);
+}
+
+.eco .bg-red-600,
+.eco .bg-red-700,
+.eco .hover\:bg-red-700:hover {
+    background-image: linear-gradient(135deg, #c9453f, #de5f52);
+    background-color: var(--coral) !important;
+    box-shadow: 0 8px 18px -8px rgba(201, 69, 63, 0.65);
+}
+
+.eco .bg-gray-600,
+.eco .bg-gray-700,
+.eco .bg-gray-500,
+.eco .bg-gray-800 {
+    background-image: linear-gradient(135deg, #1b4746, #123b3a);
+    background-color: var(--ink-soft) !important;
+}
+
+.eco a.bg-blue-600,
+.eco button.bg-blue-600,
+.eco a.bg-green-600,
+.eco button.bg-green-600,
+.eco a.bg-red-600,
+.eco button.bg-red-600,
+.eco a.bg-gray-600,
+.eco button.bg-gray-600 {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.eco a.bg-blue-600:hover,
+.eco button.bg-blue-600:hover,
+.eco a.bg-green-600:hover,
+.eco button.bg-green-600:hover,
+.eco a.bg-red-600:hover,
+.eco button.bg-red-600:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.eco button:active,
+.eco a.bg-blue-600:active {
+    transform: translateY(0);
+}
+
+/* ---------- Status badges ---------- */
+
+.eco .bg-green-100 {
+    background-color: rgba(52, 211, 163, 0.2) !important;
+}
+.eco .bg-red-100 {
+    background-color: rgba(212, 82, 79, 0.15) !important;
+}
+.eco .bg-yellow-100,
+.eco .bg-orange-100 {
+    background-color: rgba(233, 162, 59, 0.22) !important;
+}
+.eco .bg-blue-100 {
+    background-color: rgba(90, 215, 230, 0.22) !important;
+}
+.eco .text-green-700,
+.eco .text-green-800 {
+    color: #0a6b4f;
+}
+.eco .text-red-700,
+.eco .text-red-800 {
+    color: #a63532;
+}
+.eco .text-yellow-700,
+.eco .text-yellow-800 {
+    color: #8a5a0f;
+}
+
+/* ---------- Form controls ---------- */
+
+.eco input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]),
+.eco select,
+.eco textarea {
+    background-color: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(13, 43, 44, 0.14);
+    border-radius: 12px;
+    color: var(--text);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.eco input::placeholder,
+.eco textarea::placeholder {
+    color: #8aa0a2;
+}
+
+.eco input:focus,
+.eco select:focus,
+.eco textarea:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-color: var(--jade);
+    box-shadow: 0 0 0 4px rgba(52, 211, 163, 0.22);
+}
+
+.eco input[type="checkbox"],
+.eco input[type="radio"] {
+    accent-color: var(--lagoon);
+}
+
+.eco :focus-visible {
+    outline: 2px solid var(--lagoon);
+    outline-offset: 2px;
+}
+
+.eco [class*="focus:ring-blue"]:focus,
+.eco [class*="focus:ring-indigo"]:focus {
+    --tw-ring-color: rgba(52, 211, 163, 0.35);
+}
+
+/* ---------- Tables ---------- */
+
+.eco table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.eco thead th {
+    background: rgba(13, 43, 44, 0.045);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    padding-block: 0.8rem;
+    border-bottom: 1px solid var(--hairline);
+}
+
+.eco thead th:first-child {
+    border-top-left-radius: 14px;
+}
+.eco thead th:last-child {
+    border-top-right-radius: 14px;
+}
+
+.eco tbody td {
+    border-bottom: 1px solid var(--hairline);
+    font-variant-numeric: tabular-nums;
+}
+
+.eco tbody tr {
+    transition: background-color 0.12s ease;
+}
+
+.eco tbody tr:hover {
+    background: rgba(52, 211, 163, 0.09);
+}
+
+.eco tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ---------- Shell: sidebar, topbar ---------- */
+
+.eco-sidebar {
+    background: linear-gradient(180deg, rgba(10, 38, 40, 0.94), rgba(13, 48, 48, 0.9));
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 48px -20px rgba(6, 30, 30, 0.7),
+        0 1px 0 rgba(255, 255, 255, 0.08) inset;
+    border-radius: 26px;
+    color: #e6f3f1;
+}
+
+.eco-brand-mark {
+    background: linear-gradient(135deg, var(--jade), var(--sky));
+    color: #05302b;
+    box-shadow: 0 8px 20px -6px rgba(52, 211, 163, 0.7);
+}
+
+.eco-nav-label {
+    padding: 0 1.1rem;
+    margin: 1.4rem 0 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(214, 235, 232, 0.5);
+}
+
+.eco-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2px;
+    padding: 0.6rem 1rem;
+    border-radius: 14px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: rgba(226, 241, 238, 0.74);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.eco-nav-link svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex: none;
+    opacity: 0.9;
+}
+
+.eco-nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.eco-nav-link[aria-current="page"] {
+    background: linear-gradient(135deg, var(--jade), var(--sky));
+    color: #05302b;
+    font-weight: 700;
+    box-shadow: 0 10px 22px -10px rgba(52, 211, 163, 0.9);
+}
+
+.eco-nav-link.is-soon {
+    color: rgba(214, 235, 232, 0.38);
+    cursor: default;
+}
+
+.eco-nav-link.is-soon:hover {
+    background: transparent;
+    color: rgba(214, 235, 232, 0.38);
+}
+
+.eco-soon {
+    margin-left: auto;
+    font-size: 0.68rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.eco-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.eco-topbar {
+    background: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(22px) saturate(170%);
+    backdrop-filter: blur(22px) saturate(170%);
+    border: 1px solid var(--glass-edge);
+    border-radius: 22px;
+    box-shadow: var(--shadow-glass);
+}
+
+.eco-avatar {
+    background: linear-gradient(135deg, var(--lagoon), var(--jade));
+    color: #fff;
+}
+
+.eco-logout {
+    border: 1px solid rgba(212, 82, 79, 0.28);
+    color: #b0403c;
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.5);
+    transition: background-color 0.15s ease;
+}
+
+.eco-logout:hover {
+    background: rgba(212, 82, 79, 0.12);
+}
+
+/* ---------- Login card ---------- */
+
+.eco-auth-card {
+    background: rgba(255, 255, 255, 0.62);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    backdrop-filter: blur(28px) saturate(170%);
+    border: 1px solid var(--glass-edge);
+    border-radius: 28px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 30px 60px -24px rgba(13, 60, 58, 0.4);
+}
+
+.eco-primary-btn {
+    background-image: linear-gradient(135deg, var(--lagoon), var(--lagoon-2));
+    color: #fff;
+    border-radius: 12px;
+    padding: 0.7rem 1.4rem;
+    font-weight: 700;
+    box-shadow: 0 10px 22px -10px rgba(11, 122, 120, 0.8);
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.eco-primary-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+/* ---------- Mobile drawer ---------- */
+
+@media (max-width: 1023px) {
+    .eco-drawer {
+        position: fixed;
+        inset: 0.75rem auto 0.75rem 0.75rem;
+        z-index: 50;
+        transform: translateX(-120%);
+        transition: transform 0.25s ease;
+    }
+
+    .eco-drawer.is-open {
+        transform: translateX(0);
+    }
+
+    .eco-scrim {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        background: rgba(6, 30, 30, 0.45);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .eco *,
+    .eco-drawer {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* Browsers without backdrop-filter: keep text readable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .eco .bg-white,
+    .eco-topbar,
+    .eco-auth-card {
+        background-color: rgba(255, 255, 255, 0.92) !important;
+    }
 }

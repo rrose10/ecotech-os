@@ -4,27 +4,26 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'Employee Portal')</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-slate-100">
+<body class="eco min-h-screen antialiased">
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen gap-4 p-3 lg:p-4">
 
-    {{-- Sidebar --}}
+    <div id="eco-scrim" class="eco-scrim hidden lg:hidden" data-eco-close></div>
+
     @include('portal.partials.sidebar')
 
-    {{-- Main Content --}}
-    <div class="flex-1 flex flex-col">
+    <div class="flex min-w-0 flex-1 flex-col gap-4">
 
-        {{-- Topbar --}}
         @include('portal.partials.topbar')
 
-        {{-- Page Content --}}
-        <main class="flex-1 p-8">
+        <main class="min-w-0 flex-1 px-1 pb-6 lg:px-2">
             @include('partials.alerts')
             @yield('content')
         </main>
@@ -33,5 +32,6 @@
 
 </div>
 
+@stack('scripts')
 </body>
 </html>

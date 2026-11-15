@@ -1,3 +1,36 @@
+@php
+    $groups = [
+        'Main' => [
+            ['dashboard',        'dashboard',     'Dashboard',        'dashboard'],
+            ['employees.index',  'employees.*',   'Employees',        'employees'],
+            ['departments.index','departments.*', 'Departments',      'departments'],
+            ['attendances.index','attendances.*', 'Attendance',       'attendance'],
+            ['leave-types.index','leave-types.*', 'Leave types',      'calendar'],
+            ['leaves.index',     'leaves.*',      'Leaves',           'leaves'],
+            ['leave-balances.index','leave-balances.*','Leave balance','balance'],
+        ],
+        'Finance' => [
+            ['expense-categories.index','expense-categories.*','Expense categories','tag'],
+            ['expenses.index',   'expenses.*',    'Expenses',         'expense'],
+            ['income-categories.index','income-categories.*','Income categories','tag'],
+            ['incomes.index',    'incomes.*',     'Incomes',          'income'],
+            ['advance-salaries.index','advance-salaries.*','Advance salary','advance'],
+            ['employee-loans.index','employee-loans.*','Employee loans','loan'],
+            ['payrolls.index',   'payrolls.*',    'Payroll',          'payroll'],
+            ['bank-accounts.index','bank-accounts.*','Cash & bank',   'bank'],
+        ],
+        'Office' => [
+            ['notices.index',    'notices.*',     'Notices',          'notice'],
+            ['activity-logs.index','activity-logs.*','Activity logs', 'logs'],
+            [null, null, 'Assets',    'assets'],
+            [null, null, 'Inventory', 'inventory'],
+        ],
+        'Reports' => [
+            [null, null, 'Reports',  'reports'],
+            [null, null, 'Settings', 'settings'],
+        ],
+    ];
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -8,273 +41,93 @@
 
     <title>@yield('title', 'EcoTech OS')</title>
 
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-100 font-sans antialiased">
+<body class="eco min-h-screen antialiased">
 
-<div class="flex min-h-screen">
+<div class="flex min-h-screen gap-4 p-3 lg:p-4">
+
+    <div id="eco-scrim" class="eco-scrim hidden lg:hidden" data-eco-close></div>
 
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-white shadow-xl">
+    <aside id="eco-sidebar"
+           class="eco-sidebar eco-drawer flex w-64 shrink-0 flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
 
-        <div class="p-6 border-b border-slate-700">
-            <h1 class="text-3xl font-bold tracking-wide">
-                EcoTech
-            </h1>
-
-            <p class="text-slate-400 text-sm mt-1">
-                Office Management System
-            </p>
+        <div class="flex items-center gap-3 px-5 pb-4 pt-6">
+            <span class="eco-brand-mark flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-extrabold">E</span>
+            <div>
+                <p class="text-lg font-extrabold leading-tight tracking-tight">EcoTech</p>
+                <p class="text-xs text-white/50">Office management</p>
+            </div>
         </div>
 
-        <nav class="mt-6">
+        <nav class="eco-scroll flex-1 overflow-y-auto px-3 pb-6">
+            @foreach($groups as $label => $items)
+                @if($label !== 'Main')
+                    <p class="eco-nav-label">{{ $label }}</p>
+                @endif
 
-            <a href="{{ route('dashboard') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('dashboard')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📊 Dashboard
-            </a>
-
-            <a href="{{ route('employees.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('employees.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                👥 Employees
-            </a>
-
-            <a href="{{ route('departments.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('departments.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                🏢 Departments
-            </a>
-
-            <a href="{{ route('attendances.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('attendances.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                🕒 Attendance
-            </a>
-
-            <a href="{{ route('leave-types.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('leave-types.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📅 Leave Types
-            </a>
-
-            <a href="{{ route('leaves.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('leaves.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📝 Leaves
-            </a>
-
-            <a href="{{ route('leave-balances.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('leave-balances.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📊 Leave Balance
-            </a>
-
-            <hr class="my-5 border-slate-700">
-
-            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-                Finance
-            </p>
-
-            <a href="{{ route('expense-categories.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('expense-categories.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💰 Expense Categories
-            </a>
-
-            <a href="{{ route('expenses.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('expenses.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💸 Expenses
-            </a>
-
-            <a href="{{ route('income-categories.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('income-categories.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💵 Income Categories
-            </a>
-
-            <a href="{{ route('incomes.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('incomes.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💰 Incomes
-            </a>
-
-            <a href="{{ route('advance-salaries.index') }}"
-                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-                {{ request()->routeIs('advance-salaries.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💵 Advance Salary
-            </a>
-
-            <a href="{{ route('employee-loans.index') }}"
-                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-                {{ request()->routeIs('employee-loans.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💳 Employee Loans
-            </a>
-
-            <a href="{{ route('payrolls.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('payrolls.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                💼 Payroll
-            </a>
-
-            <a href="{{ route('bank-accounts.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('bank-accounts.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                🏦 Cash & Bank
-            </a>
-                        <hr class="my-5 border-slate-700">
-
-            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-                Office
-            </p>
-
-            <a href="{{ route('notices.index') }}"
-               class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-               {{ request()->routeIs('notices.*')
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                📢 Notices
-            </a>
-
-            <a href="{{ route('activity-logs.index') }}"
-                class="block mx-3 mb-2 rounded-lg px-5 py-3 transition
-                {{ request()->routeIs('activity-logs.*')
-                        ? 'bg-blue-600 text-white shadow'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                    📜 Activity Logs
-                </a>
-
-            <div class="px-6 py-2 text-slate-500">
-                💻 Assets
-            </div>
-
-            <div class="px-6 py-2 text-slate-500">
-                📦 Inventory
-            </div>
-
-            <hr class="my-5 border-slate-700">
-
-            <p class="px-6 mb-3 text-xs uppercase tracking-widest text-slate-500">
-                Reports
-            </p>
-
-            <div class="px-6 py-2 text-slate-500">
-                📊 Reports
-            </div>
-
-            <div class="px-6 py-2 text-slate-500">
-                ⚙️ Settings
-            </div>
-
+                @foreach($items as [$route, $pattern, $text, $icon])
+                    @if($route)
+                        <a href="{{ route($route) }}"
+                           class="eco-nav-link"
+                           @if(request()->routeIs($pattern)) aria-current="page" @endif>
+                            @include('partials.nav-icon', ['name' => $icon])
+                            {{ $text }}
+                        </a>
+                    @else
+                        <div class="eco-nav-link is-soon" title="Coming soon">
+                            @include('partials.nav-icon', ['name' => $icon])
+                            {{ $text }}
+                            <span class="eco-soon">Soon</span>
+                        </div>
+                    @endif
+                @endforeach
+            @endforeach
         </nav>
-
     </aside>
 
     <!-- Main -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex min-w-0 flex-1 flex-col gap-4">
 
-        <!-- Topbar -->
-        <header class="bg-white shadow-sm border-b">
-
-            <div class="flex justify-between items-center px-8 py-5">
-
+        <header class="eco-topbar sticky top-3 z-30 flex items-center justify-between gap-4 px-4 py-3 lg:top-4 lg:px-6 lg:py-4">
+            <div class="flex items-center gap-3">
+                <button type="button" id="eco-menu" class="eco-logout !px-3 lg:hidden" aria-label="Open menu">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+                </button>
                 <div>
-
-                    <h2 class="text-2xl font-bold text-gray-800">
+                    <h2 class="text-xl font-extrabold tracking-tight lg:text-2xl">
                         @yield('page_title', 'Dashboard')
                     </h2>
-
-                    <p class="text-sm text-gray-500">
-                        Welcome back, {{ Auth::user()->name }}
+                    <p class="hidden text-sm text-gray-500 sm:block">
+                        {{ now()->format('l, d F Y') }}
                     </p>
-
                 </div>
-
-                <div class="flex items-center gap-4">
-
-                    <div class="text-right">
-
-                        <p class="font-semibold text-gray-700">
-                            {{ Auth::user()->name }}
-                        </p>
-
-                        <p class="text-sm text-gray-500">
-                            {{ ucfirst(Auth::user()->role) }}
-                        </p>
-
-                    </div>
-
-                    <form method="POST" action="{{ route('logout') }}">
-
-                        @csrf
-
-                        <button
-                            class="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700 transition">
-                            Logout
-                        </button>
-
-                    </form>
-
-                </div>
-
             </div>
 
+            <div class="flex items-center gap-3">
+                <div class="hidden text-right sm:block">
+                    <p class="text-sm font-bold leading-tight">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</p>
+                </div>
+                <span class="eco-avatar flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold">
+                    {{ strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
+                </span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button class="eco-logout">Log out</button>
+                </form>
+            </div>
         </header>
 
-        <!-- Page Content -->
-
-        <main class="flex-1 p-8">
-
+        <main class="min-w-0 flex-1 px-1 pb-6 lg:px-2">
             @include('partials.alerts')
             @yield('content')
-                    </main>
-
+        </main>
     </div>
-
 </div>
 
 @stack('scripts')
-
-<script>
-console.log('LAYOUT SCRIPT');
-</script>
-
 </body>
-
 </html>
