@@ -6,6 +6,12 @@
 
 @section('content')
 
+@if(!$employee)
+<div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-600">
+    No employee profile is linked to your account yet. Please contact the administrator.
+</div>
+@else
+
 <div class="space-y-6">
 
     <!-- Profile Header -->
@@ -132,5 +138,7 @@
     </div>
 
 </div>
+
+@endif
 
 @endsection
