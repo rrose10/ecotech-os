@@ -1,5 +1,29 @@
 # EcoTech OS – Production Deployment Guide
 
+## 0. Quick install on the office NAS (OpenMediaVault + Docker) — recommended
+1. In OMV: **System → omv-extras → Docker** (install Docker and the Compose plugin).
+2. SSH into the NAS and run:
+```bash
+git clone https://github.com/rrose10/ecotech-os.git
+cd ecotech-os
+sh deploy/install.sh 192.168.10.154      # use the NAS IP your team reaches
+```
+3. The script builds the app, starts MariaDB, runs migrations, seeds the default
+   categories and prints the three Super Admin passwords **once**. Save them.
+4. Open `http://<NAS-IP>:8088`. Both office networks can reach it the same way as SMB.
+5. Daily database backups land in `ecotech-os/backups/` on the NAS (14 kept). Add that
+   folder to an OMV rsync/USB backup job.
+6. Update later: `git pull && docker compose --env-file .env.docker up -d --build`
+   (migrations run automatically).
+
+Secrets live in `.env.docker` (never commit it). The LAN setup uses plain http
+(`FORCE_HTTPS=false`); put Cloudflare Tunnel or a reverse proxy with HTTPS in front
+before exposing it to the internet, then set `FORCE_HTTPS=true` and
+`SESSION_SECURE_COOKIE=true`.
+
+---
+# Manual install (without Docker)
+
 ## 1. Server requirements
 - PHP 8.4 (extensions: pdo_mysql, mbstring, openssl, tokenizer, xml, ctype, fileinfo, bcmath)
 - MySQL 8 / MariaDB 10.6+ (SQLite is for development only)
