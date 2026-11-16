@@ -90,6 +90,9 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
         ActivityLogController::class
     )->only(['index']);
 
+    Route::get('employees/{employee}/nid-copy', [\App\Http\Controllers\EmployeeController::class, 'nidCopy'])
+        ->name('employees.nid-copy');
+
 });
 
 /*

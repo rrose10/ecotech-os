@@ -188,6 +188,16 @@
                 </p>
 
 
+                <p>
+                    <strong>NID:</strong>
+                    {{ $employee->nid_number ?: '-' }}
+                    @if($employee->nid_file && auth()->user()->role === 'super_admin')
+                        <a href="{{ route('employees.nid-copy', $employee) }}" target="_blank"
+                           class="ml-2 text-sm text-blue-600 underline">View copy</a>
+                    @endif
+                </p>
+
+
             </div>
 
 
