@@ -53,7 +53,7 @@
                         </td>
 
                         <td class="px-6 py-4 text-sm">
-                            {{ $log->module }}
+                            {{ $log->module === 'Employee' ? 'Team' : $log->module }}
                         </td>
 
                         <td class="px-6 py-4">

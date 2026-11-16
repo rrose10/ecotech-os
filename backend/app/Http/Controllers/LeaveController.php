@@ -9,10 +9,65 @@ use App\Models\LeaveBalance;
 use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 
 class LeaveController extends Controller
 {
+
+
+    /** The yearly balance row a leave counts against. */
+    private function balanceFor(Leave $leave): LeaveBalance
+    {
+        $leave->loadMissing('leaveType');
+
+        return LeaveBalance::firstOrCreate(
+            [
+                'employee_id'   => $leave->employee_id,
+                'leave_type_id' => $leave->leave_type_id,
+                'year'          => Carbon::parse($leave->from_date)->year,
+            ],
+            [
+                'total_days'     => $leave->leaveType->days_per_year,
+                'used_days'      => 0,
+                'remaining_days' => $leave->leaveType->days_per_year,
+            ]
+        );
+    }
+
+    /** Give the days of an approved leave back to the balance. */
+    private function refundIfApproved(Leave $leave): void
+    {
+        if ($leave->status !== 'Approved') {
+            return;
+        }
+
+        $balance = $this->balanceFor($leave);
+        $used = max(0, $balance->used_days - $leave->total_days);
+
+        $balance->update([
+            'used_days'      => $used,
+            'remaining_days' => max(0, $balance->total_days - $used),
+        ]);
+    }
+
+    /** A team member cannot have two Pending/Approved leaves on the same day. */
+    private function assertNoOverlap(Request $request, ?Leave $ignore = null): void
+    {
+        $overlap = Leave::where('employee_id', $request->employee_id)
+            ->whereIn('status', ['Pending', 'Approved'])
+            ->whereDate('from_date', '<=', $request->to_date)
+            ->whereDate('to_date', '>=', $request->from_date)
+            ->when($ignore, fn ($q) => $q->where('id', '!=', $ignore->id))
+            ->exists();
+
+        if ($overlap) {
+            throw ValidationException::withMessages([
+                'from_date' => 'This team member already has a leave covering some of these dates.',
+            ]);
+        }
+    }
 
     public function index(Request $request)
     {
@@ -69,6 +124,8 @@ class LeaveController extends Controller
             'reason' => 'nullable|string',
 
         ]);
+
+        $this->assertNoOverlap($request);
 
         $totalDays = Carbon::parse($request->from_date)
             ->diffInDays(
@@ -164,6 +221,13 @@ class LeaveController extends Controller
 
         ]);
 
+        if ($leave->status !== 'Pending') {
+            return redirect()->route('leaves.index')
+                ->with('error', 'Only pending leaves can be edited. Reject or delete it first.');
+        }
+
+        $this->assertNoOverlap($request, $leave);
+
         // Old data for Activity Log
         $oldData = $leave->toArray();
 
@@ -221,56 +285,37 @@ class LeaveController extends Controller
 
     public function approve(Leave $leave)
     {
-        $leave->load([
-            'employee',
-            'leaveType'
-        ]);
+        if ($leave->status !== 'Pending') {
+            return redirect()->route('leaves.index')
+                ->with('error', 'Only pending leaves can be approved.');
+        }
+
+        $leave->load(['employee', 'leaveType']);
 
         $oldData = $leave->toArray();
 
-        $leave->update([
+        $balance = $this->balanceFor($leave);
 
-            'status' => 'Approved',
+        if ($balance->remaining_days < $leave->total_days) {
+            return redirect()->route('leaves.index')->with(
+                'error',
+                "Not enough {$leave->leaveType->name} left: {$balance->remaining_days} day(s) remaining, "
+                . "{$leave->total_days} requested."
+            );
+        }
 
-            'approved_by' => Auth::id(),
+        DB::transaction(function () use ($leave, $balance) {
+            $leave->update([
+                'status'      => 'Approved',
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
 
-            'approved_at' => now(),
-
-        ]);
-
-        $balance = LeaveBalance::firstOrCreate(
-
-            [
-
-                'employee_id' => $leave->employee_id,
-
-                'leave_type_id' => $leave->leave_type_id,
-
-                'year' => now()->year,
-
-            ],
-
-            [
-
-                'total_days' => $leave->leaveType->days_per_year,
-
-                'used_days' => 0,
-
-                'remaining_days' => $leave->leaveType->days_per_year,
-
-            ]
-
-        );
-
-        $balance->increment(
-            'used_days',
-            $leave->total_days
-        );
-
-        $balance->decrement(
-            'remaining_days',
-            $leave->total_days
-        );
+            $balance->update([
+                'used_days'      => $balance->used_days + $leave->total_days,
+                'remaining_days' => $balance->remaining_days - $leave->total_days,
+            ]);
+        });
 
         ActivityLogger::log(
             'Leave',
@@ -282,11 +327,9 @@ class LeaveController extends Controller
 
         return redirect()
             ->route('leaves.index')
-            ->with(
-                'success',
-                'Leave Approved Successfully.'
-            );
-    } 
+            ->with('success', 'Leave Approved Successfully.');
+    }
+
         public function reject(Request $request, Leave $leave)
     {
         $oldData = $leave->toArray();
@@ -296,7 +339,10 @@ class LeaveController extends Controller
             'leaveType'
         ]);
 
-        $leave->update([
+        DB::transaction(function () use ($request, $leave) {
+            $this->refundIfApproved($leave);
+
+            $leave->update([
 
             'status' => 'Rejected',
 
@@ -307,6 +353,7 @@ class LeaveController extends Controller
             'remarks' => $request->remarks,
 
         ]);
+        });
 
         ActivityLogger::log(
             'Leave',
@@ -339,7 +386,10 @@ class LeaveController extends Controller
             null
         );
 
-        $leave->delete();
+        DB::transaction(function () use ($leave) {
+            $this->refundIfApproved($leave);
+            $leave->delete();
+        });
 
         return redirect()
             ->route('leaves.index')

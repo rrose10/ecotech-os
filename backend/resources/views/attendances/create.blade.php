@@ -97,7 +97,7 @@
                 </label>
 
                 <input
-                    type="time"
+                    type="datetime-local"
                     name="check_in"
                     value="{{ old('check_in') }}"
                     class="w-full border rounded p-3">
@@ -111,7 +111,7 @@
                 </label>
 
                 <input
-                    type="time"
+                    type="datetime-local"
                     name="check_out"
                     value="{{ old('check_out') }}"
                     class="w-full border rounded p-3">

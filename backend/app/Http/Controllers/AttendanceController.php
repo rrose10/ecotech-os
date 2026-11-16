@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Services\ActivityLogger;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class AttendanceController extends Controller
 {
@@ -54,6 +55,43 @@ class AttendanceController extends Controller
     /**
      * Store attendance.
      */
+
+    /** One attendance record per team member per day. */
+    private function assertNotDuplicate(Request $request, ?Attendance $ignore = null): void
+    {
+        $exists = Attendance::where('employee_id', $request->employee_id)
+            ->whereDate('attendance_date', $request->attendance_date)
+            ->when($ignore, fn ($q) => $q->where('id', '!=', $ignore->id))
+            ->exists();
+
+        if ($exists) {
+            throw ValidationException::withMessages([
+                'attendance_date' => 'This team member already has attendance for that date. Edit the existing record instead.',
+            ]);
+        }
+    }
+
+    /** Late and working minutes from the entered check-in / check-out. */
+    private function minutes(Request $request, int $breakMinutes = 0): array
+    {
+        $in  = $request->filled('check_in') ? Carbon::parse($request->check_in) : null;
+        $out = $request->filled('check_out') ? Carbon::parse($request->check_out) : null;
+
+        $working = (int) ($request->working_minutes ?? 0);
+        $late    = (int) ($request->late_minutes ?? 0);
+
+        if ($in) {
+            $shiftStart = Attendance::shiftStartFor(Attendance::shiftDateFor($in));
+            $late = $in->gt($shiftStart) ? Attendance::minutesBetween($shiftStart, $in) : 0;
+        }
+
+        if ($in && $out && $out->gt($in)) {
+            $working = max(0, Attendance::minutesBetween($in, $out) - $breakMinutes);
+        }
+
+        return [$working, $late];
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -66,6 +104,10 @@ class AttendanceController extends Controller
 
         ]);
 
+        $this->assertNotDuplicate($request);
+
+        [$working, $late] = $this->minutes($request);
+
         $attendance = Attendance::create([
 
             'employee_id' => $request->employee_id,
@@ -76,9 +118,9 @@ class AttendanceController extends Controller
 
             'check_out' => $request->check_out,
 
-            'working_minutes' => $request->working_minutes ?? 0,
+            'working_minutes' => $working,
 
-            'late_minutes' => $request->late_minutes ?? 0,
+            'late_minutes' => $late,
 
             'shift' => 'Night',
 
@@ -146,6 +188,8 @@ class AttendanceController extends Controller
             'status' => 'required',
 
         ]);
+
+        $this->assertNotDuplicate($request, $attendance);
 
         $oldData = $attendance->toArray();
 
