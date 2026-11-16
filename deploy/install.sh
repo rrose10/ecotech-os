@@ -59,8 +59,10 @@ docker build --allow network.host --network=host -t ecotech-os:latest ./backend
 docker compose --env-file .env.docker up -d
 
 echo "Waiting for the app to start..."
-for i in $(seq 1 60); do
-  if docker compose --env-file .env.docker exec -T app php artisan migrate:status >/dev/null 2>&1; then
+# Wait until the database answers AND every migration has been applied.
+for i in $(seq 1 100); do
+  out=$(docker compose --env-file .env.docker exec -T app php artisan migrate:status 2>&1) || { sleep 3; continue; }
+  if ! echo "$out" | grep -q "Pending"; then
     break
   fi
   sleep 3
@@ -70,3 +72,4 @@ docker compose --env-file .env.docker exec -T app php artisan ecotech:install
 
 echo
 echo "Done. Open  http://${HOST}:${PORT}  and log in with the Super Admin details above."
+docker compose --env-file .env.docker exec -T app php artisan ecotech:users

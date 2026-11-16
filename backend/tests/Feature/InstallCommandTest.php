@@ -25,4 +25,15 @@ class InstallCommandTest extends TestCase
         $this->assertSame(3, User::count());
         $this->assertSame($hash, $rose->fresh()->password);
     }
+
+    public function test_install_never_adds_admins_when_one_already_exists(): void
+    {
+        // e.g. an owner changed their email after the first install
+        User::factory()->create(['role' => 'super_admin', 'email' => 'rose.new@example.com']);
+
+        $this->artisan('ecotech:install')->assertSuccessful();
+
+        $this->assertSame(1, User::where('role', 'super_admin')->count());
+        $this->assertDatabaseMissing('users', ['email' => 'shad@ecotech.com']);
+    }
 }
