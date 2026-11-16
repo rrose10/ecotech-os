@@ -14,9 +14,10 @@ for d in /srv/dev-disk-by-*; do
   [ -d "\$d" ] || continue
   mountpoint -q "\$d" || continue
   mkdir -p "\$d/ecotech-backups"
-  cp -u "\$SRC"/*.sql "\$d/ecotech-backups/" 2>/dev/null || true
-  # keep the 60 newest copies per disk
+  cp -u "\$SRC"/*.sql "\$SRC"/*.tar.gz "\$d/ecotech-backups/" 2>/dev/null || true
+  # keep the 60 newest copies per disk (database dumps and upload archives separately)
   ls -1t "\$d"/ecotech-backups/*.sql 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
+  ls -1t "\$d"/ecotech-backups/*.tar.gz 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
 done
 SCRIPT
 chmod 755 /usr/local/bin/ecotech-backup-sync.sh

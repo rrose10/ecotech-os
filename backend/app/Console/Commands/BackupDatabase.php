@@ -59,16 +59,44 @@ class BackupDatabase extends Command
             return self::FAILURE;
         }
 
-        // Keep only the newest backups
-        $files = collect(File::files($dir))
-            ->sortByDesc(fn ($f) => $f->getMTime())
-            ->values();
+        $this->backupUploads($dir, $stamp);
 
-        $files->slice((int) $this->option('keep'))
-            ->each(fn ($f) => File::delete($f->getPathname()));
+        // Keep only the newest backups, separately for database dumps and upload archives
+        foreach (['ecotech_files_*.tar.gz', 'ecotech_2*'] as $pattern) {
+            collect(glob("{$dir}/{$pattern}") ?: [])
+                ->reject(fn ($f) => $pattern === 'ecotech_2*' && str_contains($f, 'ecotech_files_'))
+                ->sortByDesc(fn ($f) => filemtime($f))
+                ->values()
+                ->slice((int) $this->option('keep'))
+                ->each(fn ($f) => File::delete($f));
+        }
 
         $this->info('Backup created: ' . $target);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Archive uploaded files (employee photos, NID copies) next to the database dump.
+     * A failure here is reported but never fails the database backup.
+     */
+    private function backupUploads(string $dir, string $stamp): void
+    {
+        $app = storage_path('app');
+        $dirs = array_values(array_filter(['public', 'private'], fn ($d) => is_dir("{$app}/{$d}")));
+
+        if (!$dirs) {
+            return;
+        }
+
+        $archive = "{$dir}/ecotech_files_{$stamp}.tar.gz";
+        $process = new Process(array_merge(['tar', '-czf', $archive, '-C', $app], $dirs));
+        $process->setTimeout(600)->run();
+
+        if ($process->isSuccessful()) {
+            $this->info('Uploads archived: ' . $archive);
+        } else {
+            $this->warn('Uploads archive failed: ' . $process->getErrorOutput());
+        }
     }
 }
