@@ -36,4 +36,16 @@ class InstallCommandTest extends TestCase
         $this->assertSame(1, User::where('role', 'super_admin')->count());
         $this->assertDatabaseMissing('users', ['email' => 'shad@ecotech.com']);
     }
+
+    public function test_users_command_can_remove_a_stray_admin_but_not_the_last_one(): void
+    {
+        $keep = User::factory()->create(['role' => 'super_admin']);
+        $stray = User::factory()->create(['role' => 'super_admin']);
+
+        $this->artisan('ecotech:users', ['--remove' => $stray->id])->assertSuccessful();
+        $this->assertDatabaseMissing('users', ['id' => $stray->id]);
+
+        $this->artisan('ecotech:users', ['--remove' => $keep->id])->assertFailed();
+        $this->assertDatabaseHas('users', ['id' => $keep->id]);
+    }
 }
