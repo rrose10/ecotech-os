@@ -1,7 +1,9 @@
 # EcoTech OS on a NAS / small server.  Start with:  sh deploy/install.sh
 services:
   app:
-    build: ./backend
+    build:
+      context: ./backend
+      network: host   # build steps use the NAS's own internet (container NAT can block apt/npm)
     restart: unless-stopped
     env_file: .env.docker
     environment:
@@ -16,7 +18,9 @@ services:
       - ./backups:/var/www/html/storage/app/backups
 
   scheduler:
-    build: ./backend
+    build:
+      context: ./backend
+      network: host   # build steps use the NAS's own internet (container NAT can block apt/npm)
     restart: unless-stopped
     env_file: .env.docker
     environment:
