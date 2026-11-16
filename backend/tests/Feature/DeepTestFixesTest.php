@@ -156,6 +156,8 @@ class DeepTestFixesTest extends TestCase
             'from_date' => '2026-12-01', 'to_date' => '2026-12-02', 'reason' => 'Family trip']);
         $leave = Leave::first();
 
+        $this->get('/leaves')->assertOk()->assertSee('Person One')
+            ->assertSee("/leaves/{$leave->id}/edit", false);
         $this->get("/leaves/{$leave->id}")->assertOk()->assertSee('Person One');
         $this->get("/leaves/{$leave->id}/edit")->assertOk()->assertSee('Family trip');
 
