@@ -264,7 +264,7 @@
     </div>
 
 </div>
-|@push('scripts')
+@push('scripts')
 <script>
 console.log('Payroll JS Loaded');
 
