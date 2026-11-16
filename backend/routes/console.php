@@ -14,3 +14,6 @@ Schedule::command('db:backup')->dailyAt('02:00');
 
 // Birthday / work-anniversary wishes on the notice board every morning
 Schedule::command('notices:celebrations')->dailyAt('08:00');
+
+// Notifications for notices whose publish date arrived (08:05, after the celebrations)
+Schedule::command('notices:announce')->dailyAt('08:05');

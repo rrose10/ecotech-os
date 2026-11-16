@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notice;
+use App\Models\PortalNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\ActivityLogger;
@@ -45,6 +46,7 @@ class NoticeController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
 
         $notice = Notice::create($validated);
+        PortalNotification::announceNotice($notice);
 
         ActivityLogger::log(
             'Notice',
@@ -94,6 +96,7 @@ class NoticeController extends Controller
         $validated['is_published'] = $request->boolean('is_published');
 
         $notice->update($validated);
+        PortalNotification::announceNotice($notice->fresh());
 
         ActivityLogger::log(
             'Notice',
