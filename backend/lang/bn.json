@@ -134,5 +134,9 @@
     "Leave request sent. You will see it here once it is reviewed.": "ছুটির আবেদন পাঠানো হয়েছে। পর্যালোচনার পর এখানে দেখতে পাবেন।",
     "English": "English",
     "Bangla": "বাংলা",
-    "Cancel this leave request?": "এই ছুটির আবেদন বাতিল করবেন?"
+    "Cancel this leave request?": "এই ছুটির আবেদন বাতিল করবেন?",
+    "Notifications": "নোটিফিকেশন",
+    "Salary and other updates for you": "আপনার বেতন ও অন্যান্য আপডেট",
+    "Mark all as read": "সব পড়া হয়েছে",
+    "No notifications yet.": "এখনো কোনো নোটিফিকেশন নেই।"
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Portal\SalaryController;
 use App\Http\Controllers\Portal\NoticeController;
 use App\Http\Controllers\Portal\LeaveController;
 use App\Http\Controllers\Portal\PayslipController;
+use App\Http\Controllers\Portal\NotificationController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -98,5 +99,20 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/portal/salary/{payroll}/payslip', [PayslipController::class, 'show'])
         ->name('portal.payslip');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications (salary paid, etc.)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/portal/notifications', [NotificationController::class, 'index'])
+        ->name('portal.notifications');
+
+    Route::post('/portal/notifications/read-all', [NotificationController::class, 'readAll'])
+        ->name('portal.notifications.readall');
+
+    Route::get('/portal/notifications/{notification}', [NotificationController::class, 'open'])
+        ->name('portal.notifications.open');
 
 });
