@@ -2,24 +2,24 @@
 
 @section('content')
 
-<div class="p-8">
+<div class="p-4 sm:p-8">
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
 
         <h1 class="text-3xl font-bold">
             Attendance
         </h1>
 
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3">
 
-            <form action="{{ route('attendances.index') }}" method="GET">
+            <form action="{{ route('attendances.index') }}" method="GET" class="flex gap-2">
 
                 <input
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
                     placeholder="Search employee..."
-                    class="border rounded px-4 py-2">
+                    class="border rounded px-4 py-2 min-w-0 flex-1">
 
                 <button
                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

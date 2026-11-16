@@ -29,7 +29,7 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-xl shadow overflow-hidden">
+    <div class="bg-white rounded-xl shadow overflow-x-auto">
 
         <table class="w-full">
 

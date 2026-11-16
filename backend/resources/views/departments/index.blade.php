@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow p-6 overflow-x-auto">
 
         @if($departments->count())
 

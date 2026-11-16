@@ -1671,3 +1671,17 @@ html.dark .eco textarea {
         cursor: not-allowed;
     }
 }
+
+
+/* ---- Small screens: keep the top bar from overflowing ---- */
+@media (max-width: 480px) {
+    .eco-logout {
+        white-space: nowrap;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    .eco-topbar {
+        gap: 0.5rem;
+    }
+}
