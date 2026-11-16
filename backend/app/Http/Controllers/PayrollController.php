@@ -675,9 +675,7 @@ class PayrollController extends Controller
             if ($payroll->status === 'Paid') {
 
                 if ((float) $payroll->loan_amount > 0) {
-                    throw new \Exception(
-                        'This paid payroll included a loan installment. It cannot be deleted automatically.'
-                    );
+                    $this->reverseLoanInstallments($payroll);
                 }
 
                 $expenses = Expense::where('payroll_id', $payroll->id)
@@ -783,5 +781,65 @@ class PayrollController extends Controller
 
                 $loan->save();
             });
+    }
+
+    /**
+     * Undo the loan installment(s) a Paid payroll collected.
+     *
+     * Installments are not stored per payroll, so the loans are matched by
+     * amount: the employee's loans that have paid installments and had
+     * started by that month. If the loan was already deleted there is
+     * nothing to give back. If the match is ambiguous we refuse instead of
+     * guessing.
+     */
+    private function reverseLoanInstallments(Payroll $payroll): void
+    {
+        $amount = round((float) $payroll->loan_amount, 2);
+
+        $loans = EmployeeLoan::where('employee_id', $payroll->employee_id)
+            ->where('paid_installments', '>', 0)
+            ->where(function ($query) use ($payroll) {
+                $query->where('start_year', '<', $payroll->year)
+                    ->orWhere(function ($q) use ($payroll) {
+                        $q->where('start_year', $payroll->year)
+                            ->where('start_month', '<=', $payroll->month);
+                    });
+            })
+            ->lockForUpdate()
+            ->get();
+
+        if ($loans->isEmpty()) {
+            return;
+        }
+
+        $sum = round((float) $loans->sum('monthly_installment'), 2);
+
+        if (abs($sum - $amount) < 0.02) {
+            $targets = $loans;
+        } else {
+            $targets = $loans->filter(
+                fn ($loan) => abs((float) $loan->monthly_installment - $amount) < 0.02
+            );
+
+            if ($targets->count() !== 1) {
+                throw new \Exception(
+                    'This paid payroll included a loan installment that cannot be matched to a loan automatically. Please check the loans of this team member first.'
+                );
+            }
+        }
+
+        foreach ($targets as $loan) {
+            $loan->paid_installments = max(0, (int) $loan->paid_installments - 1);
+            $loan->remaining_balance = min(
+                (float) $loan->loan_amount,
+                (float) $loan->remaining_balance + (float) $loan->monthly_installment
+            );
+
+            if ($loan->status === 'Closed' && $loan->remaining_balance > 0) {
+                $loan->status = 'Active';
+            }
+
+            $loan->save();
+        }
     }
 }
