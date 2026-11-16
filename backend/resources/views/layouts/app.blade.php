@@ -18,6 +18,7 @@
             ['employee-loans.index','employee-loans.*','Team loans','loan'],
             ['payrolls.index',   'payrolls.*',    'Payroll',          'payroll'],
             ['bank-accounts.index','bank-accounts.*','Cash & bank',   'bank'],
+            ['payment-reminders.index','payment-reminders.*','Payment reminders','bell'],
         ],
         'Office' => [
             ['notices.index',    'notices.*',     'Notices',          'notice'],
