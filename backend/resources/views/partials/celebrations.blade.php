@@ -1,4 +1,6 @@
-@php($celebrations = \App\Support\Celebrations::today())
+@php
+    $celebrations = \App\Support\Celebrations::today();
+@endphp
 
 @if($celebrations['birthdays']->isNotEmpty() || $celebrations['anniversaries']->isNotEmpty())
     <div class="rounded-2xl border border-pink-200 bg-gradient-to-r from-pink-50 to-amber-50 p-5 text-slate-800">
