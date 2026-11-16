@@ -46,7 +46,7 @@
                 </p>
 
                 <p class="mt-2 text-lg font-bold text-indigo-600">
-                    ৳ {{ number_format($latestPayroll?->total_salary ?? 0, 2) }}
+                    ৳ {{ number_format($latestPayroll?->total_salary ?? $employee?->basic_salary ?? 0, 2) }}
                 </p>
             </div>
 
