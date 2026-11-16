@@ -48,6 +48,26 @@ class PayrollController extends Controller
     }
 
     /**
+     * Every salary slip of one month on a single page, one slip per printed sheet.
+     * Print it and choose "Save as PDF" to get one PDF with all slips.
+     */
+    public function slips(Request $request)
+    {
+        $month = min(max((int) $request->query('month', now()->month), 1), 12);
+        $year = min(max((int) $request->query('year', now()->year), 2000), 2100);
+        $status = in_array($request->query('status'), ['Paid', 'Pending'], true) ? $request->query('status') : null;
+
+        $payrolls = Payroll::with('employee.department')
+            ->where('month', $month)
+            ->where('year', $year)
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->orderBy('employee_id')
+            ->get();
+
+        return view('payrolls.slips', compact('payrolls', 'month', 'year', 'status'));
+    }
+
+    /**
      * Show create form.
      */
     public function create()
