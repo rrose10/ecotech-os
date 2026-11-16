@@ -1685,3 +1685,140 @@ html.dark .eco textarea {
         gap: 0.5rem;
     }
 }
+
+/* =====================================================================
+   Readability pass: text must always win over the decorative background
+   ===================================================================== */
+
+:root {
+    --glass: rgba(255, 255, 255, 0.82);
+    --glass-strong: rgba(255, 255, 255, 0.92);
+    --muted: #4b5563;
+}
+
+html.dark {
+    --glass: rgba(14, 16, 24, 0.84);
+    --glass-strong: rgba(14, 16, 24, 0.92);
+    --muted: #c7c7cc;
+}
+
+/* Softer, calmer decoration behind the content */
+.eco-ic {
+    opacity: 0.42;
+}
+
+.eco-net {
+    opacity: 0.45;
+}
+
+html.dark body.eco::before {
+    opacity: 0.7;
+}
+
+/* Stronger blur so anything behind a panel dissolves instead of competing with text */
+.eco .bg-white,
+.eco-topbar,
+.eco-sidebar,
+.eco-auth-card {
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+}
+
+html.dark .eco .bg-white.rounded-lg,
+html.dark .eco .bg-white.rounded-xl,
+html.dark .eco .bg-white.rounded-2xl,
+html.dark .eco .bg-white.rounded,
+html.dark .eco .bg-white {
+    background: rgba(14, 16, 24, 0.84) !important;
+}
+
+html.dark .eco-sidebar,
+html.dark .eco-topbar {
+    background: rgba(12, 14, 22, 0.88) !important;
+}
+
+html.dark .eco-topbar.is-scrolled {
+    background: rgba(12, 14, 22, 0.94) !important;
+}
+
+/* Text colours with real contrast */
+html.dark .eco,
+html.dark .eco .text-gray-900,
+html.dark .eco .text-gray-800,
+html.dark .eco .text-gray-700,
+html.dark .eco .text-slate-900,
+html.dark .eco .text-slate-800,
+html.dark .eco .text-slate-700 {
+    color: #f5f5f7;
+}
+
+html.dark .eco .text-gray-600,
+html.dark .eco .text-gray-500,
+html.dark .eco .text-gray-400,
+html.dark .eco .text-slate-600,
+html.dark .eco .text-slate-500,
+html.dark .eco .text-slate-400 {
+    color: #c7c7cc;
+}
+
+html:not(.dark) .eco .text-gray-600,
+html:not(.dark) .eco .text-gray-500,
+html:not(.dark) .eco .text-gray-400,
+html:not(.dark) .eco .text-slate-600,
+html:not(.dark) .eco .text-slate-500,
+html:not(.dark) .eco .text-slate-400 {
+    color: #374151;
+}
+
+.eco thead th,
+html.dark .eco thead th {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+html.dark .eco thead th {
+    color: #e5e5ea;
+}
+
+html:not(.dark) .eco thead th {
+    color: #111827;
+}
+
+/* Form controls: solid enough to read, visible placeholders */
+html.dark .eco input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark .eco select,
+html.dark .eco textarea {
+    background-color: rgba(8, 10, 18, 0.78) !important;
+    border-color: rgba(255, 255, 255, 0.32) !important;
+    color: #fff !important;
+}
+
+html:not(.dark) .eco input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]),
+html:not(.dark) .eco select,
+html:not(.dark) .eco textarea {
+    background-color: rgba(255, 255, 255, 0.92);
+    color: #111827;
+}
+
+.eco ::placeholder {
+    opacity: 1;
+}
+
+html.dark .eco ::placeholder {
+    color: #c4c4cc !important;
+}
+
+html:not(.dark) .eco ::placeholder {
+    color: #6b7280;
+}
+
+/* Table rows read better with a faint divider and no see-through */
+html.dark .eco tbody tr:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Links on dark panels */
+html.dark .eco a.text-blue-600,
+html.dark .eco a.text-blue-500 {
+    color: #6cb4ff;
+}
