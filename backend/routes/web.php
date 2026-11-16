@@ -21,6 +21,7 @@ use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdvanceSalaryController;
 use App\Http\Controllers\EmployeeLoanController;
+use App\Http\Controllers\PaymentReminderController;
 
 
 /*
@@ -284,6 +285,17 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
             'bank-accounts',
             BankAccountController::class
         );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Payment Reminders
+        |--------------------------------------------------------------------------
+        */
+
+        Route::post('/payment-reminders/{payment_reminder}/paid', [PaymentReminderController::class, 'paid'])
+            ->name('payment-reminders.paid');
+
+        Route::resource('payment-reminders', PaymentReminderController::class)->except(['show']);
 
     });
 

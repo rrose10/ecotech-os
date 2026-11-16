@@ -11,3 +11,6 @@ Artisan::command('inspire', function () {
 
 // Daily database backup at 02:00 (Asia/Dhaka)
 Schedule::command('db:backup')->dailyAt('02:00');
+
+// Birthday / work-anniversary wishes on the notice board every morning
+Schedule::command('notices:celebrations')->dailyAt('08:00');

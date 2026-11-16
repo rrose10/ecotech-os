@@ -10,6 +10,7 @@ use App\Models\ExpenseCategory;
 use App\Models\Income;
 use App\Models\IncomeCategory;
 use App\Models\Leave;
+use App\Models\PaymentReminder;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -163,7 +164,10 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
+        $paymentAlerts = PaymentReminder::needingAttention();
+
         return view('dashboard', compact(
+            'paymentAlerts',
             'employees',
             'departments',
             'presentToday',
