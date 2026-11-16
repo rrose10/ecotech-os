@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\Payroll;
+use App\Support\SimpleXlsx;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -37,7 +38,7 @@ class ReportController extends Controller
             ->map(fn ($g) => (float) $g->sum('amount'))
             ->sortDesc();
 
-        if ($request->query('export') === 'csv') {
+        if (in_array($request->query('export'), ['csv', 'xlsx'], true)) {
             $rows = [['Type', 'Category', 'BDT', 'USD']];
             foreach ($incomeByCategory as $name => $v) {
                 $rows[] = ['Income', $name, $v['bdt'], $v['usd']];
@@ -47,7 +48,7 @@ class ReportController extends Controller
             }
             $rows[] = ['Net (BDT)', '', $incomeBdt - $expenseTotal, ''];
 
-            return $this->csv("finance-{$year}-{$month}.csv", $rows);
+            return $this->download($request, "finance-{$year}-{$month}", $rows);
         }
 
         return view('reports.finance', compact(
@@ -78,14 +79,14 @@ class ReportController extends Controller
             ];
         });
 
-        if ($request->query('export') === 'csv') {
+        if (in_array($request->query('export'), ['csv', 'xlsx'], true)) {
             $csv = [['Member ID', 'Name', 'Present', 'Late', 'Absent', 'Leave', 'Working hours']];
             foreach ($rows as $row) {
                 $csv[] = [$row['employee']->employee_id, $row['employee']->name, $row['present'],
                     $row['late'], $row['absent'], $row['leave'], $row['hours']];
             }
 
-            return $this->csv("attendance-{$year}-{$month}.csv", $csv);
+            return $this->download($request, "attendance-{$year}-{$month}", $csv);
         }
 
         return view('reports.attendance', compact('month', 'year', 'rows'));
@@ -108,14 +109,14 @@ class ReportController extends Controller
             'pending' => (float) $payrolls->where('status', 'Pending')->sum('net_salary'),
         ];
 
-        if ($request->query('export') === 'csv') {
+        if (in_array($request->query('export'), ['csv', 'xlsx'], true)) {
             $csv = [['Member ID', 'Name', 'Gross', 'Advance', 'Loan', 'Net', 'Status']];
             foreach ($payrolls as $p) {
                 $csv[] = [$p->employee->employee_id ?? '', $p->employee->name ?? '', $p->total_salary,
                     $p->advance_amount, $p->loan_amount, $p->net_salary, $p->status];
             }
 
-            return $this->csv("payroll-{$year}-{$month}.csv", $csv);
+            return $this->download($request, "payroll-{$year}-{$month}", $csv);
         }
 
         return view('reports.payroll', compact('month', 'year', 'payrolls', 'totals'));
@@ -127,6 +128,20 @@ class ReportController extends Controller
         $year = (int) $request->query('year', now()->year);
 
         return [min(max($month, 1), 12), min(max($year, 2000), 2100)];
+    }
+
+    /** CSV or Excel download, depending on ?export=csv|xlsx. */
+    private function download(Request $request, string $name, array $rows)
+    {
+        if ($request->query('export') === 'xlsx') {
+            $path = SimpleXlsx::build($rows, $name);
+
+            return response()->download($path, $name.'.xlsx', [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        }
+
+        return $this->csv($name.'.csv', $rows);
     }
 
     private function csv(string $filename, array $rows): StreamedResponse

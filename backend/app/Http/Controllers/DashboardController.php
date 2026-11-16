@@ -190,4 +190,38 @@ class DashboardController extends Controller
             'upcomingBirthdays'
         ));
     }
+
+    /**
+     * Income (BDT) and expense per month for the last $months months, oldest first.
+     * Grouped in PHP so it behaves the same on SQLite and MariaDB.
+     *
+     * @return array<int, array{label: string, income: float, expense: float}>
+     */
+    private function monthlyChart(int $months): array
+    {
+        $start = today()->startOfMonth()->subMonthsNoOverflow($months - 1);
+
+        $income = Income::whereDate('income_date', '>=', $start)->get(['income_date', 'amount_bdt'])
+            ->groupBy(fn ($i) => $i->income_date->format('Y-m'))
+            ->map(fn ($g) => (float) $g->sum('amount_bdt'));
+
+        $expense = Expense::whereDate('expense_date', '>=', $start)->get(['expense_date', 'amount'])
+            ->groupBy(fn ($e) => $e->expense_date->format('Y-m'))
+            ->map(fn ($g) => (float) $g->sum('amount'));
+
+        $rows = [];
+
+        for ($i = 0; $i < $months; $i++) {
+            $month = $start->copy()->addMonthsNoOverflow($i);
+            $key = $month->format('Y-m');
+
+            $rows[] = [
+                'label' => $month->format('M'),
+                'income' => (float) ($income[$key] ?? 0),
+                'expense' => (float) ($expense[$key] ?? 0),
+            ];
+        }
+
+        return $rows;
+    }
 }

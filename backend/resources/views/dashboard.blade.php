@@ -181,7 +181,9 @@
 
         </div>
 
-    </div>    <!-- Row 2 -->
+    </div>    @include('partials.finance-chart')
+
+    <!-- Row 2 -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
         <!-- Upcoming Birthdays -->
