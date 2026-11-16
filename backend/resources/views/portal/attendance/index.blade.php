@@ -71,7 +71,7 @@
                 <p class="text-sm text-slate-500">Check In</p>
 
                 <p class="mt-2 font-semibold">
-                    {{ $todayAttendance->check_in ?? '--' }}
+                    {{ $todayAttendance?->check_in?->format('h:i A') ?? '--' }}
                 </p>
             </div>
 
@@ -79,7 +79,7 @@
                 <p class="text-sm text-slate-500">Check Out</p>
 
                 <p class="mt-2 font-semibold">
-                    {{ $todayAttendance->check_out ?? '--' }}
+                    {{ $todayAttendance?->check_out?->format('h:i A') ?? '--' }}
                 </p>
             </div>
 
@@ -190,11 +190,11 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ $attendance->check_in ?? '--' }}
+                                {{ $attendance->check_in?->format('h:i A') ?? '--' }}
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ $attendance->check_out ?? '--' }}
+                                {{ $attendance->check_out?->format('h:i A') ?? '--' }}
                             </td>
 
                             <td class="px-6 py-4">
