@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\BankAccount;
 use App\Models\ExpenseCategory;
 use App\Models\IncomeCategory;
+use App\Models\LeaveType;
 use App\Models\MotivationalQuote;
 use App\Models\User;
 use Database\Seeders\BankAccountSeeder;
@@ -41,6 +42,14 @@ class InstallEcotech extends Command
         ] as [$model, $seeder]) {
             if ($model::query()->doesntExist()) {
                 $this->call('db:seed', ['--class' => $seeder, '--force' => true]);
+            }
+        }
+
+        // Without any leave type nobody can request leave, so start with two common ones
+        // (editable any time under Leave types).
+        if (LeaveType::query()->doesntExist()) {
+            foreach ([['Casual Leave', 10], ['Sick Leave', 10]] as [$name, $days]) {
+                LeaveType::create(['name' => $name, 'days_per_year' => $days, 'is_paid' => true, 'status' => true]);
             }
         }
 

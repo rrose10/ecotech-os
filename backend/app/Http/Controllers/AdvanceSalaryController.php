@@ -99,8 +99,7 @@ class AdvanceSalaryController extends Controller
                 'created_by'       => Auth::id(),
             ]);
 
-            $expenseCategory = ExpenseCategory::where('name', 'Advance Salary')
-                ->firstOrFail();
+            $expenseCategory = ExpenseCategory::firstOrCreate(['name' => 'Advance Salary'], ['status' => true]);
 
             Expense::create([
                 'expense_category_id' => $expenseCategory->id,
@@ -225,8 +224,7 @@ class AdvanceSalaryController extends Controller
 
             if ($advanceSalary->expense) {
 
-                $expenseCategory = ExpenseCategory::where('name', 'Advance Salary')
-                    ->firstOrFail();
+                $expenseCategory = ExpenseCategory::firstOrCreate(['name' => 'Advance Salary'], ['status' => true]);
 
                 $advanceSalary->expense->update([
                     'expense_category_id' => $expenseCategory->id,

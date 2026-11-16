@@ -106,6 +106,11 @@ class EmployeeLoanController extends Controller
 
             }
 
+            // Last installment month, worked out from the start month when left blank.
+            $steps = max(0, (int) $request->total_installments - 1) + ((int) $request->start_month - 1);
+            $endMonth = $steps % 12 + 1;
+            $endYear = (int) $request->start_year + intdiv($steps, 12);
+
             $loan = EmployeeLoan::create([
 
                 'employee_id'            => $employee->id,
@@ -120,9 +125,9 @@ class EmployeeLoanController extends Controller
 
                 'paid_installments' => 0,
 
-                'end_month' => $request->end_month,
+                'end_month' => $request->filled('end_month') ? $request->end_month : $endMonth,
 
-                'end_year' => $request->end_year,
+                'end_year' => $request->filled('end_year') ? $request->end_year : $endYear,
 
                 'remaining_balance'      => $request->loan_amount,
 
@@ -140,10 +145,7 @@ class EmployeeLoanController extends Controller
 
             ]);
 
-            $expenseCategory = ExpenseCategory::where(
-                'name',
-                'Employee Loan'
-            )->firstOrFail();
+            $expenseCategory = ExpenseCategory::firstOrCreate(['name' => 'Employee Loan'], ['status' => true]);
 
             $expense = Expense::create([
 
@@ -326,10 +328,7 @@ class EmployeeLoanController extends Controller
 
             if ($employeeLoan->expense) {
 
-                $expenseCategory = ExpenseCategory::where(
-                    'name',
-                    'Employee Loan'
-                )->firstOrFail();
+                $expenseCategory = ExpenseCategory::firstOrCreate(['name' => 'Employee Loan'], ['status' => true]);
 
                 $employeeLoan->expense->update([
 
