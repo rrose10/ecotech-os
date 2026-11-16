@@ -103,4 +103,30 @@ class Attendance extends Model
             ->whereDate('attendance_date', self::shiftDateFor()->toDateString())
             ->first();
     }
+
+    /**
+     * check_in / check_out are TIME columns, so the date is lost. For forms
+     * and lists, rebuild full date-times from attendance_date; a check-out
+     * earlier than the check-in belongs to the next day (night shift).
+     */
+    public function checkInAt(): ?Carbon
+    {
+        if (!$this->check_in || !$this->attendance_date) {
+            return null;
+        }
+
+        return Carbon::parse($this->attendance_date->format('Y-m-d') . ' ' . $this->check_in->format('H:i:s'));
+    }
+
+    public function checkOutAt(): ?Carbon
+    {
+        if (!$this->check_out || !$this->attendance_date) {
+            return null;
+        }
+
+        $out = Carbon::parse($this->attendance_date->format('Y-m-d') . ' ' . $this->check_out->format('H:i:s'));
+        $in = $this->checkInAt();
+
+        return ($in && $out->lte($in)) ? $out->addDay() : $out;
+    }
 }

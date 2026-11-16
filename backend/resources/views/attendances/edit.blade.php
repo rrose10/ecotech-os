@@ -100,7 +100,7 @@
                 <input
                     type="datetime-local"
                     name="check_in"
-                    value="{{ old('check_in', $attendance->check_in?->format('Y-m-d\TH:i')) }}"
+                    value="{{ old('check_in', $attendance->checkInAt()?->format('Y-m-d\TH:i')) }}"
                     class="w-full border rounded p-3">
 
             </div>
@@ -114,7 +114,7 @@
                 <input
                     type="datetime-local"
                     name="check_out"
-                    value="{{ old('check_out', $attendance->check_out?->format('Y-m-d\TH:i')) }}"
+                    value="{{ old('check_out', $attendance->checkOutAt()?->format('Y-m-d\TH:i')) }}"
                     class="w-full border rounded p-3">
 
             </div>
