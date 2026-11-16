@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Notice;
+use App\Models\PortalNotification;
 use App\Models\User;
 use App\Support\Celebrations;
 use Illuminate\Console\Command;
@@ -65,7 +66,7 @@ class PostCelebrationNotices extends Command
             return 0;
         }
 
-        Notice::create([
+        $notice = Notice::create([
             'title' => $title,
             'content' => $content,
             'type' => 'General',
@@ -74,6 +75,7 @@ class PostCelebrationNotices extends Command
             'expiry_date' => $today,
             'created_by' => $this->authorId,
         ]);
+        PortalNotification::announceNotice($notice);
 
         return 1;
     }
