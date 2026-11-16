@@ -19,7 +19,7 @@ class PortalDisplayTest extends TestCase
         $dept = Department::create(['name' => 'Design', 'code' => 'DSN']);
         $emp = Employee::create([
             'department_id' => $dept->id, 'employee_id' => 'EMP1', 'name' => 'Person One',
-            'email' => 'p1@example.com', 'designation' => 'Designer', 'salary' => 12000,
+            'email' => 'p1@example.com', 'designation' => 'Designer', 'basic_salary' => 12000,
             'joining_date' => today()->subYear(), 'gender' => 'Male', 'status' => true, 'user_id' => $user->id,
         ]);
 

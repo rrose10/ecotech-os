@@ -107,7 +107,8 @@ class PaymentReminderTest extends TestCase
     public function test_hr_and_team_cannot_open_reminders(): void
     {
         $this->actingAs($this->admin('hr'));
-        $this->get('/payment-reminders')->assertForbidden();
+        $this->get('/payment-reminders')->assertRedirect(route('employees.index'));
+        $this->post('/payment-reminders', ['title' => 'x'])->assertForbidden();
     }
 
     public function test_celebration_notices_are_posted_once(): void
