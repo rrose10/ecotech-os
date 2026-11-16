@@ -37,13 +37,14 @@ class PayrollNotificationTest extends TestCase
             'account_name' => 'Cash', 'type' => 'Cash', 'opening_balance' => 100000,
             'current_balance' => 100000, 'is_active' => true,
         ]);
+        $admin = User::factory()->create(['role' => 'super_admin']);
         $payroll = Payroll::create([
-            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'month' => 11, 'year' => 2026,
-            'basic_salary' => 20000, 'bonus' => 0, 'advance_amount' => 0, 'loan_amount' => 0,
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'created_by' => $admin->id,
+            'month' => 11, 'year' => 2026, 'basic_salary' => 20000, 'bonus' => 0, 'advance_amount' => 0, 'loan_amount' => 0,
             'total_salary' => 20000, 'net_salary' => 20000, 'status' => 'Pending',
         ]);
 
-        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+        $this->actingAs($admin);
         $data = [
             'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'month' => 11, 'year' => 2026,
             'bonus' => 0, 'payment_date' => '2026-11-30', 'status' => 'Paid',
@@ -60,8 +61,14 @@ class PayrollNotificationTest extends TestCase
     public function test_member_sees_and_opens_own_notification_only(): void
     {
         [$user, $emp] = $this->member();
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $bank = BankAccount::create([
+            'account_name' => 'Cash', 'type' => 'Cash', 'opening_balance' => 100000,
+            'current_balance' => 100000, 'is_active' => true,
+        ]);
         $payroll = Payroll::create([
-            'employee_id' => $emp->id, 'month' => 11, 'year' => 2026, 'basic_salary' => 20000,
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'created_by' => $admin->id,
+            'month' => 11, 'year' => 2026, 'basic_salary' => 20000,
             'bonus' => 0, 'advance_amount' => 0, 'loan_amount' => 0,
             'total_salary' => 20000, 'net_salary' => 20000, 'status' => 'Paid',
         ]);

@@ -203,6 +203,7 @@ class DeepTestFixesTest extends TestCase
             'account_name' => 'Main', 'type' => 'Bank', 'opening_balance' => 50000,
             'current_balance' => 50000, 'is_active' => true,
         ]);
+        ExpenseCategory::firstOrCreate(['name' => 'Salary'], ['status' => true]);
 
         $this->post('/employee-loans', [
             'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'loan_amount' => 3000,

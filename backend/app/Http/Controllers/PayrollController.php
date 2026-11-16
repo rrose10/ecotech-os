@@ -303,7 +303,7 @@ class PayrollController extends Controller
         DB::commit();
 
         if ($payroll->status === 'Paid') {
-            PortalNotification::salaryPaid($payroll);
+            $this->notifySalaryPaid($payroll);
         }
 
         return redirect()
@@ -664,7 +664,7 @@ class PayrollController extends Controller
             DB::commit();
 
             if ($oldStatus !== 'Paid' && $newStatus === 'Paid') {
-                PortalNotification::salaryPaid($payroll->fresh());
+                $this->notifySalaryPaid($payroll->fresh());
             }
 
             return redirect()
@@ -869,6 +869,18 @@ class PayrollController extends Controller
             }
 
             $loan->save();
+        }
+    }
+
+    /**
+     * The notification is a courtesy: if it fails, the saved payroll stays.
+     */
+    private function notifySalaryPaid(Payroll $payroll): void
+    {
+        try {
+            PortalNotification::salaryPaid($payroll);
+        } catch (\Throwable $e) {
+            report($e);
         }
     }
 }
