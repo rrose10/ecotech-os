@@ -189,4 +189,61 @@ class DeepTestFixesTest extends TestCase
         $this->assertEquals(10000, $bank->fresh()->current_balance);
         $this->assertSame(0, Expense::count());
     }
+
+    private function paidPayrollWithLoan(): array
+    {
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+        $dept = Department::create(['name' => 'Design', 'code' => 'DSN']);
+        $emp = Employee::create([
+            'department_id' => $dept->id, 'employee_id' => 'EMP1', 'name' => 'Person One',
+            'email' => 'p1@example.com', 'designation' => 'Designer', 'basic_salary' => 5000,
+            'joining_date' => today()->subYear(), 'gender' => 'Male', 'status' => true,
+        ]);
+        $bank = BankAccount::create([
+            'account_name' => 'Main', 'type' => 'Bank', 'opening_balance' => 50000,
+            'current_balance' => 50000, 'is_active' => true,
+        ]);
+
+        $this->post('/employee-loans', [
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'loan_amount' => 3000,
+            'monthly_installment' => 1000, 'total_installments' => 3, 'loan_date' => today()->toDateString(),
+            'start_month' => 1, 'start_year' => 2026, 'end_month' => '', 'end_year' => '',
+        ]);
+        $this->assertSame(47000.0, (float) $bank->fresh()->current_balance);
+
+        $this->post('/payrolls', [
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'month' => 11, 'year' => 2026,
+            'bonus' => 0, 'payment_date' => today()->toDateString(), 'status' => 'Paid',
+        ]);
+
+        $payroll = \App\Models\Payroll::firstOrFail();
+        $this->assertEquals(1000, $payroll->loan_amount);
+        $this->assertSame(1, (int) EmployeeLoan::first()->paid_installments);
+
+        return [$emp, $bank, $payroll];
+    }
+
+    public function test_paid_payroll_with_loan_can_be_deleted_and_loan_is_restored(): void
+    {
+        [, $bank, $payroll] = $this->paidPayrollWithLoan();
+
+        $this->delete("/payrolls/{$payroll->id}")->assertRedirect(route('payrolls.index'));
+
+        $this->assertSame(0, \App\Models\Payroll::count());
+        $this->assertSame(47000.0, (float) $bank->fresh()->current_balance);   // salary paid back
+        $loan = EmployeeLoan::first();
+        $this->assertSame(0, (int) $loan->paid_installments);
+        $this->assertEquals(3000, $loan->remaining_balance);
+    }
+
+    public function test_paid_payroll_can_be_deleted_after_its_loan_was_removed(): void
+    {
+        [, $bank, $payroll] = $this->paidPayrollWithLoan();
+        EmployeeLoan::query()->delete();
+
+        $this->delete("/payrolls/{$payroll->id}")->assertRedirect(route('payrolls.index'));
+
+        $this->assertSame(0, \App\Models\Payroll::count());
+        $this->assertSame(0, Expense::where('payroll_id', $payroll->id)->count());
+    }
 }
