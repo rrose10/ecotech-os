@@ -9,7 +9,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Income;
 use App\Models\IncomeCategory;
-use App\Models\LeaveRequest;
+use App\Models\Leave;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -39,7 +39,7 @@ class DashboardController extends Controller
             ->where('status', 'Absent')
             ->count();
 
-        $pendingLeaves = LeaveRequest::where('status', 'Pending')
+        $pendingLeaves = Leave::where('status', 'Pending')
             ->count();
 
         /*
@@ -105,7 +105,7 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $recentLeaves = LeaveRequest::with(['employee', 'leaveType'])
+        $recentLeaves = Leave::with(['employee', 'leaveType'])
             ->where('status', 'Pending')
             ->latest()
             ->take(5)
