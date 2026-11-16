@@ -6,6 +6,8 @@ use App\Http\Controllers\Portal\ProfileController;
 use App\Http\Controllers\Portal\AttendanceController;
 use App\Http\Controllers\Portal\SalaryController;
 use App\Http\Controllers\Portal\NoticeController;
+use App\Http\Controllers\Portal\LeaveController;
+use App\Http\Controllers\Portal\PayslipController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -72,5 +74,29 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/portal/notices/{notice}', [NoticeController::class, 'show'])
         ->name('portal.notices.show');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Leaves
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/portal/leaves', [LeaveController::class, 'index'])
+        ->name('portal.leaves');
+
+    Route::post('/portal/leaves', [LeaveController::class, 'store'])
+        ->name('portal.leaves.store');
+
+    Route::delete('/portal/leaves/{leave}', [LeaveController::class, 'cancel'])
+        ->name('portal.leaves.cancel');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payslip (printable, save as PDF from the browser)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get('/portal/salary/{payroll}/payslip', [PayslipController::class, 'show'])
+        ->name('portal.payslip');
 
 });

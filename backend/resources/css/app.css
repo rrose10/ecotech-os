@@ -527,3 +527,97 @@ body.eco {
         background-color: rgba(255, 255, 255, 0.92) !important;
     }
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Dark mode (toggled with the moon button in the top bar, saved per browser)
+|--------------------------------------------------------------------------
+*/
+
+html.dark {
+    color-scheme: dark;
+    --text: #e4efee;
+    --muted: #9db5b6;
+    --glass: rgba(16, 36, 38, 0.66);
+    --glass-strong: rgba(16, 36, 38, 0.84);
+    --glass-edge: rgba(255, 255, 255, 0.09);
+    --hairline: rgba(255, 255, 255, 0.12);
+    --shadow-glass: 0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 14px 34px -14px rgba(0, 0, 0, 0.65);
+}
+
+html.dark body.eco {
+    background-color: #06100f;
+    background-image:
+        radial-gradient(60rem 38rem at 8% -8%, #0c3a35 0%, transparent 62%),
+        radial-gradient(52rem 38rem at 100% 2%, #0d2f3d 0%, transparent 58%),
+        radial-gradient(46rem 34rem at 68% 112%, #2a2412 0%, transparent 62%);
+}
+
+html.dark .eco .bg-white.rounded-lg,
+html.dark .eco .bg-white.rounded-xl,
+html.dark .eco .bg-white.rounded-2xl,
+html.dark .eco .bg-white.rounded {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+html.dark .eco .eco-topbar {
+    background: rgba(14, 32, 34, 0.72);
+}
+
+html.dark .eco .bg-gray-50,
+html.dark .eco .bg-gray-100,
+html.dark .eco .bg-gray-200,
+html.dark .eco .bg-slate-50,
+html.dark .eco .bg-slate-100 {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+html.dark .eco .text-gray-900,
+html.dark .eco .text-gray-800,
+html.dark .eco .text-gray-700,
+html.dark .eco .text-slate-900,
+html.dark .eco .text-slate-800,
+html.dark .eco .text-slate-700 {
+    color: var(--text) !important;
+}
+
+html.dark .eco .text-gray-600,
+html.dark .eco .text-gray-500,
+html.dark .eco .text-gray-400,
+html.dark .eco .text-slate-600,
+html.dark .eco .text-slate-500 {
+    color: var(--muted) !important;
+}
+
+html.dark .eco .border-gray-100,
+html.dark .eco .border-gray-200,
+html.dark .eco .border-gray-300,
+html.dark .eco .border-slate-200,
+html.dark .eco .border-slate-300,
+html.dark .eco .divide-gray-100 > :not(:last-child),
+html.dark .eco .divide-gray-200 > :not(:last-child),
+html.dark .eco .divide-slate-100 > :not(:last-child),
+html.dark .eco .divide-slate-200 > :not(:last-child) {
+    border-color: var(--hairline) !important;
+}
+
+html.dark .eco input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark .eco select,
+html.dark .eco textarea {
+    background-color: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .eco select option {
+    background: #0f2426;
+    color: var(--text);
+}
+
+html.dark .eco .eco-theme-btn .sun { display: block; }
+html.dark .eco .eco-theme-btn .moon { display: none; }
+
+.eco-theme-btn .sun { display: none; }
+.eco-theme-btn .moon { display: block; }

@@ -62,6 +62,8 @@ class EmployeeController extends Controller
             'role' => 'employee',
         ]);
 
+        $user->forceFill(['must_change_password' => true])->save();
+
         $lastEmployee = Employee::latest()->first();
 
         if ($lastEmployee) {

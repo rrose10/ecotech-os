@@ -119,12 +119,17 @@
 
                     <td class="px-6 py-4">
 
+                        <div class="flex items-center gap-3">
+                        <x-avatar :name="$leave->employee->name ?? '?'" :photo="$leave->employee->photo ?? null" size="h-9 w-9" text="text-sm" />
+                        <div>
                         <div class="font-medium">
                             {{ $leave->employee->name ?? 'Deleted Employee' }}
                         </div>
 
                         <div class="text-sm text-gray-500">
                             {{ $leave->employee->employee_id ?? '-' }}
+                        </div>
+                        </div>
                         </div>
 
                     </td>

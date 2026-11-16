@@ -53,13 +53,14 @@ class InstallEcotech extends Command
 
             $password = Str::password(14, symbols: false);
 
-            User::create([
+            $admin = User::create([
                 'name' => $name,
                 'email' => $email,
                 'password' => Hash::make($password),
                 'role' => 'super_admin',
                 'email_verified_at' => now(),
             ]);
+            $admin->forceFill(['must_change_password' => true])->save();
 
             $created[] = [$name, $email, $password];
         }
