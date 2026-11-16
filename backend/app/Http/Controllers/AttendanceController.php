@@ -111,12 +111,7 @@ class AttendanceController extends Controller
      */
     public function show(Attendance $attendance)
     {
-        $attendance->load('employee');
-
-        return view(
-            'attendances.show',
-            compact('attendance')
-        );
+        return redirect()->route('attendances.edit', $attendance);
     }
 
     /**
@@ -154,6 +149,21 @@ class AttendanceController extends Controller
 
         $oldData = $attendance->toArray();
 
+        $in  = $request->filled('check_in') ? Carbon::parse($request->check_in) : null;
+        $out = $request->filled('check_out') ? Carbon::parse($request->check_out) : null;
+
+        $working = $request->working_minutes ?? 0;
+        $late    = $request->late_minutes ?? 0;
+
+        if ($in) {
+            $shiftStart = Attendance::shiftStartFor(Attendance::shiftDateFor($in));
+            $late = $in->gt($shiftStart) ? Attendance::minutesBetween($shiftStart, $in) : 0;
+        }
+
+        if ($in && $out && $out->gt($in)) {
+            $working = max(0, Attendance::minutesBetween($in, $out) - (int) $attendance->break_minutes);
+        }
+
         $attendance->update([
 
             'employee_id' => $request->employee_id,
@@ -164,9 +174,9 @@ class AttendanceController extends Controller
 
             'check_out' => $request->check_out,
 
-            'working_minutes' => $request->working_minutes ?? 0,
+            'working_minutes' => $working,
 
-            'late_minutes' => $request->late_minutes ?? 0,
+            'late_minutes' => $late,
 
             'shift' => 'Night',
 
