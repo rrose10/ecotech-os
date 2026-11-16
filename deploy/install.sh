@@ -53,7 +53,10 @@ mkdir -p backups
 chmod 777 backups
 
 # docker compose reads DB_* for the db container from the same file
-docker compose --env-file .env.docker up -d --build
+# Build with the NAS's own network (container NAT on this NAS blocks apt/npm during builds)
+docker build --allow network.host --network=host -t ecotech-os:latest ./backend
+
+docker compose --env-file .env.docker up -d
 
 echo "Waiting for the app to start..."
 for i in $(seq 1 60); do

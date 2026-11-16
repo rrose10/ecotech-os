@@ -1,7 +1,8 @@
 # EcoTech OS on a NAS / small server.  Start with:  sh deploy/install.sh
 services:
   app:
-    build: ./backend
+    image: ecotech-os:latest   # built by deploy/install.sh
+    pull_policy: never
     restart: unless-stopped
     env_file: .env.docker
     environment:
@@ -16,7 +17,8 @@ services:
       - ./backups:/var/www/html/storage/app/backups
 
   scheduler:
-    build: ./backend
+    image: ecotech-os:latest   # built by deploy/install.sh
+    pull_policy: never
     restart: unless-stopped
     env_file: .env.docker
     environment:

@@ -13,8 +13,8 @@ sh deploy/install.sh 192.168.10.154      # use the NAS IP your team reaches
 4. Open `http://<NAS-IP>:8088`. Both office networks can reach it the same way as SMB.
 5. Daily database backups land in `ecotech-os/backups/` on the NAS (14 kept). Add that
    folder to an OMV rsync/USB backup job.
-6. Update later: `git pull && docker compose --env-file .env.docker up -d --build`
-   (migrations run automatically).
+6. Update later: `cd /opt/ecotech-os && sudo git pull && sudo sh deploy/install.sh <NAS-IP>`
+   (rebuilds, restarts; migrations run automatically; existing secrets are kept).
 
 Secrets live in `.env.docker` (never commit it). The LAN setup uses plain http
 (`FORCE_HTTPS=false`); put Cloudflare Tunnel or a reverse proxy with HTTPS in front
