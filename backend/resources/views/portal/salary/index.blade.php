@@ -137,6 +137,10 @@
                             Status
                         </th>
 
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                            Payslip
+                        </th>
+
                     </tr>
 
                 </thead>
@@ -189,13 +193,18 @@
 
                             </td>
 
+                            <td class="px-6 py-4">
+                                <a href="{{ route('portal.payslip', $payroll) }}" target="_blank" rel="noopener"
+                                   class="font-semibold text-indigo-600 hover:text-indigo-700">View</a>
+                            </td>
+
                         </tr>
 
                     @empty
 
                         <tr>
 
-                            <td colspan="7" class="px-6 py-8 text-center text-slate-500">
+                            <td colspan="8" class="px-6 py-8 text-center text-slate-500">
                                 No salary records found.
                             </td>
 

@@ -73,7 +73,10 @@
                 <tr class="border-b">
 
                     <td class="p-2">
-                        {{ $attendance->employee->name }}
+                        <div class="flex items-center gap-2">
+                            <x-avatar :name="$attendance->employee->name" :photo="$attendance->employee->photo" size="h-8 w-8" text="text-xs" />
+                            <span>{{ $attendance->employee->name }}</span>
+                        </div>
                     </td>
 
                     <td class="p-2">

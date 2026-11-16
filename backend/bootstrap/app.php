@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // Behind a reverse proxy / Cloudflare Tunnel
         $middleware->trustProxies(at: '*');
 
+        $middleware->web(append: [
+            \App\Http\Middleware\ForcePasswordChange::class,
+        ]);
+
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);

@@ -8,6 +8,7 @@
 
     <title>@yield('title', 'Employee Portal')</title>
 
+    @include('partials.theme-head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 

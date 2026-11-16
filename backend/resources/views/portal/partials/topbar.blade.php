@@ -21,9 +21,8 @@
             <p class="text-xs text-slate-500">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
         </div>
 
-        <span class="eco-avatar flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold">
-            {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
-        </span>
+        @include('partials.theme-toggle')
+        <x-avatar :name="auth()->user()->name" :photo="optional(auth()->user()->employee)->photo" />
     </div>
 
 </header>

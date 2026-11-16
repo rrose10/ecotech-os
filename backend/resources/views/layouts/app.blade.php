@@ -54,6 +54,7 @@
 
     <title>@yield('title', 'EcoTech OS')</title>
 
+    @include('partials.theme-head')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -124,15 +125,8 @@
                     <p class="text-sm font-bold leading-tight">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</p>
                 </div>
-                @php $topbarPhoto = optional(Auth::user()->employee)->photo; @endphp
-                @if($topbarPhoto)
-                    <img src="{{ asset('storage/' . $topbarPhoto) }}" alt="{{ Auth::user()->name }}"
-                         class="h-10 w-10 rounded-full object-cover ring-2 ring-white/60">
-                @else
-                    <span class="eco-avatar flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold">
-                        {{ strtoupper(mb_substr(Auth::user()->name, 0, 1)) }}
-                    </span>
-                @endif
+                @include('partials.theme-toggle')
+                <x-avatar :name="Auth::user()->name" :photo="optional(Auth::user()->employee)->photo" />
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button class="eco-logout">Log out</button>

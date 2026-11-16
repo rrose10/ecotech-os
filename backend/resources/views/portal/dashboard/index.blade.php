@@ -8,6 +8,8 @@
 
 <div class="space-y-6">
 
+    @include('partials.celebrations')
+
     {{-- Welcome --}}
     <div class="bg-white rounded-2xl border border-slate-200 p-6">
 
@@ -453,14 +455,7 @@
             @forelse($upcomingBirthdays as $person)
                 <div class="flex items-center justify-between gap-4 py-3">
                     <div class="flex items-center gap-3 min-w-0">
-                        @if($person->photo)
-                            <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}"
-                                 class="h-10 w-10 shrink-0 rounded-full object-cover">
-                        @else
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
-                                {{ strtoupper(mb_substr($person->name, 0, 1)) }}
-                            </span>
-                        @endif
+                        <x-avatar :name="$person->name" :photo="$person->photo" />
                         <div class="min-w-0">
                             <p class="truncate font-semibold text-slate-800">{{ $person->name }}</p>
                             <p class="truncate text-sm text-slate-500">{{ $person->department->name ?? 'No Department' }}</p>

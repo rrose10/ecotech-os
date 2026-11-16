@@ -109,19 +109,7 @@
                         <!-- Photo -->
                         <td class="px-6 py-4">
 
-                            @if($employee->photo)
-
-                                <img
-                                    src="{{ asset('storage/'.$employee->photo) }}"
-                                    class="h-12 w-12 rounded-full border object-cover">
-
-                            @else
-
-                                <img
-                                    src="https://ui-avatars.com/api/?name={{ urlencode($employee->name) }}&background=2563eb&color=fff"
-                                    class="h-12 w-12 rounded-full border">
-
-                            @endif
+                            <x-avatar :name="$employee->name" :photo="$employee->photo" size="h-12 w-12" text="text-base" />
 
                         </td>
 

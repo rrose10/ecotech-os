@@ -3,6 +3,7 @@
         ['portal.dashboard',  'portal.dashboard',  'Dashboard',   'home'],
         ['portal.profile',    'portal.profile',    'My profile',  'profile'],
         ['portal.attendance', 'portal.attendance', 'My attendance','attendance'],
+        ['portal.leaves',     'portal.leaves*',    'My leaves',   'leaves'],
         ['portal.salary',     'portal.salary',     'My payroll',  'payroll'],
         ['portal.notices',    'portal.notices*',   'Team notices','notice'],
     ];
