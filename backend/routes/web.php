@@ -35,6 +35,10 @@ Route::get('/', function () {
 
 });
 
+// Interface language switch (English / Bangla)
+Route::post('/locale/{locale}', [\App\Http\Controllers\LocaleController::class, 'update'])
+    ->name('locale.switch');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes

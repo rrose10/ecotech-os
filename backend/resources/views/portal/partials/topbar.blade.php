@@ -10,7 +10,7 @@
                 @yield('page_title', 'Dashboard')
             </h1>
             <p class="hidden text-sm text-slate-500 sm:block">
-                {{ now()->format('l, d F Y') }}
+                {{ now()->translatedFormat('l, d F Y') }}
             </p>
         </div>
     </div>
@@ -18,9 +18,10 @@
     <div class="flex items-center gap-3">
         <div class="hidden text-right sm:block">
             <p class="text-sm font-bold leading-tight">{{ auth()->user()->name }}</p>
-            <p class="text-xs text-slate-500">{{ auth()->user()->role === 'employee' ? 'Team member' : ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
+            <p class="text-xs text-slate-500">{{ auth()->user()->role === 'employee' ? __('Team Member') : ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
         </div>
 
+        @include('partials.language-switch')
         @include('partials.theme-toggle')
         <x-avatar :name="auth()->user()->name" :photo="optional(auth()->user()->employee)->photo" />
     </div>

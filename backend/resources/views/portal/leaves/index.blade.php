@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 
-@section('title', 'My leaves')
-@section('page_title', 'My leaves')
+@section('title', __('My leaves'))
+@section('page_title', __('My leaves'))
 
 @section('content')
 
@@ -24,7 +24,7 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-5">
                 <p class="text-sm text-slate-500">{{ $type->name }}</p>
                 <p class="mt-2 text-3xl font-extrabold text-slate-900">{{ $left }}
-                    <span class="text-base font-medium text-slate-500">days left</span></p>
+                    <span class="text-base font-medium text-slate-500">{{ __("days left") }}</span></p>
                 <p class="mt-1 text-xs text-slate-500">{{ $used }} used of {{ $type->days_per_year }} this year</p>
             </div>
         @endforeach
@@ -33,17 +33,17 @@
     {{-- Request form --}}
     <div class="rounded-2xl border border-slate-200 bg-white">
         <div class="border-b border-slate-200 px-6 py-4">
-            <h2 class="text-xl font-bold text-slate-900">Request leave</h2>
+            <h2 class="text-xl font-bold text-slate-900">{{ __("Request leave") }}</h2>
         </div>
 
         <form method="POST" action="{{ route('portal.leaves.store') }}" class="grid gap-5 p-6 md:grid-cols-2">
             @csrf
 
             <div>
-                <label for="leave_type_id" class="mb-1 block text-sm font-semibold text-slate-700">Leave type</label>
+                <label for="leave_type_id" class="mb-1 block text-sm font-semibold text-slate-700">{{ __("Leave type") }}</label>
                 <select id="leave_type_id" name="leave_type_id" required
                         class="w-full rounded-xl border border-slate-300 px-3 py-2.5">
-                    <option value="">Choose a type</option>
+                    <option value="">{{ __("Choose a type") }}</option>
                     @foreach($leaveTypes as $type)
                         <option value="{{ $type->id }}" @selected(old('leave_type_id') == $type->id)>{{ $type->name }}</option>
                     @endforeach
@@ -54,14 +54,14 @@
             <div class="hidden md:block"></div>
 
             <div>
-                <label for="from_date" class="mb-1 block text-sm font-semibold text-slate-700">From</label>
+                <label for="from_date" class="mb-1 block text-sm font-semibold text-slate-700">{{ __("From") }}</label>
                 <input id="from_date" type="date" name="from_date" value="{{ old('from_date') }}" min="{{ today()->toDateString() }}" required
                        class="w-full rounded-xl border border-slate-300 px-3 py-2.5">
                 @error('from_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <div>
-                <label for="to_date" class="mb-1 block text-sm font-semibold text-slate-700">To</label>
+                <label for="to_date" class="mb-1 block text-sm font-semibold text-slate-700">{{ __("To") }}</label>
                 <input id="to_date" type="date" name="to_date" value="{{ old('to_date') }}" min="{{ today()->toDateString() }}" required
                        class="w-full rounded-xl border border-slate-300 px-3 py-2.5">
                 @error('to_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -76,7 +76,7 @@
 
             <div class="md:col-span-2">
                 <button type="submit" class="rounded-xl bg-indigo-600 px-5 py-2.5 font-semibold text-white hover:bg-indigo-700">
-                    Send request
+                    {{ __("Send request") }}
                 </button>
             </div>
         </form>
@@ -85,7 +85,7 @@
     {{-- History --}}
     <div class="rounded-2xl border border-slate-200 bg-white">
         <div class="border-b border-slate-200 px-6 py-4">
-            <h2 class="text-xl font-bold text-slate-900">My requests</h2>
+            <h2 class="text-xl font-bold text-slate-900">{{ __("My requests") }}</h2>
         </div>
 
         <div class="divide-y divide-slate-100">
@@ -114,16 +114,16 @@
 
                         @if($leave->status === 'Pending')
                             <form method="POST" action="{{ route('portal.leaves.cancel', $leave) }}"
-                                  onsubmit="return confirm('Cancel this leave request?')">
+                                  onsubmit="return confirm('{{ __('Cancel this leave request?') }}')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-sm font-semibold text-red-600 hover:text-red-700">Cancel</button>
+                                <button class="text-sm font-semibold text-red-600 hover:text-red-700">{{ __("Cancel") }}</button>
                             </form>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="px-6 py-10 text-center text-slate-500">You have not requested any leave yet.</div>
+                <div class="px-6 py-10 text-center text-slate-500">{{ __("You have not requested any leave yet.") }}</div>
             @endforelse
         </div>
 

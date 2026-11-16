@@ -1,8 +1,8 @@
 @extends('layouts.portal')
 
-@section('title', 'Salary')
+@section('title', __('Salary'))
 
-@section('page_title', 'Salary')
+@section('page_title', __('Salary'))
 
 @section('content')
 
@@ -14,7 +14,7 @@
 
         <div class="border-b border-slate-200 px-6 py-4">
             <h2 class="text-xl font-bold text-slate-900">
-                Current Salary
+                {{ __("Current Salary") }}
             </h2>
         </div>
 
@@ -22,7 +22,7 @@
 
             <div>
                 <p class="text-sm text-slate-500">
-                    Basic Salary
+                    {{ __("Basic Salary") }}
                 </p>
 
                 <p class="mt-2 text-lg font-bold text-slate-900">
@@ -32,7 +32,7 @@
 
             <div>
                 <p class="text-sm text-slate-500">
-                    Bonus
+                    {{ __("Bonus") }}
                 </p>
 
                 <p class="mt-2 text-lg font-bold text-green-600">
@@ -42,7 +42,7 @@
 
             <div>
                 <p class="text-sm text-slate-500">
-                    Total Salary
+                    {{ __("Total Salary") }}
                 </p>
 
                 <p class="mt-2 text-lg font-bold text-indigo-600">
@@ -52,7 +52,7 @@
 
             <div>
                 <p class="text-sm text-slate-500">
-                    Payment Date
+                    {{ __("Payment Date") }}
                 </p>
 
                 <p class="mt-2 font-semibold text-slate-900">
@@ -62,19 +62,19 @@
 
             <div>
                 <p class="text-sm text-slate-500">
-                    Status
+                    {{ __("Status") }}
                 </p>
 
                 @if(($latestPayroll?->status ?? '') === 'Paid')
 
                     <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                        Paid
+                        {{ __("Paid") }}
                     </span>
 
                 @elseif(($latestPayroll?->status ?? '') === 'Pending')
 
                     <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
-                        Pending
+                        {{ __("Pending") }}
                     </span>
 
                 @else
@@ -97,7 +97,7 @@
 
         <div class="border-b border-slate-200 px-6 py-4">
             <h2 class="text-xl font-bold text-slate-900">
-                Salary History
+                {{ __("Salary History") }}
             </h2>
         </div>
 
@@ -110,35 +110,35 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Month
+                            {{ __("Month") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Year
+                            {{ __("Year") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Basic
+                            {{ __("Basic") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Bonus
+                            {{ __("Bonus") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Total
+                            {{ __("Total") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Payment Date
+                            {{ __("Payment Date") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Status
+                            {{ __("Status") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Payslip
+                            {{ __("Payslip") }}
                         </th>
 
                     </tr>
@@ -180,13 +180,13 @@
                                 @if($payroll->status == 'Paid')
 
                                     <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                                        Paid
+                                        {{ __("Paid") }}
                                     </span>
 
                                 @else
 
                                     <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                        Pending
+                                        {{ __("Pending") }}
                                     </span>
 
                                 @endif
@@ -195,7 +195,7 @@
 
                             <td class="px-6 py-4">
                                 <a href="{{ route('portal.payslip', $payroll) }}" target="_blank" rel="noopener"
-                                   class="font-semibold text-indigo-600 hover:text-indigo-700">View</a>
+                                   class="font-semibold text-indigo-600 hover:text-indigo-700">{{ __("View") }}</a>
                             </td>
 
                         </tr>
@@ -205,7 +205,7 @@
                         <tr>
 
                             <td colspan="8" class="px-6 py-8 text-center text-slate-500">
-                                No salary records found.
+                                {{ __("No salary records found.") }}
                             </td>
 
                         </tr>

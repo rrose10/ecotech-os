@@ -1,8 +1,8 @@
 @extends('layouts.portal')
 
-@section('title', 'Team Dashboard')
+@section('title', __('Team Dashboard'))
 
-@section('page_title', 'Dashboard')
+@section('page_title', __('Dashboard'))
 
 @section('content')
 
@@ -22,11 +22,11 @@
             <div>
 
                 <h1 class="text-3xl font-bold text-slate-900">
-                    Welcome Back, {{ $employee?->name ?? 'Team Member' }} 👋
+                    {{ __('Welcome Back, :name 👋', ['name' => $employee?->name ?? __('Team Member')]) }}
                 </h1>
 
                 <p class="text-slate-500 mt-2">
-                    Member ID:
+                    {{ __("Member ID:") }}
                     <strong>{{ $employee?->employee_id ?? '--' }}</strong>
                 </p>
 
@@ -70,13 +70,13 @@
 
                 <h2 class="text-2xl font-bold">
 
-                    Daily Motivation
+                    {{ __("Daily Motivation") }}
 
                 </h2>
 
                 <p class="text-indigo-100">
 
-                    A new quote appears every day.
+                    {{ __("A new quote appears every day.") }}
 
                 </p>
 
@@ -114,7 +114,7 @@
     <div class="bg-white rounded-2xl border border-slate-200 p-6">
 
         <h2 class="text-xl font-bold mb-6">
-            Today's Attendance
+            {{ __("Today's Attendance") }}
         </h2>
 
         <div class="grid lg:grid-cols-2 gap-8">
@@ -124,7 +124,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Status
+                        {{ __("Status") }}
                     </p>
 
                     <p class="font-semibold text-lg">
@@ -134,7 +134,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Shift
+                        {{ __("Shift") }}
                     </p>
 
                     <p class="font-semibold">
@@ -144,7 +144,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Check In
+                        {{ __("Check In") }}
                     </p>
 
                     <p class="font-semibold">
@@ -154,7 +154,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Dinner Break Start
+                        {{ __("Dinner Break Start") }}
                     </p>
 
                     <p class="font-semibold">
@@ -164,7 +164,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Dinner Break End
+                        {{ __("Dinner Break End") }}
                     </p>
 
                     <p class="font-semibold">
@@ -174,7 +174,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Check Out
+                        {{ __("Check Out") }}
                     </p>
 
                     <p class="font-semibold">
@@ -184,7 +184,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Break Duration
+                        {{ __("Break Duration") }}
                     </p>
 
                     <p class="font-semibold">
@@ -205,7 +205,7 @@
 
                 <div>
                     <p class="text-slate-500 text-sm">
-                        Net Working Time
+                        {{ __("Net Working Time") }}
                     </p>
 
                     <p class="font-semibold">
@@ -238,7 +238,7 @@
                             onclick="return confirm('Check In now?')"
                             class="px-10 py-4 rounded-xl bg-green-600 hover:bg-green-700 text-white font-semibold text-lg">
 
-                            🟢 Check In
+                            {{ __("🟢 Check In") }}
 
                         </button>
 
@@ -253,7 +253,7 @@
                             onclick="return confirm('Start Dinner Break?')"
                             class="px-10 py-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-lg">
 
-                            🍽 Start Dinner Break
+                            {{ __("🍽 Start Dinner Break") }}
 
                         </button>
 
@@ -268,7 +268,7 @@
                             onclick="return confirm('End Dinner Break?')"
                             class="px-10 py-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg">
 
-                            ▶ End Dinner Break
+                            {{ __("▶ End Dinner Break") }}
 
                         </button>
 
@@ -283,7 +283,7 @@
                             onclick="return confirm('Check Out now?')"
                             class="px-10 py-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-semibold text-lg">
 
-                            🔴 Check Out
+                            {{ __("🔴 Check Out") }}
 
                         </button>
 
@@ -298,7 +298,7 @@
                         </div>
 
                         <p class="mt-3 font-semibold text-green-700 text-lg">
-                            Attendance Completed
+                            {{ __("Attendance Completed") }}
                         </p>
 
                     </div>
@@ -317,7 +317,7 @@
 
         <div class="bg-white rounded-2xl border border-slate-200 p-6">
             <p class="text-slate-500 text-sm">
-                Present This Month
+                {{ __("Present This Month") }}
             </p>
 
             <h2 class="text-3xl font-bold text-green-600 mt-2">
@@ -330,7 +330,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 p-6">
 
             <p class="text-slate-500 text-sm">
-                Late This Month
+                {{ __("Late This Month") }}
             </p>
 
             <h2 class="text-3xl font-bold text-orange-500 mt-2">
@@ -344,7 +344,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 p-6">
 
             <p class="text-slate-500 text-sm">
-                Absent This Month
+                {{ __("Absent This Month") }}
             </p>
 
             <h2 class="text-3xl font-bold text-red-600 mt-2">
@@ -364,11 +364,11 @@
             <div>
 
                 <h2 class="text-xl font-bold text-slate-900">
-                    📢 Team Notices
+                    {{ __("📢 Team Notices") }}
                 </h2>
 
                 <p class="text-sm text-slate-500 mt-1">
-                    Stay updated with the latest announcements.
+                    {{ __("Stay updated with the latest announcements.") }}
                 </p>
 
             </div>
@@ -376,7 +376,7 @@
             <a href="{{ route('portal.notices') }}"
                class="text-indigo-600 hover:text-indigo-700 font-semibold">
 
-                View All →
+                {{ __("View All →") }}
 
             </a>
 
@@ -433,11 +433,11 @@
                 </div>
 
                 <h3 class="text-lg font-semibold text-slate-700">
-                    No Notices Found
+                    {{ __("No Notices Found") }}
                 </h3>
 
                 <p class="text-slate-500 mt-2">
-                    There are no published notices at the moment.
+                    {{ __("There are no published notices at the moment.") }}
                 </p>
 
             </div>
@@ -451,8 +451,8 @@
     <div class="bg-white rounded-2xl border border-slate-200 p-6">
 
         <div class="mb-6">
-            <h2 class="text-xl font-bold text-slate-900">🎂 Upcoming Birthdays</h2>
-            <p class="text-sm text-slate-500 mt-1">Celebrate with your teammates.</p>
+            <h2 class="text-xl font-bold text-slate-900">{{ __("🎂 Upcoming Birthdays") }}</h2>
+            <p class="text-sm text-slate-500 mt-1">{{ __("Celebrate with your teammates.") }}</p>
         </div>
 
         <div class="divide-y divide-slate-100">
@@ -467,7 +467,7 @@
                     </div>
                     <div class="shrink-0 text-right">
                         @if($person->days_until === 0)
-                            <span class="rounded-full bg-pink-100 px-3 py-1 text-sm font-semibold text-pink-700">Today 🎉</span>
+                            <span class="rounded-full bg-pink-100 px-3 py-1 text-sm font-semibold text-pink-700">{{ __("Today 🎉") }}</span>
                         @else
                             <p class="text-sm font-semibold text-slate-700">{{ $person->next_birthday->format('d M') }}</p>
                             <p class="text-xs text-slate-500">{{ $person->days_until === 1 ? 'Tomorrow' : 'in ' . $person->days_until . ' days' }}</p>
@@ -475,7 +475,7 @@
                     </div>
                 </div>
             @empty
-                <div class="py-8 text-center text-slate-500">No birthdays on record yet.</div>
+                <div class="py-8 text-center text-slate-500">{{ __("No birthdays on record yet.") }}</div>
             @endforelse
         </div>
 
@@ -488,11 +488,11 @@
             <div class="mb-6">
 
                 <h2 class="text-xl font-bold text-slate-900">
-                    🏖 My Leave Balance
+                    {{ __("🏖 My Leave Balance") }}
                 </h2>
 
                 <p class="text-sm text-slate-500 mt-1">
-                    Current year leave summary
+                    {{ __("Current year leave summary") }}
                 </p>
 
             </div>
@@ -516,7 +516,7 @@
                             {{ $leave->remaining_days }}
 
                             <span class="text-lg font-medium">
-                                Days
+                                {{ __("Days") }}
                             </span>
 
                         </h3>
@@ -540,7 +540,7 @@
 
 
                     <div class="text-slate-500">
-                        No leave balance available.
+                        {{ __("No leave balance available.") }}
                     </div>
 
 

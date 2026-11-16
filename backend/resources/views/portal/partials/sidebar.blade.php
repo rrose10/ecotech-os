@@ -16,7 +16,7 @@
         <span class="eco-logo-tile flex h-11 w-11 items-center justify-center rounded-2xl"><img src="{{ asset('images/ecotech-mark.png') }}" alt="EcoTech" class="h-full w-full object-contain"></span>
         <div>
             <p class="text-lg font-extrabold leading-tight tracking-tight">EcoTech</p>
-            <p class="text-xs text-white/50">Team portal</p>
+            <p class="text-xs text-white/50">{{ __('Team portal') }}</p>
         </div>
     </div>
 
@@ -26,7 +26,7 @@
                class="eco-nav-link"
                @if(request()->routeIs($pattern)) aria-current="page" @endif>
                 @include('partials.nav-icon', ['name' => $icon])
-                {{ $text }}
+                {{ __($text) }}
             </a>
         @endforeach
     </nav>
@@ -36,7 +36,7 @@
             @csrf
             <button type="submit"
                     class="w-full rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10">
-                Log out
+                {{ __('Log out') }}
             </button>
         </form>
     </div>

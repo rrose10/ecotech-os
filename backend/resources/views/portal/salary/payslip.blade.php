@@ -36,8 +36,8 @@
 <body>
 
 <div class="actions">
-    <button class="btn" onclick="window.print()">Print / Save as PDF</button>
-    <a class="btn alt" href="{{ route('portal.salary') }}">Back to payroll</a>
+    <button class="btn" onclick="window.print()">{{ __("Print / Save as PDF") }}</button>
+    <a class="btn alt" href="{{ route('portal.salary') }}">{{ __("Back to payroll") }}</a>
 </div>
 
 <div class="sheet">
@@ -52,31 +52,31 @@
             </div>
         </div>
         <div style="text-align:right">
-            <h2>Payslip</h2>
+            <h2>{{ __("Payslip") }}</h2>
             <div class="muted">{{ \Carbon\Carbon::create(null, $payroll->month, 1)->format('F') }} {{ $payroll->year }}</div>
         </div>
     </div>
 
     <div class="grid">
-        <div><b>Team Member</b>{{ $payroll->employee->name }}</div>
-        <div><b>Member ID</b>{{ $payroll->employee->employee_id }}</div>
-        <div><b>Designation</b>{{ $payroll->employee->designation }}</div>
-        <div><b>Department</b>{{ $payroll->employee->department->name ?? '-' }}</div>
-        <div><b>Payment date</b>{{ $payroll->payment_date?->format('d M Y') ?? '-' }}</div>
-        <div><b>Status</b><span class="status {{ $payroll->status === 'Paid' ? 'paid' : '' }}">{{ $payroll->status }}</span></div>
+        <div><b>{{ __("Team Member") }}</b>{{ $payroll->employee->name }}</div>
+        <div><b>{{ __("Member ID") }}</b>{{ $payroll->employee->employee_id }}</div>
+        <div><b>{{ __("Designation") }}</b>{{ $payroll->employee->designation }}</div>
+        <div><b>{{ __("Department") }}</b>{{ $payroll->employee->department->name ?? '-' }}</div>
+        <div><b>{{ __("Payment date") }}</b>{{ $payroll->payment_date?->format('d M Y') ?? '-' }}</div>
+        <div><b>{{ __("Status") }}</b><span class="status {{ $payroll->status === 'Paid' ? 'paid' : '' }}">{{ $payroll->status }}</span></div>
     </div>
 
     <table>
         <thead>
-            <tr><th>Description</th><th class="num">Amount (BDT)</th></tr>
+            <tr><th>{{ __("Description") }}</th><th class="num">Amount (BDT)</th></tr>
         </thead>
         <tbody>
-            <tr><td>Basic salary</td><td class="num">{{ number_format($payroll->basic_salary, 2) }}</td></tr>
-            <tr><td>Bonus</td><td class="num">{{ number_format($payroll->bonus, 2) }}</td></tr>
-            <tr><td><b>Gross salary</b></td><td class="num"><b>{{ number_format($payroll->total_salary, 2) }}</b></td></tr>
-            <tr><td>Advance deduction</td><td class="num">- {{ number_format($payroll->advance_amount, 2) }}</td></tr>
-            <tr><td>Loan deduction</td><td class="num">- {{ number_format($payroll->loan_amount, 2) }}</td></tr>
-            <tr class="total"><td>Net pay</td><td class="num">{{ number_format($payroll->net_salary, 2) }}</td></tr>
+            <tr><td>{{ __("Basic salary") }}</td><td class="num">{{ number_format($payroll->basic_salary, 2) }}</td></tr>
+            <tr><td>{{ __("Bonus") }}</td><td class="num">{{ number_format($payroll->bonus, 2) }}</td></tr>
+            <tr><td><b>{{ __("Gross salary") }}</b></td><td class="num"><b>{{ number_format($payroll->total_salary, 2) }}</b></td></tr>
+            <tr><td>{{ __("Advance deduction") }}</td><td class="num">- {{ number_format($payroll->advance_amount, 2) }}</td></tr>
+            <tr><td>{{ __("Loan deduction") }}</td><td class="num">- {{ number_format($payroll->loan_amount, 2) }}</td></tr>
+            <tr class="total"><td>{{ __("Net pay") }}</td><td class="num">{{ number_format($payroll->net_salary, 2) }}</td></tr>
         </tbody>
     </table>
 

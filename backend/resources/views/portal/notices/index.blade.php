@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 
-@section('title', 'Notices')
-@section('page_title', 'Notices')
+@section('title', __('Notices'))
+@section('page_title', __('Notices'))
 
 @section('content')
 
@@ -12,11 +12,11 @@
         <div>
 
             <h1 class="text-3xl font-bold text-slate-900">
-                📢 Notices
+                {{ __("📢 Notices") }}
             </h1>
 
             <p class="text-slate-500 mt-2">
-                Latest office announcements
+                {{ __("Latest office announcements") }}
             </p>
 
         </div>
@@ -47,7 +47,7 @@
                     @case('Important')
 
                         <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm">
-                            Important
+                            {{ __("Important") }}
                         </span>
 
                         @break
@@ -55,7 +55,7 @@
                     @case('Holiday')
 
                         <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm">
-                            Holiday
+                            {{ __("Holiday") }}
                         </span>
 
                         @break
@@ -63,7 +63,7 @@
                     @case('Meeting')
 
                         <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm">
-                            Meeting
+                            {{ __("Meeting") }}
                         </span>
 
                         @break
@@ -71,7 +71,7 @@
                     @default
 
                         <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm">
-                            General
+                            {{ __("General") }}
                         </span>
 
                 @endswitch
@@ -90,7 +90,7 @@
 
         <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center text-slate-500">
 
-            No notices available.
+            {{ __("No notices available.") }}
 
         </div>
 

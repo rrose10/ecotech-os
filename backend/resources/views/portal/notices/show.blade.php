@@ -1,7 +1,7 @@
 @extends('layouts.portal')
 
-@section('title', 'Notice')
-@section('page_title', 'Notice')
+@section('title', __('Notice'))
+@section('page_title', __('Notice'))
 
 @section('content')
 
@@ -30,7 +30,7 @@
             <a href="{{ route('portal.notices') }}"
                class="px-5 py-2 border rounded-lg hover:bg-slate-100">
 
-                ← Back
+                {{ __("← Back") }}
 
             </a>
 
