@@ -12,7 +12,7 @@
             </h1>
 
             <p class="text-gray-500 mt-1">
-                Manage employee advance salaries.
+                Manage team advance salaries.
             </p>
         </div>
 
@@ -72,7 +72,7 @@
                 <tr>
 
                     <th class="px-4 py-3 text-left">
-                        Employee
+                        Team Member
                     </th>
 
                     <th class="px-4 py-3 text-left">

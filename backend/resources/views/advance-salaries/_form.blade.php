@@ -1,9 +1,9 @@
 <div class="space-y-6">
 
-    {{-- Employee --}}
+    {{-- Team Member --}}
     <div>
         <label for="employee_id" class="block text-sm font-medium text-gray-700 mb-2">
-            Employee <span class="text-red-500">*</span>
+            Team Member <span class="text-red-500">*</span>
         </label>
 
         <select
@@ -12,7 +12,7 @@
             required
             class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500">
 
-            <option value="">Select Employee</option>
+            <option value="">Select Team Member</option>
 
             @foreach($employees as $employee)
                 <option

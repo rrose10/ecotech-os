@@ -33,7 +33,7 @@
                 type="text"
                 name="search"
                 value="{{ $search }}"
-                placeholder="Search Employee..."
+                placeholder="Search team member..."
                 class="w-full md:w-80 border rounded px-4 py-2 focus:outline-none focus:ring focus:ring-blue-200">
         </form>
 
@@ -45,7 +45,7 @@
 
                     <thead>
                         <tr class="border-b bg-gray-50">
-                            <th class="text-left p-3">Employee</th>
+                            <th class="text-left p-3">Team Member</th>
                             <th class="text-left p-3">Month</th>
                             <th class="text-left p-3">Year</th>
                             <th class="text-left p-3">Basic Salary</th>

@@ -45,7 +45,7 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
 
         if (!$employee) {
-            return back()->with('error', 'Employee profile not found.');
+            return back()->with('error', 'Team profile not found.');
         }
 
         try {
@@ -103,7 +103,7 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
 
         if (!$employee) {
-            return back()->with('error', 'Employee profile not found.');
+            return back()->with('error', 'Team profile not found.');
         }
 
         $attendance = Attendance::currentFor($employee->id);
@@ -132,7 +132,7 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
 
         if (!$employee) {
-            return back()->with('error', 'Employee profile not found.');
+            return back()->with('error', 'Team profile not found.');
         }
 
         $attendance = Attendance::currentFor($employee->id);
@@ -168,7 +168,7 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
 
         if (!$employee) {
-            return back()->with('error', 'Employee profile not found.');
+            return back()->with('error', 'Team profile not found.');
         }
 
         $attendance = Attendance::currentFor($employee->id);

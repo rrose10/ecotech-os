@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Employee Loan Details')
+@section('title', 'Team Loan Details')
 
-@section('page_title', 'Employee Loan Details')
+@section('page_title', 'Team Loan Details')
 
 @section('content')
 
@@ -15,7 +15,7 @@
             <div>
 
                 <h2 class="text-xl font-bold">
-                    Employee Loan Details
+                    Team Loan Details
                 </h2>
 
                 <p class="text-sm text-gray-500">
@@ -38,7 +38,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 <div>
-                    <label class="text-gray-500 text-sm">Employee</label>
+                    <label class="text-gray-500 text-sm">Team Member</label>
                     <div class="font-semibold text-lg">
                         {{ $employeeLoan->employee->name }}
                     </div>

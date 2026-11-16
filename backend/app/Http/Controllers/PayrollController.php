@@ -427,7 +427,7 @@ class PayrollController extends Controller
 
                 if ($keysChanged) {
                     throw new \Exception(
-                        'This paid payroll included a loan installment. Employee, month and year cannot be changed.'
+                        'This paid payroll included a loan installment. Team member, month and year cannot be changed.'
                     );
                 }
             }

@@ -33,7 +33,7 @@
             <tbody>
 
                 <tr class="border-b">
-                    <td class="px-6 py-4 font-semibold w-64">Employee</td>
+                    <td class="px-6 py-4 font-semibold w-64">Team Member</td>
                     <td class="px-6 py-4">
                         {{ $advanceSalary->employee->employee_id }}
                         -

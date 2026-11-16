@@ -16,7 +16,7 @@
             </h1>
 
             <p class="mt-1 text-gray-500">
-                Manage employee leave applications.
+                Manage team leave applications.
             </p>
         </div>
 
@@ -28,7 +28,7 @@
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
-                    placeholder="Search Employee..."
+                    placeholder="Search team member..."
                     class="w-72 rounded-l-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none">
 
                 <button
@@ -63,7 +63,7 @@
 
                 <tr>
 
-                    <th class="px-6 py-4 text-left">Employee</th>
+                    <th class="px-6 py-4 text-left">Team Member</th>
 
                     <th class="px-6 py-4 text-left">Leave Type</th>
 

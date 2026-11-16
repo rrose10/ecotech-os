@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Employees')
-@section('page_title', 'Employees')
+@section('title', 'Team')
+@section('page_title', 'Team')
 
 @section('content')
 
@@ -12,11 +12,11 @@
 
         <div>
             <h1 class="text-3xl font-bold text-gray-800">
-                Employees
+                Team
             </h1>
 
             <p class="mt-1 text-gray-500">
-                Manage all employees from one place.
+                Manage all team members from one place.
             </p>
         </div>
 
@@ -40,7 +40,7 @@
 
             <a href="{{ route('employees.create') }}"
                class="rounded-lg bg-green-600 px-5 py-2 text-center font-medium text-white hover:bg-green-700">
-                + Add Employee
+                + Add Team Member
             </a>
 
         </div>
@@ -73,7 +73,7 @@
                         </th>
 
                         <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                            Employee
+                            Team Member
                         </th>
 
                         <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">
@@ -113,7 +113,7 @@
 
                         </td>
 
-                        <!-- Employee -->
+                        <!-- Team Member -->
                         <td class="px-6 py-4">
 
                             <div class="font-semibold text-gray-800">
@@ -177,7 +177,7 @@
 
                                 <form action="{{ route('employees.destroy',$employee) }}"
                                       method="POST"
-                                      onsubmit="return confirm('Delete this employee?')">
+                                      onsubmit="return confirm('Delete this team member?')">
 
                                     @csrf
                                     @method('DELETE')
@@ -216,7 +216,7 @@
             </div>
 
             <h2 class="mt-4 text-xl font-semibold text-gray-700">
-                No Employees Found
+                No Team Members Found
             </h2>
 
             <p class="mt-2 text-gray-500">
@@ -225,7 +225,7 @@
 
             <a href="{{ route('employees.create') }}"
                class="mt-5 inline-block rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700">
-                + Add Employee
+                + Add Team Member
             </a>
 
         </div>

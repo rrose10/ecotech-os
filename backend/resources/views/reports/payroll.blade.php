@@ -16,7 +16,7 @@
         @if($payrolls->count())
         <table class="w-full">
             <thead><tr class="border-b">
-                <th class="text-left p-2">Employee</th><th class="text-left p-2">Gross</th><th class="text-left p-2">Advance</th>
+                <th class="text-left p-2">Team Member</th><th class="text-left p-2">Gross</th><th class="text-left p-2">Advance</th>
                 <th class="text-left p-2">Loan</th><th class="text-left p-2">Net</th><th class="text-left p-2">Status</th>
             </tr></thead>
             <tbody>

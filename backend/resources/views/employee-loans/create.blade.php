@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Add Employee Loan')
+@section('title', 'Add Team Loan')
 
-@section('page_title', 'Add Employee Loan')
+@section('page_title', 'Add Team Loan')
 
 @section('content')
 
@@ -13,7 +13,7 @@
         <div class="border-b px-6 py-4">
 
             <h2 class="text-xl font-bold">
-                Add Employee Loan
+                Add Team Loan
             </h2>
 
             <p class="text-gray-500 text-sm mt-1">

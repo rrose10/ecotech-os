@@ -17,7 +17,7 @@ class LeaveController extends Controller
     private function me()
     {
         $employee = Auth::user()->employee;
-        abort_if(!$employee, 403, 'Employee profile not found.');
+        abort_if(!$employee, 403, 'Team profile not found.');
 
         return $employee;
     }

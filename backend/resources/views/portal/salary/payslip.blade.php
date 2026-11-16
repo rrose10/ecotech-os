@@ -56,8 +56,8 @@
     </div>
 
     <div class="grid">
-        <div><b>Employee</b>{{ $payroll->employee->name }}</div>
-        <div><b>Employee ID</b>{{ $payroll->employee->employee_id }}</div>
+        <div><b>Team Member</b>{{ $payroll->employee->name }}</div>
+        <div><b>Member ID</b>{{ $payroll->employee->employee_id }}</div>
         <div><b>Designation</b>{{ $payroll->employee->designation }}</div>
         <div><b>Department</b>{{ $payroll->employee->department->name ?? '-' }}</div>
         <div><b>Payment date</b>{{ $payroll->payment_date?->format('d M Y') ?? '-' }}</div>

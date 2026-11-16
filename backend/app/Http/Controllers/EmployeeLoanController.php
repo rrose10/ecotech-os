@@ -198,7 +198,7 @@ class EmployeeLoanController extends Controller
                 ->route('employee-loans.index')
                 ->with(
                     'success',
-                    'Employee loan created successfully.'
+                    'Team loan created successfully.'
                 );
 
         } catch (\Exception $e) {
@@ -373,7 +373,7 @@ class EmployeeLoanController extends Controller
                 ->route('employee-loans.index')
                 ->with(
                     'success',
-                    'Employee loan updated successfully.'
+                    'Team loan updated successfully.'
                 );
 
         } catch (\Exception $e) {
@@ -434,7 +434,7 @@ class EmployeeLoanController extends Controller
                 ->route('employee-loans.index')
                 ->with(
                     'success',
-                    'Employee loan deleted successfully.'
+                    'Team loan deleted successfully.'
                 );
 
         } catch (\Exception $e) {

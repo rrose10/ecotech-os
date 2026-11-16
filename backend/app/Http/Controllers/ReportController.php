@@ -79,7 +79,7 @@ class ReportController extends Controller
         });
 
         if ($request->query('export') === 'csv') {
-            $csv = [['Employee ID', 'Name', 'Present', 'Late', 'Absent', 'Leave', 'Working hours']];
+            $csv = [['Member ID', 'Name', 'Present', 'Late', 'Absent', 'Leave', 'Working hours']];
             foreach ($rows as $row) {
                 $csv[] = [$row['employee']->employee_id, $row['employee']->name, $row['present'],
                     $row['late'], $row['absent'], $row['leave'], $row['hours']];
@@ -109,7 +109,7 @@ class ReportController extends Controller
         ];
 
         if ($request->query('export') === 'csv') {
-            $csv = [['Employee ID', 'Name', 'Gross', 'Advance', 'Loan', 'Net', 'Status']];
+            $csv = [['Member ID', 'Name', 'Gross', 'Advance', 'Loan', 'Net', 'Status']];
             foreach ($payrolls as $p) {
                 $csv[] = [$p->employee->employee_id ?? '', $p->employee->name ?? '', $p->total_salary,
                     $p->advance_amount, $p->loan_amount, $p->net_salary, $p->status];

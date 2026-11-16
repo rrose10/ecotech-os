@@ -55,7 +55,7 @@
 
                 <tr class="border-b">
 
-                    <th class="text-left p-2">Employee</th>
+                    <th class="text-left p-2">Team Member</th>
                     <th class="text-left p-2">Date</th>
                     <th class="text-left p-2">Status</th>
                     <th class="text-left p-2">Check In</th>

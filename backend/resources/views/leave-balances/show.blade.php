@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Employee Leave Balance')
-@section('page_title', 'Employee Leave Balance')
+@section('title', 'Team Leave Balance')
+@section('page_title', 'Team Leave Balance')
 
 @section('content')
 
@@ -21,7 +21,7 @@
 
         <p class="text-gray-500">
 
-            Employee ID:
+            Member ID:
             {{ $employee->employee_id }}
 
         </p>

@@ -32,7 +32,7 @@
 
                 <div>
                     <label class="block mb-2 font-medium">
-                        Employee
+                        Team Member
                     </label>
 
                     <select
@@ -41,7 +41,7 @@
                         required>
 
                         <option value="">
-                            Select Employee
+                            Select Team Member
                         </option>
 
 

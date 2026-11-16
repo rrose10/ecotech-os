@@ -148,7 +148,7 @@ class EmployeeController extends Controller
             ->route('employees.index')
             ->with(
                 'success',
-                'Employee Added Successfully.'
+                'Team Member Added Successfully.'
             );
     }
         public function show(Employee $employee)
@@ -247,7 +247,7 @@ class EmployeeController extends Controller
             ->route('employees.index')
             ->with(
                 'success',
-                'Employee Updated Successfully.'
+                'Team Member Updated Successfully.'
             );
     }
         public function destroy(Employee $employee)
@@ -275,7 +275,7 @@ class EmployeeController extends Controller
             ->route('employees.index')
             ->with(
                 'success',
-                'Employee Deleted Successfully.'
+                'Team Member Deleted Successfully.'
             );
     }
 }

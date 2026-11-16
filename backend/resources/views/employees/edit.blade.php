@@ -5,7 +5,7 @@
 <div class="max-w-7xl mx-auto">
 
     <h1 class="text-3xl font-bold mb-8">
-        Edit Employee
+        Edit Team Member
     </h1>
 
     @if ($errors->any())
