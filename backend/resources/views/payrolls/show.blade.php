@@ -135,13 +135,37 @@
                         </td>
                     </tr>
 
-                    <tr class="border-b bg-green-50">
-                        <td class="p-3 font-bold text-green-700">
+                    <tr class="border-b eco-row-gross">
+                        <td class="p-3 font-bold">
                             Total Salary
                         </td>
 
-                        <td class="p-3 font-bold text-green-700">
+                        <td class="p-3 font-bold">
                             ৳ {{ number_format($payroll->total_salary,2) }}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b">
+                        <td class="p-3 font-medium">Advance Salary Deducted</td>
+                        <td class="p-3 {{ $payroll->advance_amount > 0 ? 'eco-minus' : '' }}">
+                            {{ $payroll->advance_amount > 0 ? '− ' : '' }}৳ {{ number_format($payroll->advance_amount,2) }}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b">
+                        <td class="p-3 font-medium">Loan Installment Deducted</td>
+                        <td class="p-3 {{ $payroll->loan_amount > 0 ? 'eco-minus' : '' }}">
+                            {{ $payroll->loan_amount > 0 ? '− ' : '' }}৳ {{ number_format($payroll->loan_amount,2) }}
+                        </td>
+                    </tr>
+
+                    <tr class="border-b eco-row-net">
+                        <td class="p-3 font-bold">
+                            Net Salary
+                        </td>
+
+                        <td class="p-3 font-bold">
+                            ৳ {{ number_format($payroll->net_salary,2) }}
                         </td>
                     </tr>
 

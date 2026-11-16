@@ -51,6 +51,8 @@
                             <th class="text-left p-3">Basic Salary</th>
                             <th class="text-left p-3">Bonus</th>
                             <th class="text-left p-3">Total Salary</th>
+                            <th class="text-left p-3">Deductions</th>
+                            <th class="text-left p-3">Net Salary</th>
                             <th class="text-left p-3">Status</th>
                             <th class="text-left p-3">Payment Date</th>
                             <th class="text-center p-3">Action</th>
@@ -91,6 +93,15 @@
 
                                 <td class="p-3 font-bold text-green-700">
                                     ৳ {{ number_format($payroll->total_salary,2) }}
+                                </td>
+
+                                <td class="p-3 eco-minus">
+                                    @php($deduct = (float) $payroll->advance_amount + (float) $payroll->loan_amount)
+                                    {{ $deduct > 0 ? '− ৳ ' . number_format($deduct,2) : '৳ 0.00' }}
+                                </td>
+
+                                <td class="p-3 font-bold">
+                                    ৳ {{ number_format($payroll->net_salary,2) }}
                                 </td>
 
                                 <td class="p-3">
