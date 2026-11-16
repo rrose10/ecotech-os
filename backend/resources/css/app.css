@@ -1900,11 +1900,32 @@ html.dark .eco .eco-minus { color: #ff8a80; }
         color: #000 !important;
     }
 
-    .eco main, .eco .max-w-5xl {
+    .eco main {
+        width: 100% !important;
         padding: 0 !important;
-        margin: 0 auto !important;
+        margin: 0 !important;
         max-width: 100% !important;
     }
+
+    .eco .max-w-5xl {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* Compact spacing so a salary slip fits on one sheet */
+    .eco {
+        font-size: 13px !important;
+    }
+
+    .eco .p-8 { padding: 0 !important; }
+    .eco .mb-8 { margin-bottom: 14px !important; }
+    .eco .pb-6 { padding-bottom: 8px !important; }
+    .eco .pt-8 { padding-top: 10px !important; }
+    .eco .mb-12 { margin-bottom: 26px !important; }
+    .eco td.p-3, .eco th.p-3 { padding: 6px 10px !important; }
+    .eco h2.text-3xl { font-size: 22px !important; }
+    .eco h3.text-xl { margin-top: 6px !important; }
 
     .eco .flex.min-h-screen {
         display: block !important;
