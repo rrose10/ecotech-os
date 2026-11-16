@@ -441,6 +441,47 @@
     </div>
     </div>
 
+        {{-- Upcoming Birthdays --}}
+    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-slate-900">🎂 Upcoming Birthdays</h2>
+            <p class="text-sm text-slate-500 mt-1">Celebrate with your teammates.</p>
+        </div>
+
+        <div class="divide-y divide-slate-100">
+            @forelse($upcomingBirthdays as $person)
+                <div class="flex items-center justify-between gap-4 py-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        @if($person->photo)
+                            <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->name }}"
+                                 class="h-10 w-10 shrink-0 rounded-full object-cover">
+                        @else
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
+                                {{ strtoupper(mb_substr($person->name, 0, 1)) }}
+                            </span>
+                        @endif
+                        <div class="min-w-0">
+                            <p class="truncate font-semibold text-slate-800">{{ $person->name }}</p>
+                            <p class="truncate text-sm text-slate-500">{{ $person->department->name ?? 'No Department' }}</p>
+                        </div>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        @if($person->days_until === 0)
+                            <span class="rounded-full bg-pink-100 px-3 py-1 text-sm font-semibold text-pink-700">Today 🎉</span>
+                        @else
+                            <p class="text-sm font-semibold text-slate-700">{{ $person->next_birthday->format('d M') }}</p>
+                            <p class="text-xs text-slate-500">{{ $person->days_until === 1 ? 'Tomorrow' : 'in ' . $person->days_until . ' days' }}</p>
+                        @endif
+                    </div>
+                </div>
+            @empty
+                <div class="py-8 text-center text-slate-500">No birthdays on record yet.</div>
+            @endforelse
+        </div>
+
+    </div>
+
                 {{-- Leave Balance --}}
 
         <div class="bg-white rounded-2xl border border-slate-200 p-6">
