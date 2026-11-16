@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Income & expense report')
 @section('content')
-<div class="p-8">
+<div class="p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-6">Income &amp; expense report</h1>
     @include('reports._period')
 
