@@ -78,7 +78,7 @@ class BankAccountController extends Controller
      */
     public function show(BankAccount $bankAccount)
     {
-        return view('bank_accounts.show', compact('bankAccount'));
+        return redirect()->route('bank-accounts.index');
     }
 
     /**
