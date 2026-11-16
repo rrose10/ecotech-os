@@ -8,6 +8,7 @@ use App\Models\BankAccount;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EmployeeLoan;
+use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Leave;
 use App\Models\LeaveBalance;
@@ -163,5 +164,30 @@ class DeepTestFixesTest extends TestCase
 
         $this->delete("/leaves/{$leave->id}")->assertRedirect(route('leaves.index'));
         $this->assertSame(0, Leave::count());
+    }
+
+    public function test_advance_salary_expense_is_linked_edited_and_refunded_on_delete(): void
+    {
+        [$emp, $bank] = $this->setupData();
+
+        $this->post('/advance-salaries', [
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'amount' => 100,
+            'advance_date' => today()->toDateString(), 'deduction_month' => 12, 'deduction_year' => 2026,
+        ]);
+        $adv = AdvanceSalary::first();
+        $this->assertNotNull($adv->expense, 'expense must be linked to the advance');
+        $this->assertEquals(9900, $bank->fresh()->current_balance);
+
+        $this->put("/advance-salaries/{$adv->id}", [
+            'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'amount' => 150,
+            'advance_date' => today()->toDateString(), 'deduction_month' => 12, 'deduction_year' => 2026,
+            'status' => 'Pending',
+        ]);
+        $this->assertEquals(9850, $bank->fresh()->current_balance);
+        $this->assertEquals(150, $adv->fresh()->expense->amount);
+
+        $this->delete("/advance-salaries/{$adv->id}");
+        $this->assertEquals(10000, $bank->fresh()->current_balance);
+        $this->assertSame(0, Expense::count());
     }
 }

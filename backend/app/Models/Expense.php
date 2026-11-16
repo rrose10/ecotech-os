@@ -11,6 +11,7 @@ class Expense extends Model
         'expense_category_id',
         'bank_account_id',
         'payroll_id',
+        'advance_salary_id',
         'title',
         'amount',
         'expense_date',
