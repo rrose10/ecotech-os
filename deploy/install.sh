@@ -52,6 +52,9 @@ fi
 mkdir -p backups
 chmod 777 backups
 
+# Classic build path: lets the build use the NAS's own network (compose 'bake' refuses network: host)
+export COMPOSE_BAKE=false
+
 # docker compose reads DB_* for the db container from the same file
 docker compose --env-file .env.docker up -d --build
 
