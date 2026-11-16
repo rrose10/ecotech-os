@@ -147,4 +147,19 @@ class DeepTestFixesTest extends TestCase
         $this->post("/leaves/{$leave->id}/approve")->assertSessionHas('error');
         $this->assertSame(5, LeaveBalance::first()->remaining_days);
     }
+
+    public function test_leave_show_edit_and_delete_use_the_right_record(): void
+    {
+        [$emp] = $this->setupData();
+        $type = $this->leaveType(5);
+        $this->post('/leaves', ['employee_id' => $emp->id, 'leave_type_id' => $type->id,
+            'from_date' => '2026-12-01', 'to_date' => '2026-12-02', 'reason' => 'Family trip']);
+        $leave = Leave::first();
+
+        $this->get("/leaves/{$leave->id}")->assertOk()->assertSee('Person One');
+        $this->get("/leaves/{$leave->id}/edit")->assertOk()->assertSee('Family trip');
+
+        $this->delete("/leaves/{$leave->id}")->assertRedirect(route('leaves.index'));
+        $this->assertSame(0, Leave::count());
+    }
 }

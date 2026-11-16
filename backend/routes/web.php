@@ -152,10 +152,11 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
+    // Laravel singularises "leaves" to "leaf", which breaks route-model binding.
     Route::resource(
         'leaves',
         LeaveController::class
-    );
+    )->parameters(['leaves' => 'leave']);
 
     Route::post(
         '/leaves/{leave}/approve',
