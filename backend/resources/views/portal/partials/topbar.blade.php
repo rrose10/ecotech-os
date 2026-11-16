@@ -21,6 +21,14 @@
             <p class="text-xs text-slate-500">{{ auth()->user()->role === 'employee' ? __('Team Member') : ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
         </div>
 
+        @php($unreadCount = \App\Models\PortalNotification::where('user_id', auth()->id())->unread()->count())
+        <a href="{{ route('portal.notifications') }}" class="eco-logout relative !px-3" aria-label="{{ __('Notifications') }}">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+            @if($unreadCount > 0)
+                <span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-bold text-white">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
+            @endif
+        </a>
+
         @include('partials.language-switch')
         @include('partials.theme-toggle')
         <x-avatar :name="auth()->user()->name" :photo="optional(auth()->user()->employee)->photo" />

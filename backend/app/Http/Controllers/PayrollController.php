@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PortalNotification;
 use App\Models\AdvanceSalary;
 use App\Models\BankAccount;
 use App\Models\Employee;
@@ -300,6 +301,10 @@ class PayrollController extends Controller
         );
 
         DB::commit();
+
+        if ($payroll->status === 'Paid') {
+            PortalNotification::salaryPaid($payroll);
+        }
 
         return redirect()
             ->route('payrolls.index')
@@ -657,6 +662,10 @@ class PayrollController extends Controller
             );
 
             DB::commit();
+
+            if ($oldStatus !== 'Paid' && $newStatus === 'Paid') {
+                PortalNotification::salaryPaid($payroll->fresh());
+            }
 
             return redirect()
                 ->route('payrolls.index')
