@@ -55,4 +55,16 @@ class AttendanceEditTest extends TestCase
         $this->assertSame(30, $a->late_minutes);
         $this->assertSame(600, $a->working_minutes);
     }
+
+    public function test_edit_form_prefills_dates_from_attendance_date_including_night_shift(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+        $a = $this->record();
+        // TIME columns lose the date in production; simulate that.
+        $a->forceFill(['check_in' => '19:00:00', 'check_out' => '06:00:00'])->saveQuietly();
+
+        $this->get("/attendances/{$a->id}/edit")
+            ->assertSee('2026-11-10T19:00', false)
+            ->assertSee('2026-11-11T06:00', false);
+    }
 }

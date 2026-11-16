@@ -101,11 +101,11 @@
                     </td>
 
                     <td class="p-2">
-                        {{ $attendance->check_in ? $attendance->check_in->format('d M, h:i A') : '-' }}
+                        {{ $attendance->check_in ? $attendance->check_in->format('h:i A') : '-' }}
                     </td>
 
                     <td class="p-2">
-                        {{ $attendance->check_out ? $attendance->check_out->format('d M, h:i A') : '-' }}
+                        {{ $attendance->check_out ? $attendance->check_out->format('h:i A') : '-' }}
                     </td>
 
                     <td class="p-2 flex gap-2">
