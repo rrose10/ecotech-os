@@ -11,6 +11,7 @@ use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -53,6 +54,10 @@ class EmployeeController extends Controller
             'basic_salary' => 'required|numeric|min:0',
             'joining_date' => 'required|date',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'nid_number' => ['nullable', 'regex:/^(\d{10}|\d{13}|\d{17})$/', 'unique:employees,nid_number'],
+            'nid_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+        ], [
+            'nid_number.regex' => 'NID must be 10, 13 or 17 digits (numbers only).',
         ]);
 
         $user = User::create([
@@ -96,6 +101,10 @@ class EmployeeController extends Controller
 
         }
 
+        $nidFile = $request->hasFile('nid_file')
+            ? $request->file('nid_file')->store('nid', 'local')
+            : null;
+
         $employee = Employee::create([
             'user_id' => $user->id,
             'department_id' => $request->department_id,
@@ -112,6 +121,8 @@ class EmployeeController extends Controller
             'emergency_contact' => $request->emergency_contact,
             'address' => $request->address,
             'photo' => $photo,
+            'nid_number' => $request->nid_number ?: null,
+            'nid_file' => $nidFile,
             'status' => $request->status ?? true,
         ]);
 
@@ -192,6 +203,10 @@ class EmployeeController extends Controller
             'basic_salary' => 'required|numeric|min:0',
             'joining_date' => 'required|date',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'nid_number' => ['nullable', 'regex:/^(\d{10}|\d{13}|\d{17})$/', Rule::unique('employees', 'nid_number')->ignore($employee->id)],
+            'nid_file' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:4096',
+        ], [
+            'nid_number.regex' => 'NID must be 10, 13 or 17 digits (numbers only).',
         ]);
 
         // Old data for Activity Log
@@ -209,6 +224,16 @@ class EmployeeController extends Controller
                 ->store('employees', 'public');
         }
 
+        $nidFile = $employee->nid_file;
+
+        if ($request->hasFile('nid_file')) {
+            if ($nidFile) {
+                Storage::disk('local')->delete($nidFile);
+            }
+
+            $nidFile = $request->file('nid_file')->store('nid', 'local');
+        }
+
         $employee->update([
             'department_id' => $request->department_id,
             'name' => $request->name,
@@ -223,6 +248,8 @@ class EmployeeController extends Controller
             'emergency_contact' => $request->emergency_contact,
             'address' => $request->address,
             'photo' => $photo,
+            'nid_number' => $request->nid_number ?: null,
+            'nid_file' => $nidFile,
             'status' => $request->status,
         ]);
 
@@ -265,6 +292,10 @@ class EmployeeController extends Controller
             Storage::disk('public')->delete($employee->photo);
         }
 
+        if ($employee->nid_file) {
+            Storage::disk('local')->delete($employee->nid_file);
+        }
+
         if ($employee->user) {
             $employee->user->delete();
         }
@@ -277,5 +308,15 @@ class EmployeeController extends Controller
                 'success',
                 'Team Member Deleted Successfully.'
             );
+    }
+
+    /**
+     * Private NID copy, super admins only (see routes).
+     */
+    public function nidCopy(Employee $employee)
+    {
+        abort_unless($employee->nid_file && Storage::disk('local')->exists($employee->nid_file), 404);
+
+        return Storage::disk('local')->response($employee->nid_file);
     }
 }

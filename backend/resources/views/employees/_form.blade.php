@@ -309,6 +309,52 @@
     <div>
 
         <label class="block mb-2 font-medium">
+            NID Number
+        </label>
+
+        <input
+            type="text"
+            name="nid_number"
+            inputmode="numeric"
+            maxlength="17"
+            placeholder="10, 13 or 17 digits"
+            value="{{ old('nid_number', $employee->nid_number ?? '') }}"
+            class="w-full border rounded p-3">
+
+        @error('nid_number')
+            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+        @enderror
+
+    </div>
+
+
+    <div>
+
+        <label class="block mb-2 font-medium">
+            NID Copy (photo or PDF)
+        </label>
+
+        <input
+            type="file"
+            name="nid_file"
+            accept=".jpg,.jpeg,.png,.pdf"
+            class="w-full border rounded p-3">
+
+        @error('nid_file')
+            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+        @enderror
+
+        @if(isset($employee) && $employee->nid_file && auth()->user()->role === 'super_admin')
+            <a href="{{ route('employees.nid-copy', $employee) }}" target="_blank"
+               class="mt-2 inline-block text-sm text-blue-600 underline">View current NID copy</a>
+        @endif
+
+    </div>
+
+
+    <div>
+
+        <label class="block mb-2 font-medium">
             Photo
         </label>
 

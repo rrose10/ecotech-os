@@ -25,6 +25,8 @@ class Employee extends Model
         'emergency_contact',
         'address',
         'photo',
+        'nid_number',
+        'nid_file',
         'status',
 
     ];
