@@ -1953,3 +1953,9 @@ html.dark .eco .eco-minus { color: #ff8a80; }
     height: 6rem;
     padding: 10px 14px;
 }
+
+/* One salary slip per sheet when printing all slips of a month */
+@media print {
+    .eco .slip-page { margin: 0 !important; break-after: page; page-break-after: always; }
+    .eco .slip-page:last-child { break-after: auto; page-break-after: auto; }
+}

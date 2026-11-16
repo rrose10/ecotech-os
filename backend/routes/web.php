@@ -239,6 +239,10 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
             [PayrollController::class, 'calculate']
         )->name('payrolls.calculate');
 
+        // All salary slips of one month, one per printed page
+        Route::get('/payrolls/slips', [PayrollController::class, 'slips'])
+            ->name('payrolls.slips');
+
         Route::resource(
             'payrolls',
             PayrollController::class

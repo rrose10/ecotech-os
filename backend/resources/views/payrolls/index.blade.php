@@ -13,10 +13,17 @@
             Payrolls
         </h1>
 
-        <a href="{{ route('payrolls.create') }}"
-           class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            + Add Payroll
-        </a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('payrolls.slips') }}"
+               class="border px-4 py-2 rounded hover:bg-gray-50">
+                🖨 All slips (PDF)
+            </a>
+
+            <a href="{{ route('payrolls.create') }}"
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                + Add Payroll
+            </a>
+        </div>
 
     </div>
 
