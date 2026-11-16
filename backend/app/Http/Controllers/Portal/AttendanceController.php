@@ -66,9 +66,7 @@ class AttendanceController extends Controller
                 $shiftDate  = Attendance::shiftDateFor($now);
                 $shiftStart = Attendance::shiftStartFor($shiftDate);
 
-                $lateMinutes = $now->gt($shiftStart)
-                    ? Attendance::minutesBetween($shiftStart, $now)
-                    : 0;
+                $lateMinutes = Attendance::lateMinutes($shiftStart, $now);
 
                 Attendance::create([
                     'employee_id'     => $employee->id,

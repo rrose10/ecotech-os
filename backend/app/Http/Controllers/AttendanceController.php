@@ -82,7 +82,7 @@ class AttendanceController extends Controller
 
         if ($in) {
             $shiftStart = Attendance::shiftStartFor(Attendance::shiftDateFor($in));
-            $late = $in->gt($shiftStart) ? Attendance::minutesBetween($shiftStart, $in) : 0;
+            $late = Attendance::lateMinutes($shiftStart, $in);
         }
 
         if ($in && $out && $out->gt($in)) {
@@ -201,7 +201,7 @@ class AttendanceController extends Controller
 
         if ($in) {
             $shiftStart = Attendance::shiftStartFor(Attendance::shiftDateFor($in));
-            $late = $in->gt($shiftStart) ? Attendance::minutesBetween($shiftStart, $in) : 0;
+            $late = Attendance::lateMinutes($shiftStart, $in);
         }
 
         if ($in && $out && $out->gt($in)) {
