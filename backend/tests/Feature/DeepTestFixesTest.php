@@ -181,7 +181,6 @@ class DeepTestFixesTest extends TestCase
         $this->put("/advance-salaries/{$adv->id}", [
             'employee_id' => $emp->id, 'bank_account_id' => $bank->id, 'amount' => 150,
             'advance_date' => today()->toDateString(), 'deduction_month' => 12, 'deduction_year' => 2026,
-            'status' => 'Pending',
         ]);
         $this->assertEquals(9850, $bank->fresh()->current_balance);
         $this->assertEquals(150, $adv->fresh()->expense->amount);

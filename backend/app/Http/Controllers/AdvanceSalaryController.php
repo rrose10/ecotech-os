@@ -188,7 +188,7 @@ class AdvanceSalaryController extends Controller
             'advance_date'     => 'required|date',
             'deduction_month'  => 'required|integer|between:1,12',
             'deduction_year'   => 'required|integer|min:2024|max:2100',
-            'status'           => 'required|in:Pending,Deducted,Cancelled',
+            'status'           => 'nullable|in:Pending,Deducted,Cancelled',
             'remarks'          => 'nullable|string',
         ]);
 
@@ -218,7 +218,7 @@ class AdvanceSalaryController extends Controller
                 'advance_date'     => $request->advance_date,
                 'deduction_month'  => $request->deduction_month,
                 'deduction_year'   => $request->deduction_year,
-                'status'           => $request->status,
+                'status'           => $request->status ?? $advanceSalary->status,
                 'remarks'          => $request->remarks,
             ]);
 
