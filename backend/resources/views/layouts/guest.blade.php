@@ -10,6 +10,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="eco min-h-screen antialiased">
+@include('partials.bg-tech')
         <div class="flex min-h-screen flex-col items-center justify-center px-4 py-10">
 
             <div class="mb-8 flex items-center gap-3">
