@@ -7,7 +7,7 @@
 
 <div class="max-w-5xl mx-auto">
 
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6 no-print">
 
         <h1 class="text-3xl font-bold">
             Salary Slip
