@@ -43,6 +43,8 @@ class User extends Authenticatable
 
             'password' => 'hashed',
 
+            'must_change_password' => 'boolean',
+
         ];
     }
 

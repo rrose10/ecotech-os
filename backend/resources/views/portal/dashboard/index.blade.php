@@ -6,6 +6,8 @@
 
 @section('content')
 
+@php($upcomingBirthdays = $upcomingBirthdays ?? \App\Support\Celebrations::upcoming(6))
+
 <div class="space-y-6">
 
     @include('partials.celebrations')
