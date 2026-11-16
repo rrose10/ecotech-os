@@ -10,14 +10,21 @@ cat > /usr/local/bin/ecotech-backup-sync.sh <<SCRIPT
 # Copy DB backups to each mounted data disk (/srv/dev-disk-by-*), keep them in sync.
 SRC="$SRC"
 [ -d "\$SRC" ] || exit 0
+# Destinations: the shared folder named "office" (any case) on any data disk, plus every data disk root.
+DESTS=""
+for o in /srv/dev-disk-by-*/[Oo]ffice /srv/dev-disk-by-*/[Oo]ffice[-_]*; do
+  [ -d "\$o" ] && DESTS="\$DESTS \$o"
+done
 for d in /srv/dev-disk-by-*; do
-  [ -d "\$d" ] || continue
-  mountpoint -q "\$d" || continue
-  mkdir -p "\$d/ecotech-backups"
-  cp -u "\$SRC"/*.sql "\$SRC"/*.tar.gz "\$d/ecotech-backups/" 2>/dev/null || true
-  # keep the 60 newest copies per disk (database dumps and upload archives separately)
-  ls -1t "\$d"/ecotech-backups/*.sql 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
-  ls -1t "\$d"/ecotech-backups/*.tar.gz 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
+  mountpoint -q "\$d" 2>/dev/null && DESTS="\$DESTS \$d"
+done
+for base in \$DESTS; do
+  dest="\$base/ecotech-backups"
+  mkdir -p "\$dest"
+  cp -u "\$SRC"/*.sql "\$SRC"/*.tar.gz "\$dest/" 2>/dev/null || true
+  # keep the 60 newest copies per destination (database dumps and upload archives separately)
+  ls -1t "\$dest"/*.sql 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
+  ls -1t "\$dest"/*.tar.gz 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
 done
 SCRIPT
 chmod 755 /usr/local/bin/ecotech-backup-sync.sh
@@ -33,4 +40,4 @@ chmod 644 /etc/cron.d/ecotech-backup
 
 /usr/local/bin/ecotech-backup-sync.sh
 echo "Offsite backup installed. Copies:"
-ls -la /srv/dev-disk-by-*/ecotech-backups/ 2>/dev/null || true
+ls -la /srv/dev-disk-by-*/ecotech-backups/ /srv/dev-disk-by-*/[Oo]ffice*/ecotech-backups/ 2>/dev/null || true
