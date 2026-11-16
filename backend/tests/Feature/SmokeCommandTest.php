@@ -19,4 +19,11 @@ class SmokeCommandTest extends TestCase
             ->expectsOutputToContain('Crashes: 0')
             ->assertSuccessful();
     }
+
+    public function test_old_employee_dashboard_redirects_to_portal(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'employee']))
+            ->get('/employee/dashboard')
+            ->assertRedirect(route('portal.dashboard'));
+    }
 }
