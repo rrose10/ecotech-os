@@ -25,7 +25,7 @@
 
             <div>
                 <p class="text-gray-500">
-                    Employee
+                    Team Member
                 </p>
 
                 <p class="font-semibold">
@@ -37,7 +37,7 @@
 
             <div>
                 <p class="text-gray-500">
-                    Employee ID
+                    Member ID
                 </p>
 
                 <p class="font-semibold">

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title','Employee Dashboard')
-@section('page_title','Employee Dashboard')
+@section('title','Team Dashboard')
+@section('page_title','Team Dashboard')
 
 
 @section('content')
@@ -17,7 +17,7 @@
         </h1>
 
         <p class="text-gray-500 mt-2">
-            Employee ID: {{ $employee->employee_id }}
+            Member ID: {{ $employee->employee_id }}
         </p>
 
     </div>

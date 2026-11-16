@@ -18,7 +18,7 @@
     <div class="flex items-center gap-3">
         <div class="hidden text-right sm:block">
             <p class="text-sm font-bold leading-tight">{{ auth()->user()->name }}</p>
-            <p class="text-xs text-slate-500">{{ ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
+            <p class="text-xs text-slate-500">{{ auth()->user()->role === 'employee' ? 'Team member' : ucfirst(str_replace('_', ' ', auth()->user()->role)) }}</p>
         </div>
 
         @include('partials.theme-toggle')

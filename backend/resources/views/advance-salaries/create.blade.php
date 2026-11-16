@@ -11,7 +11,7 @@
         </h1>
 
         <p class="text-gray-500 mt-1">
-            Create a new employee advance salary.
+            Create a new team advance salary.
         </p>
 
     </div>

@@ -31,7 +31,7 @@
 
     <div>
         <label class="block mb-2 font-medium">
-            Employee Name
+            Team Member Name
         </label>
 
 
@@ -66,7 +66,7 @@
 
 
 
-    {{-- Login Password Only For New Employee --}}
+    {{-- Login Password Only For New Team Member --}}
 
     @if(!isset($employee))
 
@@ -408,7 +408,7 @@
     class="mt-8 bg-green-600 text-white px-8 py-3 rounded hover:bg-green-700">
 
 
-    {{ isset($employee) ? 'Update Employee' : 'Save Employee' }}
+    {{ isset($employee) ? 'Update Team Member' : 'Save Team Member' }}
 
 
 </button>

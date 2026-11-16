@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Employee Profile')
-@section('page_title', 'Employee Profile')
+@section('title', 'Team Member Profile')
+@section('page_title', 'Team Member Profile')
 
 @section('content')
 
@@ -11,7 +11,7 @@
     <div class="flex justify-between items-center mb-6">
 
         <h1 class="text-3xl font-bold text-gray-800">
-            Employee Profile
+            Team Member Profile
         </h1>
 
 
@@ -45,7 +45,7 @@
     <div class="bg-white rounded-xl shadow p-8">
 
 
-        <!-- Employee Header -->
+        <!-- Team Member Header -->
 
         <div class="flex items-center gap-6 mb-8">
 
@@ -112,7 +112,7 @@
 
 
 
-        <!-- Employee Information -->
+        <!-- Team Member Information -->
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

@@ -34,7 +34,7 @@
                 <div>
 
                     <label class="block mb-2 font-medium">
-                        Employee
+                        Team Member
                     </label>
 
 

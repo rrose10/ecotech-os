@@ -62,7 +62,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
 
         <div class="rounded-xl bg-blue-600 text-white shadow-lg p-6">
-            <h3 class="text-lg font-semibold">👥 Employees</h3>
+            <h3 class="text-lg font-semibold">👥 Team</h3>
             <p class="mt-4 text-5xl font-bold">{{ $employees }}</p>
         </div>
 
@@ -91,12 +91,12 @@
     <!-- Row 1 -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-        <!-- Recent Employees -->
+        <!-- Recent Team Members -->
         <div class="rounded-xl bg-white shadow-lg">
 
             <div class="border-b px-6 py-4">
                 <h2 class="text-xl font-bold">
-                    👥 Recent Employees
+                    👥 Recent Team Members
                 </h2>
             </div>
 
@@ -127,7 +127,7 @@
                 @empty
 
                     <div class="p-6 text-center text-gray-500">
-                        No employees found.
+                        No team members found.
                     </div>
 
                 @endforelse
@@ -243,7 +243,7 @@
                 <a href="{{ route('employees.create') }}"
                     class="rounded-lg bg-blue-600 p-4 text-center font-semibold text-white hover:bg-blue-700 transition">
                     👥<br>
-                    Add Employee
+                    Add Team Member
                 </a>
 
                 <a href="{{ route('departments.create') }}"
@@ -278,7 +278,7 @@
         </h2>
 
         <p class="mt-3 text-blue-100 max-w-3xl">
-            Manage your employees, departments, attendance and leave requests
+            Manage your team, departments, attendance and leave requests
             from one centralized dashboard. More powerful modules like Payroll,
             Expenses, Income, Assets, Inventory and Reports will be integrated
             soon.

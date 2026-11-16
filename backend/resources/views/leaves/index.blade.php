@@ -15,7 +15,7 @@
             </h1>
 
             <p class="mt-1 text-gray-500">
-                Manage employee leave applications.
+                Manage team leave applications.
             </p>
         </div>
 
@@ -28,7 +28,7 @@
                     type="text"
                     name="search"
                     value="{{ request('search') }}"
-                    placeholder="Search Employee..."
+                    placeholder="Search team member..."
                     class="w-72 rounded-l-lg border border-gray-300 px-4 py-2">
 
                 <button
@@ -79,7 +79,7 @@
                 <tr>
 
                     <th class="px-6 py-4 text-left">
-                        Employee
+                        Team Member
                     </th>
 
                     <th class="px-6 py-4 text-left">
@@ -123,7 +123,7 @@
                         <x-avatar :name="$leave->employee->name ?? '?'" :photo="$leave->employee->photo ?? null" size="h-9 w-9" text="text-sm" />
                         <div>
                         <div class="font-medium">
-                            {{ $leave->employee->name ?? 'Deleted Employee' }}
+                            {{ $leave->employee->name ?? 'Deleted Team Member' }}
                         </div>
 
                         <div class="text-sm text-gray-500">

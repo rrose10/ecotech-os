@@ -2,10 +2,10 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    {{-- Employee --}}
+    {{-- Team Member --}}
     <div>
         <label class="block mb-2 font-medium text-gray-700">
-            Employee <span class="text-red-500">*</span>
+            Team Member <span class="text-red-500">*</span>
         </label>
 
         <select
@@ -13,7 +13,7 @@
             class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
             required>
 
-            <option value="">Select Employee</option>
+            <option value="">Select Team Member</option>
 
             @foreach($employees as $employee)
                 <option

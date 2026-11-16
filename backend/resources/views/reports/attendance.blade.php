@@ -9,7 +9,7 @@
         @if($rows->count())
         <table class="w-full">
             <thead><tr class="border-b">
-                <th class="text-left p-2">Employee</th><th class="text-left p-2">Present</th><th class="text-left p-2">Late</th>
+                <th class="text-left p-2">Team Member</th><th class="text-left p-2">Present</th><th class="text-left p-2">Late</th>
                 <th class="text-left p-2">Absent</th><th class="text-left p-2">Leave</th><th class="text-left p-2">Hours worked</th>
             </tr></thead>
             <tbody>

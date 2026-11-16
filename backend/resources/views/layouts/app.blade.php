@@ -2,7 +2,7 @@
     $groups = [
         'Main' => [
             ['dashboard',        'dashboard',     'Dashboard',        'dashboard'],
-            ['employees.index',  'employees.*',   'Employees',        'employees'],
+            ['employees.index',  'employees.*',   'Team',        'employees'],
             ['departments.index','departments.*', 'Departments',      'departments'],
             ['attendances.index','attendances.*', 'Attendance',       'attendance'],
             ['leave-types.index','leave-types.*', 'Leave types',      'calendar'],
@@ -15,7 +15,7 @@
             ['income-categories.index','income-categories.*','Income categories','tag'],
             ['incomes.index',    'incomes.*',     'Incomes',          'income'],
             ['advance-salaries.index','advance-salaries.*','Advance salary','advance'],
-            ['employee-loans.index','employee-loans.*','Employee loans','loan'],
+            ['employee-loans.index','employee-loans.*','Team loans','loan'],
             ['payrolls.index',   'payrolls.*',    'Payroll',          'payroll'],
             ['bank-accounts.index','bank-accounts.*','Cash & bank',   'bank'],
         ],
@@ -123,7 +123,7 @@
             <div class="flex items-center gap-3">
                 <div class="hidden text-right sm:block">
                     <p class="text-sm font-bold leading-tight">{{ Auth::user()->name }}</p>
-                    <p class="text-xs text-gray-500">{{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</p>
+                    <p class="text-xs text-gray-500">{{ Auth::user()->role === 'employee' ? 'Team member' : ucfirst(str_replace('_', ' ', Auth::user()->role)) }}</p>
                 </div>
                 @include('partials.theme-toggle')
                 <x-avatar :name="Auth::user()->name" :photo="optional(Auth::user()->employee)->photo" />

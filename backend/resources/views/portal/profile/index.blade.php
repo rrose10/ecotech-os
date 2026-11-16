@@ -57,7 +57,7 @@
         <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
 
             <div>
-                <p class="text-sm text-slate-500">Employee ID</p>
+                <p class="text-sm text-slate-500">Member ID</p>
                 <p class="mt-1 font-semibold text-slate-900">
                     {{ $employee->employee_id }}
                 </p>

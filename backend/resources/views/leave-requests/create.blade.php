@@ -27,12 +27,12 @@
 
                 <div>
                     <label class="block mb-2 font-medium">
-                        Employee
+                        Team Member
                     </label>
 
                     <select name="employee_id" class="w-full rounded-lg border-gray-300" required>
 
-                        <option value="">Select Employee</option>
+                        <option value="">Select Team Member</option>
 
                         @foreach($employees as $employee)
                             <option value="{{ $employee->id }}"

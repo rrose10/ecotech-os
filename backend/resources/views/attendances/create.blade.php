@@ -26,7 +26,7 @@
 
             <div>
                 <label class="block mb-2 font-medium">
-                    Employee
+                    Team Member
                 </label>
 
                 <select
@@ -34,7 +34,7 @@
                     class="w-full border rounded p-3"
                     required>
 
-                    <option value="">Select Employee</option>
+                    <option value="">Select Team Member</option>
 
                     @foreach($employees as $employee)
 

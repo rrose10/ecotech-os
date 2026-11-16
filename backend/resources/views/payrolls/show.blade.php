@@ -49,22 +49,22 @@
 
         </div>
 
-        {{-- Employee Information --}}
+        {{-- Team Member Information --}}
         <div class="mb-8">
 
             <h4 class="text-lg font-semibold border-b pb-2 mb-4">
-                Employee Information
+                Team Member Information
             </h4>
 
             <div class="grid grid-cols-2 gap-4">
 
                 <div>
-                    <strong>Employee ID:</strong><br>
+                    <strong>Member ID:</strong><br>
                     {{ $payroll->employee->employee_id }}
                 </div>
 
                 <div>
-                    <strong>Employee Name:</strong><br>
+                    <strong>Team Member Name:</strong><br>
                     {{ $payroll->employee->name }}
                 </div>
 
@@ -184,7 +184,7 @@
                 </p>
 
                 <p>
-                    Employee Signature
+                    Team Member Signature
                 </p>
 
             </div>

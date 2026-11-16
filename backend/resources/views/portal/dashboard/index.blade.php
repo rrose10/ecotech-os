@@ -26,7 +26,7 @@
                 </h1>
 
                 <p class="text-slate-500 mt-2">
-                    Employee ID:
+                    Member ID:
                     <strong>{{ $employee?->employee_id ?? '--' }}</strong>
                 </p>
 

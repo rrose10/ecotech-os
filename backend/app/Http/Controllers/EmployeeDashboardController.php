@@ -19,7 +19,7 @@ class EmployeeDashboardController extends Controller
 
         if (!$employee) {
 
-            abort(403, 'Employee profile not found.');
+            abort(403, 'Team profile not found.');
 
         }
 

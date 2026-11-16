@@ -16,7 +16,7 @@
             </h1>
 
             <p class="mt-1 text-gray-500">
-                View employee leave balance.
+                View team leave balance.
             </p>
         </div>
 
@@ -30,7 +30,7 @@
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                placeholder="Search Employee..."
+                placeholder="Search team member..."
                 class="w-72 rounded-l-lg border border-gray-300 px-4 py-2">
 
 
@@ -62,12 +62,12 @@
                 <tr>
 
                     <th class="px-6 py-4 text-left">
-                        Employee
+                        Team Member
                     </th>
 
 
                     <th class="px-6 py-4 text-left">
-                        Employee ID
+                        Member ID
                     </th>
 
 
@@ -152,7 +152,7 @@
                     <td colspan="4"
                         class="p-10 text-center text-gray-500">
 
-                        No employee found.
+                        No team member found.
 
                     </td>
 
