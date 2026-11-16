@@ -206,7 +206,7 @@
                         <div class="flex justify-center gap-2">
 
 
-                            <a href="{{ route('leaves.show', ['leaf' => $leave->id]) }}"
+                            <a href="{{ route('leaves.show', ['leave' => $leave->id]) }}"
                                class="rounded-lg bg-gray-600 px-3 py-2 text-sm text-white">
 
                                 View
@@ -215,7 +215,7 @@
 
 
 
-                            <a href="{{ route('leaves.edit', ['leaf' => $leave->id]) }}"
+                            <a href="{{ route('leaves.edit', ['leave' => $leave->id]) }}"
                                class="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white">
 
                                 Edit
@@ -265,7 +265,7 @@
 
 
 
-                            <form action="{{ route('leaves.destroy', ['leaf' => $leave->id]) }}"
+                            <form action="{{ route('leaves.destroy', ['leave' => $leave->id]) }}"
                                   method="POST"
                                   onsubmit="return confirm('Delete this leave?')">
 
