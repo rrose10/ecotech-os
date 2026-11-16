@@ -13,6 +13,7 @@
 </head>
 
 <body class="eco min-h-screen antialiased">
+@include('partials.bg-tech')
 
 <div class="flex min-h-screen gap-4 p-3 lg:p-4">
 

@@ -1321,3 +1321,324 @@ html.dark .eco .eco-topbar {
 html.dark .eco .eco-topbar.is-scrolled {
     background: rgba(28, 28, 30, 0.88);
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Futuristic glass: vivid backdrop + real see-through glass + tech icons
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    --glass: rgba(255, 255, 255, 0.34);
+    --glass-edge: rgba(255, 255, 255, 0.75);
+    --neon-a: #00c2ff;
+    --neon-b: #7c5cff;
+    --neon-c: #0a84ff;
+}
+
+body.eco {
+    background-color: #dfe9ff;
+    background-image: linear-gradient(135deg, #dbe8ff 0%, #ece0ff 48%, #d8f4ff 100%);
+    background-attachment: fixed;
+}
+
+/* Re-tuned blobs (stronger, so the glass has something to refract) */
+body.eco::before {
+    background:
+        radial-gradient(38rem 32rem at 12% 16%, rgba(0, 132, 255, 0.4), transparent 68%),
+        radial-gradient(34rem 30rem at 88% 10%, rgba(150, 90, 255, 0.38), transparent 68%),
+        radial-gradient(38rem 32rem at 74% 90%, rgba(0, 200, 255, 0.46), transparent 68%),
+        radial-gradient(28rem 24rem at 16% 88%, rgba(255, 120, 200, 0.28), transparent 68%);
+}
+
+/* Moving tech grid */
+body.eco::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(10, 90, 255, 0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(10, 90, 255, 0.10) 1px, transparent 1px);
+    background-size: 56px 56px;
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 78%);
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 25%, transparent 78%);
+    animation: eco-grid 40s linear infinite;
+}
+
+@keyframes eco-grid {
+    to { background-position: 56px 56px, 56px 56px; }
+}
+
+/* ---------- Floating backdrop ---------- */
+
+.eco-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    --mx: 0;
+    --my: 0;
+}
+
+.eco-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    animation: eco-orb 22s ease-in-out infinite alternate;
+}
+
+.eco-orb-a { width: 26rem; height: 26rem; left: 18%; top: 8%;  background: var(--neon-a); }
+.eco-orb-b { width: 30rem; height: 30rem; right: 6%; top: 42%; background: var(--neon-b); animation-duration: 28s; animation-delay: -6s; }
+.eco-orb-c { width: 22rem; height: 22rem; left: 38%; bottom: -6%; background: #ff7ac8; opacity: 0.35; animation-duration: 25s; animation-delay: -12s; }
+
+@keyframes eco-orb {
+    from { transform: translate3d(-4%, 0, 0) scale(1); }
+    to   { transform: translate3d(6%, -8%, 0) scale(1.18); }
+}
+
+.eco-net {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--neon-c);
+    opacity: 0.4;
+}
+
+.eco-net-lines path {
+    stroke-dasharray: 6 10;
+    animation: eco-dash 16s linear infinite;
+}
+
+.eco-net-nodes circle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: eco-pulse 3.6s ease-in-out infinite;
+}
+
+.eco-net-nodes circle:nth-child(3n) { animation-delay: -1.2s; }
+.eco-net-nodes circle:nth-child(3n+1) { animation-delay: -2.4s; }
+
+@keyframes eco-dash { to { stroke-dashoffset: -160; } }
+@keyframes eco-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.55; }
+    50%      { transform: scale(1.9); opacity: 1; }
+}
+
+.eco-layer {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.9s var(--spring);
+}
+
+.eco-layer-far  { transform: translate3d(calc(var(--mx) * 14px), calc(var(--my) * 10px), 0); }
+.eco-layer-near { transform: translate3d(calc(var(--mx) * -30px), calc(var(--my) * -22px), 0); }
+
+.eco-ic {
+    position: absolute;
+    display: block;
+    filter: blur(var(--blur)) drop-shadow(0 0 10px currentColor);
+    opacity: 0.8;
+    animation: eco-float var(--dur) ease-in-out var(--delay) infinite alternate;
+}
+
+.eco-ic svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.eco-ic.tone-b { color: #0a84ff; }
+.eco-ic.tone-v { color: #8a5cff; }
+.eco-ic.tone-c { color: #00b8f0; }
+
+@keyframes eco-float {
+    0%   { transform: translate3d(0, 0, 0) rotate(-6deg); }
+    50%  { transform: translate3d(14px, -26px, 0) rotate(5deg); }
+    100% { transform: translate3d(-12px, 18px, 0) rotate(-3deg); }
+}
+
+@media (max-width: 767px) {
+    .eco-ic.hide-sm { display: none; }
+    .eco-ic { opacity: 0.4; }
+}
+
+/* ---------- Real see-through glass ---------- */
+
+.eco .bg-white,
+.eco-topbar,
+.eco-sidebar,
+.eco-auth-card {
+    background-color: var(--glass) !important;
+    background-image:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.08) 42%, rgba(255, 255, 255, 0.0) 60%, rgba(255, 255, 255, 0.22) 100%);
+    -webkit-backdrop-filter: blur(12px) saturate(210%) brightness(1.06);
+    backdrop-filter: blur(12px) saturate(210%) brightness(1.06);
+    border: 1px solid var(--glass-edge);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 -1px 0 rgba(255, 255, 255, 0.25) inset,
+        0 0 0 0.5px rgba(40, 60, 160, 0.10),
+        0 24px 48px -24px rgba(30, 50, 140, 0.42);
+}
+
+.eco-sidebar {
+    background-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+.eco .bg-white.shadow-lg:hover {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.95) inset,
+        0 0 0 0.5px rgba(10, 132, 255, 0.35),
+        0 0 28px -4px rgba(0, 194, 255, 0.45),
+        0 28px 52px -20px rgba(30, 50, 140, 0.5);
+}
+
+/* Inputs sit on glass too */
+.eco input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]),
+.eco select,
+.eco textarea {
+    background-color: rgba(255, 255, 255, 0.55);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.eco input:focus,
+.eco select:focus,
+.eco textarea:focus {
+    border-color: var(--neon-c);
+    box-shadow: 0 0 0 4px rgba(0, 194, 255, 0.22), 0 0 18px -2px rgba(0, 194, 255, 0.5);
+}
+
+/* ---------- Neon accents ---------- */
+
+.eco-brand-mark {
+    background: linear-gradient(135deg, var(--neon-a), var(--neon-b));
+    box-shadow: 0 0 22px -2px rgba(0, 194, 255, 0.75), 0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+.eco-nav-link[aria-current="page"] {
+    background: linear-gradient(135deg, #0a84ff, var(--neon-b));
+    box-shadow: 0 0 24px -4px rgba(10, 132, 255, 0.85), 0 1px 0 rgba(255, 255, 255, 0.4) inset;
+}
+
+.eco .bg-blue-600,
+.eco .bg-indigo-600,
+.eco .eco-primary-btn {
+    background-image: linear-gradient(135deg, #0a84ff, #5b6cff);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 0 22px -6px rgba(10, 132, 255, 0.9);
+}
+
+.eco a.bg-blue-600,
+.eco button.bg-blue-600,
+.eco .eco-primary-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.eco a.bg-blue-600::after,
+.eco button.bg-blue-600::after,
+.eco .eco-primary-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--spring);
+    pointer-events: none;
+}
+
+.eco a.bg-blue-600:hover::after,
+.eco button.bg-blue-600:hover::after,
+.eco .eco-primary-btn:hover::after {
+    transform: translateX(120%);
+}
+
+.eco-avatar {
+    background: linear-gradient(135deg, var(--neon-a), var(--neon-b));
+    box-shadow: 0 0 16px -2px rgba(0, 194, 255, 0.7);
+}
+
+/* Glowing hairline on top of the header */
+.eco-topbar::before {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: -1px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-a), var(--neon-b), transparent);
+    opacity: 0.8;
+}
+
+.eco-topbar {
+    position: sticky;
+}
+
+/* ---------- Dark: neon on black ---------- */
+
+html.dark {
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-edge: rgba(255, 255, 255, 0.16);
+}
+
+html.dark body.eco {
+    background-color: #04060f;
+    background-image: linear-gradient(135deg, #050a1c 0%, #0b0720 50%, #031420 100%);
+}
+
+html.dark body.eco::before {
+    background:
+        radial-gradient(38rem 32rem at 12% 16%, rgba(0, 120, 255, 0.34), transparent 68%),
+        radial-gradient(34rem 30rem at 88% 10%, rgba(140, 80, 255, 0.34), transparent 68%),
+        radial-gradient(38rem 32rem at 74% 90%, rgba(0, 200, 255, 0.26), transparent 68%),
+        radial-gradient(28rem 24rem at 16% 88%, rgba(255, 90, 190, 0.16), transparent 68%);
+}
+
+html.dark body.eco::after {
+    background-image:
+        linear-gradient(rgba(0, 194, 255, 0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 194, 255, 0.10) 1px, transparent 1px);
+}
+
+html.dark .eco-orb { opacity: 0.4; }
+html.dark .eco-net { opacity: 0.5; color: #35d0ff; }
+html.dark .eco-ic { opacity: 0.85; }
+html.dark .eco-ic.tone-b { color: #3aa0ff; }
+html.dark .eco-ic.tone-v { color: #a78bff; }
+html.dark .eco-ic.tone-c { color: #33d6ff; }
+
+html.dark .eco .bg-white,
+html.dark .eco-topbar,
+html.dark .eco-sidebar,
+html.dark .eco-auth-card,
+html.dark .eco .bg-white.rounded-lg,
+html.dark .eco .bg-white.rounded-xl,
+html.dark .eco .bg-white.rounded-2xl,
+html.dark .eco .bg-white.rounded {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0.07) 100%);
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.12) inset,
+        0 0 0 0.5px rgba(0, 194, 255, 0.14),
+        0 24px 48px -24px rgba(0, 0, 0, 0.85);
+}
+
+html.dark .eco .bg-white.shadow-lg:hover {
+    box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.14) inset,
+        0 0 0 0.5px rgba(0, 194, 255, 0.5),
+        0 0 30px -4px rgba(0, 194, 255, 0.5),
+        0 28px 52px -20px rgba(0, 0, 0, 0.9);
+}
+
+html.dark .eco input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark .eco select,
+html.dark .eco textarea {
+    background-color: rgba(255, 255, 255, 0.07);
+}

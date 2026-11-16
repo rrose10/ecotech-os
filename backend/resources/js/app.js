@@ -80,3 +80,19 @@
         requestAnimationFrame(tick);
     });
 })();
+
+// Parallax: the background icons drift a little with the mouse
+(() => {
+    const bg = document.querySelector('.eco-bg');
+    if (!bg || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let raf = 0;
+    window.addEventListener('pointermove', (e) => {
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+            raf = 0;
+            bg.style.setProperty('--mx', (e.clientX / window.innerWidth - 0.5) * 2);
+            bg.style.setProperty('--my', (e.clientY / window.innerHeight - 0.5) * 2);
+        });
+    }, { passive: true });
+})();
