@@ -46,23 +46,27 @@ class InstallEcotech extends Command
 
         $created = [];
 
-        foreach (self::ADMINS as $email => $name) {
-            if (User::where('email', $email)->exists()) {
-                continue;
+        // Only on a brand-new install. If any Super Admin exists already (even with a
+        // changed email), never create more accounts behind the owners' backs.
+        if (User::where('role', 'super_admin')->doesntExist()) {
+            foreach (self::ADMINS as $email => $name) {
+                if (User::where('email', $email)->exists()) {
+                    continue;
+                }
+
+                $password = Str::password(14, symbols: false);
+
+                $admin = new User([
+                    'name' => $name,
+                    'email' => $email,
+                    'password' => Hash::make($password),
+                    'role' => 'super_admin',
+                    'email_verified_at' => now(),
+                ]);
+                $admin->forceFill(['must_change_password' => true])->save();
+
+                $created[] = [$name, $email, $password];
             }
-
-            $password = Str::password(14, symbols: false);
-
-            $admin = User::create([
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make($password),
-                'role' => 'super_admin',
-                'email_verified_at' => now(),
-            ]);
-            $admin->forceFill(['must_change_password' => true])->save();
-
-            $created[] = [$name, $email, $password];
         }
 
         if ($created) {
