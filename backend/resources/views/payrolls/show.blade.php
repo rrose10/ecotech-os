@@ -35,9 +35,9 @@
         {{-- Company --}}
         <div class="text-center border-b pb-6 mb-8">
 
-            <h2 class="text-3xl font-bold text-slate-800">
-                EcoTech
-            </h2>
+            <div class="mx-auto mb-3 inline-block rounded-2xl" style="background:#fff;padding:8px 18px">
+                <img src="{{ asset('images/ecotech-logo.png') }}" alt="EcoTech" class="h-20 w-auto">
+            </div>
 
             <p class="text-gray-500">
                 Office Management System

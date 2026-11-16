@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
     <title>Payslip {{ \Carbon\Carbon::create(null, $payroll->month, 1)->format('F') }} {{ $payroll->year }} - {{ $payroll->employee->name }}</title>
     <style>
         * { box-sizing: border-box; }
@@ -42,6 +43,7 @@
 <div class="sheet">
     <div class="head">
         <div>
+            <img src="{{ asset('images/ecotech-logo.png') }}" alt="{{ $company['name'] }}" style="height:64px;width:auto;display:block;margin-bottom:6px">
             <h1>{{ $company['name'] }}</h1>
             <div class="muted">
                 {{ $company['address'] }}
