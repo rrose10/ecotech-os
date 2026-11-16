@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Already created under the old (mis-ordered) migration name on existing installs.
+        if (Schema::hasTable('expenses')) {
+            return;
+        }
+
         Schema::create('expenses', function (Blueprint $table) {
 
             $table->id();
