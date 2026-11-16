@@ -1,8 +1,8 @@
 @extends('layouts.portal')
 
-@section('title', 'Attendance')
+@section('title', __('Attendance'))
 
-@section('page_title', 'Attendance')
+@section('page_title', __('Attendance'))
 
 @section('content')
 
@@ -13,7 +13,7 @@
 
         <div class="border-b border-slate-200 px-6 py-4">
             <h2 class="text-xl font-bold text-slate-900">
-                Today's Attendance
+                {{ __("Today's Attendance") }}
             </h2>
         </div>
 
@@ -24,43 +24,43 @@
         <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-6">
 
             <div>
-                <p class="text-sm text-slate-500">Status</p>
+                <p class="text-sm text-slate-500">{{ __("Status") }}</p>
 
             @if($status === 'present')
 
                 <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                    Present
+                    {{ __("Present") }}
                 </span>
 
             @elseif($status === 'late')
 
                 <span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
-                    Late
+                    {{ __("Late") }}
                 </span>
 
             @elseif($status === 'absent')
 
                 <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-                    Absent
+                    {{ __("Absent") }}
                 </span>
 
             @elseif($status === 'leave')
 
                 <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
-                    Leave
+                    {{ __("Leave") }}
                 </span>
 
             @else
 
                 <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                    No Record
+                    {{ __("No Record") }}
                 </span>
 
             @endif
             </div>
 
             <div>
-                <p class="text-sm text-slate-500">Shift</p>
+                <p class="text-sm text-slate-500">{{ __("Shift") }}</p>
 
                 <p class="mt-2 font-semibold">
                     {{ $todayAttendance->shift ?? '--' }}
@@ -68,7 +68,7 @@
             </div>
 
             <div>
-                <p class="text-sm text-slate-500">Check In</p>
+                <p class="text-sm text-slate-500">{{ __("Check In") }}</p>
 
                 <p class="mt-2 font-semibold">
                     {{ $todayAttendance?->check_in?->format('h:i A') ?? '--' }}
@@ -76,7 +76,7 @@
             </div>
 
             <div>
-                <p class="text-sm text-slate-500">Check Out</p>
+                <p class="text-sm text-slate-500">{{ __("Check Out") }}</p>
 
                 <p class="mt-2 font-semibold">
                     {{ $todayAttendance?->check_out?->format('h:i A') ?? '--' }}
@@ -84,7 +84,7 @@
             </div>
 
             <div>
-                <p class="text-sm text-slate-500">Working Hours</p>
+                <p class="text-sm text-slate-500">{{ __("Working Hours") }}</p>
 
                 <p class="mt-2 font-semibold">
                     @if($todayAttendance)
@@ -97,7 +97,7 @@
             </div>
 
             <div>
-                <p class="text-sm text-slate-500">Late</p>
+                <p class="text-sm text-slate-500">{{ __("Late") }}</p>
 
                 <p class="mt-2 font-semibold">
                     @if($todayAttendance && $todayAttendance->late_minutes)
@@ -123,7 +123,7 @@
 
         <div class="border-b border-slate-200 px-6 py-4">
             <h2 class="text-xl font-bold text-slate-900">
-                Attendance History
+                {{ __("Attendance History") }}
             </h2>
         </div>
 
@@ -136,35 +136,35 @@
                     <tr>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Date
+                            {{ __("Date") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Shift
+                            {{ __("Shift") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Status
+                            {{ __("Status") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Check In
+                            {{ __("Check In") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Check Out
+                            {{ __("Check Out") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Hours
+                            {{ __("Hours") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Late
+                            {{ __("Late") }}
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
-                            Remarks
+                            {{ __("Remarks") }}
                         </th>
 
                     </tr>
@@ -226,7 +226,7 @@
                         <tr>
 
                             <td colspan="8" class="px-6 py-8 text-center text-slate-500">
-                                No attendance records found.
+                                {{ __("No attendance records found.") }}
                             </td>
 
                         </tr>

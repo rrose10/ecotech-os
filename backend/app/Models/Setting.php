@@ -28,6 +28,12 @@ class Setting extends Model
         return ($value === null || $value === '') ? $default : $value;
     }
 
+    /** Forget the request-level cache (used by tests and after bulk changes). */
+    public static function flush(): void
+    {
+        static::$cache = null;
+    }
+
     public static function put(string $key, ?string $value): void
     {
         static::updateOrCreate(['key' => $key], ['value' => $value]);

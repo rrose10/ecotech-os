@@ -32,6 +32,17 @@
             <textarea name="company_address" rows="3" class="w-full border rounded p-3">{{ old('company_address', $values['company_address']) }}</textarea>
         </div>
 
+        <h2 class="text-xl font-bold pt-4">Team check-in network</h2>
+        <div>
+            <label class="block mb-2 font-semibold">Office IP addresses</label>
+            <textarea name="office_ips" rows="4" class="w-full border rounded p-3" placeholder="192.168.10.0/24&#10;192.168.0.0/24">{{ old('office_ips', $values['office_ips']) }}</textarea>
+            @error('office_ips')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+            <p class="text-sm text-gray-500 mt-1">
+                Team members can check in, take a break and check out only from these addresses. One per line; a range like <code>192.168.10.0/24</code> covers the whole office network. Leave empty to allow check-in from anywhere.
+            </p>
+            <p class="text-sm text-gray-500 mt-1">The address you are using right now: <strong>{{ $currentIp }}</strong></p>
+        </div>
+
         <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded">Save settings</button>
     </form>
 

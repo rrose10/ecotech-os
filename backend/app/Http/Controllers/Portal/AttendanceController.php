@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Support\OfficeNetwork;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,6 +43,10 @@ class AttendanceController extends Controller
 
     public function checkIn(Request $request)
     {
+        if ($blocked = $this->blockedOutsideOffice($request)) {
+            return $blocked;
+        }
+
         $employee = Auth::user()->employee;
 
         if (!$employee) {
@@ -98,6 +103,10 @@ class AttendanceController extends Controller
 
     public function startBreak(Request $request)
     {
+        if ($blocked = $this->blockedOutsideOffice($request)) {
+            return $blocked;
+        }
+
         $employee = Auth::user()->employee;
 
         if (!$employee) {
@@ -127,6 +136,10 @@ class AttendanceController extends Controller
 
     public function endBreak(Request $request)
     {
+        if ($blocked = $this->blockedOutsideOffice($request)) {
+            return $blocked;
+        }
+
         $employee = Auth::user()->employee;
 
         if (!$employee) {
@@ -163,6 +176,10 @@ class AttendanceController extends Controller
 
     public function checkOut(Request $request)
     {
+        if ($blocked = $this->blockedOutsideOffice($request)) {
+            return $blocked;
+        }
+
         $employee = Auth::user()->employee;
 
         if (!$employee) {
@@ -197,5 +214,15 @@ class AttendanceController extends Controller
         return redirect()
             ->route('portal.dashboard')
             ->with('success', 'Checked out successfully.');
+    }
+
+    /** Returns a redirect when an office-network rule is set and this request comes from elsewhere. */
+    private function blockedOutsideOffice(Request $request)
+    {
+        if (OfficeNetwork::allowed($request->ip())) {
+            return null;
+        }
+
+        return back()->with('error', 'Check-in and check-out are allowed only from the office network. Please connect to the office Wi-Fi.');
     }
 }

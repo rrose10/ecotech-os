@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Services\ActivityLogger;
+use App\Support\OfficeNetwork;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    public const KEYS = ['company_name', 'company_email', 'company_phone', 'company_address'];
+    public const KEYS = ['company_name', 'company_email', 'company_phone', 'company_address', OfficeNetwork::SETTING];
 
     public function edit()
     {
@@ -17,7 +18,9 @@ class SettingController extends Controller
             $values[$key] = Setting::get($key, $key === 'company_name' ? 'EcoTech' : '');
         }
 
-        return view('settings.edit', compact('values'));
+        $currentIp = request()->ip();
+
+        return view('settings.edit', compact('values', 'currentIp'));
     }
 
     public function update(Request $request)
@@ -27,7 +30,20 @@ class SettingController extends Controller
             'company_email' => 'nullable|email|max:255',
             'company_phone' => 'nullable|string|max:50',
             'company_address' => 'nullable|string|max:500',
+            OfficeNetwork::SETTING => [
+                'nullable', 'string', 'max:1000',
+                function ($attribute, $value, $fail) {
+                    foreach (OfficeNetwork::parse($value) as $entry) {
+                        if (! OfficeNetwork::validEntry($entry)) {
+                            $fail("\"{$entry}\" is not a valid IP address or range (example: 192.168.10.0/24).");
+                        }
+                    }
+                },
+            ],
         ]);
+
+        // Store the cleaned list, one entry per line
+        $data[OfficeNetwork::SETTING] = implode("\n", OfficeNetwork::parse($data[OfficeNetwork::SETTING] ?? ''));
 
         foreach (self::KEYS as $key) {
             Setting::put($key, $data[$key] ?? null);
