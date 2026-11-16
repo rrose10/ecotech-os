@@ -1935,3 +1935,21 @@ html.dark .eco .eco-minus { color: #ff8a80; }
 
     tr, td, th, .eco .bg-white { break-inside: avoid; }
 }
+
+/* ---- Company logo tiles (the logo has dark navy parts, so it always sits on white) ---- */
+.eco-logo-tile {
+    background: #fff;
+    padding: 5px;
+    box-shadow: 0 8px 20px -8px rgba(0, 113, 227, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+    transition: transform 0.5s var(--bounce);
+}
+
+.eco-logo-tile:hover {
+    transform: scale(1.06) rotate(-3deg);
+}
+
+.eco-logo-tile-lg {
+    width: 8.5rem;
+    height: 6rem;
+    padding: 10px 14px;
+}

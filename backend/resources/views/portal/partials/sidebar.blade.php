@@ -13,7 +13,7 @@
        class="eco-sidebar eco-drawer flex w-64 shrink-0 flex-col lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
 
     <div class="flex items-center gap-3 px-5 pb-4 pt-6">
-        <span class="eco-brand-mark flex h-11 w-11 items-center justify-center rounded-2xl text-lg font-extrabold">E</span>
+        <span class="eco-logo-tile flex h-11 w-11 items-center justify-center rounded-2xl"><img src="{{ asset('images/ecotech-mark.png') }}" alt="EcoTech" class="h-full w-full object-contain"></span>
         <div>
             <p class="text-lg font-extrabold leading-tight tracking-tight">EcoTech</p>
             <p class="text-xs text-white/50">Team portal</p>
