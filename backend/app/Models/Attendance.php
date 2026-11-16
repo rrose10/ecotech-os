@@ -73,6 +73,22 @@ class Attendance extends Model
     }
 
     /**
+     * Arriving up to this many minutes after the shift start is not late.
+     */
+    public const LATE_GRACE_MINUTES = 10;
+
+    /**
+     * Late minutes for a check-in: 0 inside the grace period, otherwise
+     * the full time since the shift start.
+     */
+    public static function lateMinutes(Carbon $shiftStart, Carbon $checkIn): int
+    {
+        $minutes = self::minutesBetween($shiftStart, $checkIn);
+
+        return $minutes > self::LATE_GRACE_MINUTES ? $minutes : 0;
+    }
+
+    /**
      * Whole minutes between two moments (never negative, never fractional).
      */
     public static function minutesBetween(Carbon $from, Carbon $to): int
