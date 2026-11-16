@@ -6,7 +6,6 @@ use App\Models\Attendance;
 use App\Models\LeaveBalance;
 use App\Models\Payroll;
 use App\Models\Notice;
-use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -93,26 +92,7 @@ class EmployeeDashboardController extends Controller
 
 
 
-        // Upcoming birthdays (whole team, next 6; today first)
-        $upcomingBirthdays = Employee::with('department')
-            ->where('status', true)
-            ->whereNotNull('date_of_birth')
-            ->get()
-            ->map(function ($e) use ($today) {
-                $next = $e->date_of_birth->copy()->year($today->year)->startOfDay();
-                if ($next->lt($today)) {
-                    $next->addYear();
-                }
-                $e->next_birthday = $next;
-                $e->days_until = (int) $today->diffInDays($next);
-                return $e;
-            })
-            ->sortBy('days_until')
-            ->take(6)
-            ->values();
-
         return view('portal.dashboard.index', compact(
-            'upcomingBirthdays',
 
             'employee',
 

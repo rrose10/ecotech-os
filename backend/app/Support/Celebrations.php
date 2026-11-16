@@ -33,4 +33,30 @@ class Celebrations
 
         return compact('birthdays', 'anniversaries');
     }
+
+    /**
+     * Next birthdays across the team (today first), for the portal dashboard card.
+     */
+    public static function upcoming(int $limit = 6): Collection
+    {
+        $today = today();
+
+        return Employee::with('department')
+            ->where('status', true)
+            ->whereNotNull('date_of_birth')
+            ->get()
+            ->map(function ($e) use ($today) {
+                $next = $e->date_of_birth->copy()->year($today->year)->startOfDay();
+                if ($next->lt($today)) {
+                    $next->addYear();
+                }
+                $e->next_birthday = $next;
+                $e->days_until = (int) $today->diffInDays($next);
+
+                return $e;
+            })
+            ->sortBy('days_until')
+            ->take($limit)
+            ->values();
+    }
 }
