@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use App\Services\ActivityLogger;
 use App\Support\OfficeNetwork;
+use App\Support\Telegram;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -19,8 +20,9 @@ class SettingController extends Controller
         }
 
         $currentIp = request()->ip();
+        $telegramBot = Telegram::username();
 
-        return view('settings.edit', compact('values', 'currentIp'));
+        return view('settings.edit', compact('values', 'currentIp', 'telegramBot'));
     }
 
     public function update(Request $request)
@@ -40,7 +42,22 @@ class SettingController extends Controller
                     }
                 },
             ],
+            'telegram_bot_token' => 'nullable|string|max:200',
         ]);
+
+        // Telegram bot: blank keeps the saved token; a new token must work.
+        if (!empty($data['telegram_bot_token'])) {
+            $username = Telegram::botUsername(trim($data['telegram_bot_token']));
+
+            if (!$username) {
+                return back()->withInput()->withErrors(['telegram_bot_token' => 'Telegram did not accept this token. Copy it again from @BotFather.']);
+            }
+
+            Setting::put(Telegram::TOKEN, trim($data['telegram_bot_token']));
+            Setting::put(Telegram::USERNAME, $username);
+        }
+
+        unset($data['telegram_bot_token']);
 
         // Store the cleaned list, one entry per line
         $data[OfficeNetwork::SETTING] = implode("\n", OfficeNetwork::parse($data[OfficeNetwork::SETTING] ?? ''));

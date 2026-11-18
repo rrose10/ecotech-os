@@ -43,6 +43,17 @@
             <p class="text-sm text-gray-500 mt-1">The address you are using right now: <strong>{{ $currentIp }}</strong></p>
         </div>
 
+        <h2 class="text-xl font-bold pt-4">Telegram check-out reminders</h2>
+        <div>
+            <label class="block mb-2 font-semibold">Bot token</label>
+            <input type="password" name="telegram_bot_token" autocomplete="off" class="w-full border rounded p-3"
+                   placeholder="{{ $telegramBot ? 'Saved (bot @'.$telegramBot.'). Leave empty to keep it.' : '123456:ABC... from @BotFather' }}">
+            @error('telegram_bot_token')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+            <p class="text-sm text-gray-500 mt-1">
+                Create a bot with @BotFather in Telegram and paste its token here. Team members then connect their own Telegram from My Profile and get a message 5 minutes before the shift ends.
+            </p>
+        </div>
+
         <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded">Save settings</button>
     </form>
 

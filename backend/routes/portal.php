@@ -9,6 +9,7 @@ use App\Http\Controllers\Portal\NoticeController;
 use App\Http\Controllers\Portal\LeaveController;
 use App\Http\Controllers\Portal\PayslipController;
 use App\Http\Controllers\Portal\NotificationController;
+use App\Http\Controllers\Portal\TelegramController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -114,5 +115,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/portal/notifications/{notification}', [NotificationController::class, 'open'])
         ->name('portal.notifications.open');
+
+    Route::post('/portal/telegram/link', [TelegramController::class, 'link'])
+        ->name('portal.telegram.link');
+
+    Route::delete('/portal/telegram', [TelegramController::class, 'unlink'])
+        ->name('portal.telegram.unlink');
 
 });
