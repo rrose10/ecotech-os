@@ -21,7 +21,7 @@
     @forelse($notifications as $n)
         <a href="{{ route('portal.notifications.open', $n) }}"
            class="block rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-lg {{ $n->read_at ? '' : 'border-l-4 border-l-emerald-500' }}">
-            <p class="font-semibold text-slate-900">{{ $n->title }}</p>
+            <p class="font-semibold text-slate-900">{{ __($n->title) }}</p>
             @if($n->body)
                 <p class="mt-1 text-sm text-slate-600">{{ $n->body }}</p>
             @endif

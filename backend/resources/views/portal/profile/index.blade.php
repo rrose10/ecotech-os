@@ -45,6 +45,35 @@
 
     </div>
 
+    <!-- Telegram reminders -->
+    @php($tgUser = auth()->user())
+    @if(\App\Support\Telegram::configured() && \App\Support\Telegram::username())
+    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h3 class="text-lg font-semibold text-slate-900">{{ __('Telegram reminders') }}</h3>
+
+        @if($tgUser->telegram_chat_id)
+            <p class="mt-2 text-sm text-emerald-700">✅ {{ __('Connected. Check-out reminders come to your Telegram.') }}</p>
+            <form method="POST" action="{{ route('portal.telegram.unlink') }}" class="mt-3">
+                @csrf @method('DELETE')
+                <button class="eco-logout">{{ __('Disconnect') }}</button>
+            </form>
+        @elseif($tgUser->telegram_link_code)
+            <p class="mt-2 text-sm text-slate-600">{{ __('Open this link on your phone and press Start:') }}</p>
+            <a class="mt-2 inline-block rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white"
+               href="https://t.me/{{ \App\Support\Telegram::username() }}?start={{ $tgUser->telegram_link_code }}">
+                {{ __('Open Telegram') }}
+            </a>
+            <p class="mt-2 text-xs text-slate-500">{{ __('After pressing Start, reload this page in a minute.') }}</p>
+        @else
+            <p class="mt-2 text-sm text-slate-600">{{ __('Get a Telegram message 5 minutes before your shift ends, so you never forget to check out.') }}</p>
+            <form method="POST" action="{{ route('portal.telegram.link') }}" class="mt-3">
+                @csrf
+                <button class="eco-logout">{{ __('Connect Telegram') }}</button>
+            </form>
+        @endif
+    </div>
+    @endif
+
     <!-- Personal Information -->
     <div class="bg-white rounded-2xl border border-slate-200">
 

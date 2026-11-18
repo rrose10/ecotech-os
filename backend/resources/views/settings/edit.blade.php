@@ -43,6 +43,30 @@
             <p class="text-sm text-gray-500 mt-1">The address you are using right now: <strong>{{ $currentIp }}</strong></p>
         </div>
 
+        <h2 class="text-xl font-bold pt-4">Telegram check-out reminders</h2>
+        <div>
+            <label class="block mb-2 font-semibold">Bot token</label>
+            <input type="password" name="telegram_bot_token" autocomplete="off" class="w-full border rounded p-3"
+                   placeholder="{{ $telegramBot ? 'Saved (bot @'.$telegramBot.'). Leave empty to keep it.' : '123456:ABC... from @BotFather' }}">
+            @error('telegram_bot_token')<p class="text-red-600 text-sm mt-1">{{ $message }}</p>@enderror
+            <p class="text-sm text-gray-500 mt-1">
+                Create a bot with @BotFather in Telegram and paste its token here. Team members then connect their own Telegram from My Profile and get a message 5 minutes before the shift ends.
+            </p>
+        </div>
+
+        @if($groupCode)
+        <div class="rounded border p-4 bg-gray-50">
+            <p class="font-semibold mb-1">Team group</p>
+            @if($telegramGroup)
+                <p class="text-green-700 text-sm">Connected. Reminders are posted in your Telegram group.</p>
+                <p class="text-sm text-gray-500 mt-1">To use another group, add the bot there and send the command below in that group.</p>
+            @else
+                <p class="text-sm text-gray-600">Not connected yet. Add the bot to your team group, then send this message in the group:</p>
+            @endif
+            <p class="mt-2"><code class="bg-white border rounded px-2 py-1">/setgroup {{ $groupCode }}</code></p>
+        </div>
+        @endif
+
         <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded">Save settings</button>
     </form>
 

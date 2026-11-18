@@ -138,5 +138,16 @@
     "Notifications": "নোটিফিকেশন",
     "Salary and other updates for you": "আপনার বেতন ও অন্যান্য আপডেট",
     "Mark all as read": "সব পড়া হয়েছে",
-    "No notifications yet.": "এখনো কোনো নোটিফিকেশন নেই।"
+    "No notifications yet.": "এখনো কোনো নোটিফিকেশন নেই।",
+    "Telegram reminders": "টেলিগ্রাম রিমাইন্ডার",
+    "Connected. Check-out reminders come to your Telegram.": "সংযুক্ত। চেক-আউটের রিমাইন্ডার আপনার টেলিগ্রামে আসবে।",
+    "Disconnect": "সংযোগ বিচ্ছিন্ন করুন",
+    "Open this link on your phone and press Start:": "ফোনে এই লিংকটি খুলে Start চাপুন:",
+    "Open Telegram": "টেলিগ্রাম খুলুন",
+    "After pressing Start, reload this page in a minute.": "Start চাপার পর এক মিনিট পরে এই পেজ রিলোড করুন।",
+    "Get a Telegram message 5 minutes before your shift ends, so you never forget to check out.": "শিফট শেষ হওয়ার ৫ মিনিট আগে টেলিগ্রামে মেসেজ পান, যাতে চেক-আউট ভুলে না যান।",
+    "Connect Telegram": "টেলিগ্রাম সংযুক্ত করুন",
+    "Telegram disconnected.": "টেলিগ্রাম সংযোগ বিচ্ছিন্ন হয়েছে।",
+    "Your shift ends in 5 minutes. Please check out.": "শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।",
+    "Dinner break starts in 5 minutes. Please press Start break.": "৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।"
 }
