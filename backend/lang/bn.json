@@ -148,5 +148,6 @@
     "Get a Telegram message 5 minutes before your shift ends, so you never forget to check out.": "শিফট শেষ হওয়ার ৫ মিনিট আগে টেলিগ্রামে মেসেজ পান, যাতে চেক-আউট ভুলে না যান।",
     "Connect Telegram": "টেলিগ্রাম সংযুক্ত করুন",
     "Telegram disconnected.": "টেলিগ্রাম সংযোগ বিচ্ছিন্ন হয়েছে।",
-    "Your shift ends in 5 minutes. Please check out.": "শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।"
+    "Your shift ends in 5 minutes. Please check out.": "শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।",
+    "Dinner break starts in 5 minutes. Please press Start break.": "৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।"
 }

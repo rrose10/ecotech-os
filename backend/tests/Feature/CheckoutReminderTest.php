@@ -65,6 +65,25 @@ class CheckoutReminderTest extends TestCase
         Http::assertSentCount(1);
     }
 
+    public function test_dinner_reminder_skips_people_already_on_break(): void
+    {
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => []])]);
+        Setting::put(Telegram::TOKEN, 'TOKEN123');
+
+        [$waiting, $waitingEmp] = $this->member('1');
+        [$onBreak, $onBreakEmp] = $this->member('2');
+        $waiting->forceFill(['telegram_chat_id' => '555'])->save();
+        $this->checkIn($waitingEmp);
+        $this->checkIn($onBreakEmp);
+        Attendance::where('employee_id', $onBreakEmp->id)->update(['break_start' => now()]);
+
+        $this->artisan('attendance:remind-dinner')->assertExitCode(0);
+
+        $this->assertSame(1, PortalNotification::where('user_id', $waiting->id)->count());
+        $this->assertSame(0, PortalNotification::where('user_id', $onBreak->id)->count());
+        Http::assertSentCount(1);
+    }
+
     public function test_telegram_start_code_connects_the_member(): void
     {
         Setting::put(Telegram::TOKEN, 'TOKEN123');
