@@ -21,6 +21,11 @@ class MotivationQuoteTest extends TestCase
         );
     }
 
+    public function test_every_quote_has_bangla(): void
+    {
+        $this->assertSame(0, MotivationalQuote::whereNull('quote_bn')->orWhere('quote_bn', '')->count());
+    }
+
     public function test_everyone_gets_a_different_quote_and_it_changes_every_hour(): void
     {
         $at = Carbon::parse('2026-11-19 10:15:00');
@@ -51,6 +56,10 @@ class MotivationQuoteTest extends TestCase
         $user = User::factory()->create(['role' => 'employee']);
         $quote = MotivationalQuote::forUser($user->id);
 
-        $this->actingAs($user)->get('/portal/dashboard')->assertOk()->assertSee($quote->quote);
+        $this->assertNotEmpty($quote->quote_bn);
+
+        $this->actingAs($user)->get('/portal/dashboard')->assertOk()
+            ->assertSee($quote->quote)
+            ->assertSee($quote->quote_bn);
     }
 }
