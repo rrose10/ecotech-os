@@ -18,6 +18,9 @@ class Telegram
     public const GROUP = 'telegram_group_chat_id';
     public const GROUP_CODE = 'telegram_group_code';
 
+    /** Why the last call failed (shown to the admin when saving the token). */
+    public static ?string $lastError = null;
+
     public static function token(): ?string
     {
         return Setting::get(self::TOKEN);
@@ -37,6 +40,7 @@ class Telegram
     public static function call(string $method, array $params = [], ?string $token = null, int $timeout = 10): mixed
     {
         $token = $token ?? self::token();
+        self::$lastError = null;
 
         if (!$token) {
             return null;
@@ -46,8 +50,15 @@ class Telegram
             $response = Http::timeout($timeout)->asForm()
                 ->post("https://api.telegram.org/bot{$token}/{$method}", $params);
 
-            return $response->successful() && $response->json('ok') ? $response->json('result') : null;
+            if ($response->successful() && $response->json('ok')) {
+                return $response->json('result');
+            }
+
+            self::$lastError = 'Telegram answered ' . $response->status() . ': ' . ($response->json('description') ?? 'no details');
+
+            return null;
         } catch (\Throwable $e) {
+            self::$lastError = 'This server cannot reach Telegram (' . class_basename($e) . ': ' . mb_substr($e->getMessage(), 0, 160) . ')';
             report($e);
 
             return null;
