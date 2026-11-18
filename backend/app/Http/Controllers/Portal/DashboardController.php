@@ -63,21 +63,8 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $quotes = MotivationalQuote::where('is_active', true)
-            ->orderBy('id')
-            ->get();
-
-
-        $dailyQuote = null;
-
-
-        if ($quotes->isNotEmpty()) {
-
-            $index = today()->dayOfYear % $quotes->count();
-
-            $dailyQuote = $quotes[$index];
-
-        }
+        // A different quote for every person, changing every hour.
+        $dailyQuote = MotivationalQuote::forUser(Auth::id());
 
 
 
