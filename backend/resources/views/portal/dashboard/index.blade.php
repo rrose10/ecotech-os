@@ -92,6 +92,14 @@
 
             </blockquote>
 
+            @if($dailyQuote->quote_bn)
+                <blockquote class="mt-5 text-2xl leading-10 font-medium text-indigo-50">
+
+                    “{{ $dailyQuote->quote_bn }}”
+
+                </blockquote>
+            @endif
+
             @if($dailyQuote->author)
 
                 <p class="mt-6 text-lg font-semibold text-indigo-100">

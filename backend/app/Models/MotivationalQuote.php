@@ -8,6 +8,7 @@ class MotivationalQuote extends Model
 {
     protected $fillable = [
         'quote',
+        'quote_bn',
         'author',
         'is_active',
     ];
