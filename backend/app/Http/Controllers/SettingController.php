@@ -52,7 +52,7 @@ class SettingController extends Controller
             $username = Telegram::botUsername(trim($data['telegram_bot_token']));
 
             if (!$username) {
-                return back()->withInput()->withErrors(['telegram_bot_token' => 'Telegram did not accept this token. Copy it again from @BotFather.']);
+                return back()->withInput()->withErrors(['telegram_bot_token' => 'Telegram did not accept this token. ' . (Telegram::$lastError ?? 'Copy it again from @BotFather.')]);
             }
 
             Setting::put(Telegram::TOKEN, trim($data['telegram_bot_token']));
