@@ -17,12 +17,13 @@ class RemindCheckout extends Command
     {
         $shiftDate = Attendance::shiftDateFor(now())->toDateString();
         $sent = 0;
+        $users = collect();
 
         Attendance::with('employee.user')
             ->whereDate('attendance_date', $shiftDate)
             ->whereNotNull('check_in')
             ->whereNull('check_out')
-            ->each(function (Attendance $a) use (&$sent) {
+            ->each(function (Attendance $a) use (&$sent, &$users) {
                 $user = optional($a->employee)->user;
 
                 if (!$user) {
@@ -35,15 +36,12 @@ class RemindCheckout extends Command
                     'url'     => route('portal.attendance', [], false),
                 ]);
 
-                if ($user->telegram_chat_id) {
-                    Telegram::send(
-                        $user->telegram_chat_id,
-                        "⏰ Your shift ends in 5 minutes. Please check out.\n⏰ শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।"
-                    );
-                }
+                $users->push($user);
 
                 $sent++;
             });
+
+        Telegram::remind($users, "⏰ শিফট শেষ হতে ৫ মিনিট বাকি। এখনো চেক-আউট করেননি:\n⏰ Shift ends in 5 minutes. Not checked out yet:");
 
         $this->info("{$sent} reminder(s) sent.");
 

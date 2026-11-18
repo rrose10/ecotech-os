@@ -17,13 +17,14 @@ class RemindDinner extends Command
     {
         $shiftDate = Attendance::shiftDateFor(now())->toDateString();
         $sent = 0;
+        $users = collect();
 
         Attendance::with('employee.user')
             ->whereDate('attendance_date', $shiftDate)
             ->whereNotNull('check_in')
             ->whereNull('break_start')
             ->whereNull('check_out')
-            ->each(function (Attendance $a) use (&$sent) {
+            ->each(function (Attendance $a) use (&$sent, &$users) {
                 $user = optional($a->employee)->user;
 
                 if (!$user) {
@@ -36,15 +37,12 @@ class RemindDinner extends Command
                     'url'     => route('portal.attendance', [], false),
                 ]);
 
-                if ($user->telegram_chat_id) {
-                    Telegram::send(
-                        $user->telegram_chat_id,
-                        "🍽️ Dinner break starts in 5 minutes. Please press Start break.\n🍽️ ৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।"
-                    );
-                }
+                $users->push($user);
 
                 $sent++;
             });
+
+        Telegram::remind($users, "🍽️ ৫ মিনিট পরে ডিনার ব্রেক। এখনো ব্রেক শুরু করেননি:\n🍽️ Dinner break in 5 minutes. Break not started yet:");
 
         $this->info("{$sent} reminder(s) sent.");
 

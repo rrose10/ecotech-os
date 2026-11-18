@@ -21,8 +21,10 @@ class SettingController extends Controller
 
         $currentIp = request()->ip();
         $telegramBot = Telegram::username();
+        $telegramGroup = Telegram::groupChatId();
+        $groupCode = Telegram::configured() ? Telegram::groupCode() : null;
 
-        return view('settings.edit', compact('values', 'currentIp', 'telegramBot'));
+        return view('settings.edit', compact('values', 'currentIp', 'telegramBot', 'telegramGroup', 'groupCode'));
     }
 
     public function update(Request $request)

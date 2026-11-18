@@ -106,6 +106,38 @@ class CheckoutReminderTest extends TestCase
         $this->assertSame('11', Setting::get(Telegram::OFFSET));
     }
 
+    public function test_group_is_picked_with_the_secret_code_and_gets_one_message(): void
+    {
+        Setting::put(Telegram::TOKEN, 'TOKEN123');
+        $code = Telegram::groupCode();
+
+        Http::fake([
+            '*getUpdates*' => Http::response(['ok' => true, 'result' => [
+                ['update_id' => 1, 'message' => ['chat' => ['id' => -100, 'type' => 'supergroup'], 'text' => '/setgroup wrongcode']],
+                ['update_id' => 2, 'message' => ['chat' => ['id' => -200, 'type' => 'supergroup'], 'text' => "/setgroup@eco_bot {$code}"]],
+            ]]),
+            '*sendMessage*' => Http::response(['ok' => true, 'result' => []]),
+        ]);
+
+        $this->artisan('telegram:poll')->assertExitCode(0);
+        Setting::flush();
+        $this->assertSame('-200', Telegram::groupChatId());
+
+        [$a, $aEmp] = $this->member('1');
+        [$b, $bEmp] = $this->member('2');
+        $a->forceFill(['telegram_chat_id' => '555'])->save();
+        $this->checkIn($aEmp);
+        $this->checkIn($bEmp);
+
+        Http::fake(['*sendMessage*' => Http::response(['ok' => true, 'result' => []])]);
+        $this->artisan('attendance:remind-checkout')->assertExitCode(0);
+
+        // One message, in the group, naming both people; no private message.
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($r) => $r['chat_id'] == '-200'
+            && str_contains($r['text'], $a->name) && str_contains($r['text'], $b->name));
+    }
+
     public function test_settings_rejects_a_bad_token_and_saves_a_good_one(): void
     {
         $admin = User::factory()->create(['role' => 'super_admin']);

@@ -31,12 +31,26 @@ class TelegramPoll extends Command
             $offset = max($offset, ((int) $update['update_id']) + 1);
             $message = $update['message'] ?? null;
 
-            if (!$message || ($message['chat']['type'] ?? '') !== 'private') {
+            if (!$message) {
                 continue;
             }
 
             $chatId = (string) $message['chat']['id'];
             $text = trim((string) ($message['text'] ?? ''));
+
+            // Admin picks the team group: /setgroup CODE (typed inside the group)
+            if (in_array($message['chat']['type'] ?? '', ['group', 'supergroup'], true)) {
+                if (preg_match('/^\/setgroup(?:@\w+)?\s+(\S+)$/', $text, $m) && hash_equals(Telegram::groupCode(), $m[1])) {
+                    Setting::put(Telegram::GROUP, $chatId);
+                    Telegram::send($chatId, "✅ এই গ্রুপে এখন থেকে চেক-আউট ও ডিনারের রিমাইন্ডার আসবে।\n✅ Reminders will now be posted in this group.");
+                }
+
+                continue;
+            }
+
+            if (($message['chat']['type'] ?? '') !== 'private') {
+                continue;
+            }
 
             if (preg_match('/^\/start\s+([A-Za-z0-9]+)$/', $text, $m)) {
                 $this->link($chatId, $m[1]);

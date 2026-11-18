@@ -54,6 +54,19 @@
             </p>
         </div>
 
+        @if($groupCode)
+        <div class="rounded border p-4 bg-gray-50">
+            <p class="font-semibold mb-1">Team group</p>
+            @if($telegramGroup)
+                <p class="text-green-700 text-sm">Connected. Reminders are posted in your Telegram group.</p>
+                <p class="text-sm text-gray-500 mt-1">To use another group, add the bot there and send the command below in that group.</p>
+            @else
+                <p class="text-sm text-gray-600">Not connected yet. Add the bot to your team group, then send this message in the group:</p>
+            @endif
+            <p class="mt-2"><code class="bg-white border rounded px-2 py-1">/setgroup {{ $groupCode }}</code></p>
+        </div>
+        @endif
+
         <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded">Save settings</button>
     </form>
 
