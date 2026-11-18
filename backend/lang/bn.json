@@ -17,7 +17,6 @@
     "Team Member": "টিম সদস্য",
     "Member ID": "সদস্য আইডি",
     "Member ID:": "সদস্য আইডি:",
-    "A new quote appears every day.": "প্রতিদিন নতুন একটি উক্তি দেখা যায়।",
     "Absent": "অনুপস্থিত",
     "Absent This Month": "এ মাসে অনুপস্থিত",
     "Address": "ঠিকানা",
@@ -149,5 +148,6 @@
     "Connect Telegram": "টেলিগ্রাম সংযুক্ত করুন",
     "Telegram disconnected.": "টেলিগ্রাম সংযোগ বিচ্ছিন্ন হয়েছে।",
     "Your shift ends in 5 minutes. Please check out.": "শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।",
-    "Dinner break starts in 5 minutes. Please press Start break.": "৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।"
+    "Dinner break starts in 5 minutes. Please press Start break.": "৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।",
+    "A new quote appears every hour.": "প্রতি ঘণ্টায় নতুন একটি উক্তি দেখা যায়।"
 }

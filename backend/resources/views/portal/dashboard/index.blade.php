@@ -76,7 +76,7 @@
 
                 <p class="text-indigo-100">
 
-                    {{ __("A new quote appears every day.") }}
+                    {{ __("A new quote appears every hour.") }}
 
                 </p>
 
