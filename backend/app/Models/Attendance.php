@@ -145,4 +145,40 @@ class Attendance extends Model
 
         return ($in && $out->lte($in)) ? $out->addDay() : $out;
     }
+
+    /**
+     * Net working minutes: the saved value once checked out, otherwise the
+     * time worked so far (since check-in, minus any dinner break).
+     */
+    public function liveWorkingMinutes(): int
+    {
+        if ($this->check_out || !$this->check_in) {
+            return (int) $this->working_minutes;
+        }
+
+        $in = $this->checkInAt();
+
+        if (!$in) {
+            return 0;
+        }
+
+        // A check-in before noon belongs to the early hours after midnight.
+        if ($in->hour < 12) {
+            $in->addDay();
+        }
+
+        $break = (int) $this->break_minutes;
+
+        if ($this->break_start && !$this->break_end) {
+            $break = self::minutesBetween($this->break_start, Carbon::now());
+        }
+
+        return max(0, self::minutesBetween($in, Carbon::now()) - $break);
+    }
+
+    /** "7h 05m" style text for a number of minutes. */
+    public static function hm(int $minutes): string
+    {
+        return intdiv($minutes, 60) . 'h ' . str_pad((string) ($minutes % 60), 2, '0', STR_PAD_LEFT) . 'm';
+    }
 }

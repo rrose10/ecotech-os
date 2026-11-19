@@ -65,4 +65,36 @@ class PortalDisplayTest extends TestCase
             ->assertOk()
             ->assertViewHas('attendanceSummary', fn ($s) => $s->present_days === 2 && $s->late_days === 1 && $s->absent_days === 1);
     }
+
+    public function test_attendance_history_shows_break_and_hours_for_a_night_shift(): void
+    {
+        [$user, $emp] = $this->member();
+        Attendance::create([
+            'employee_id' => $emp->id, 'attendance_date' => today()->subDays(2)->toDateString(),
+            'check_in' => '19:01:00', 'check_out' => '06:00:00',
+            'working_minutes' => 600, 'break_minutes' => 45, 'late_minutes' => 0, 'status' => 'Present', 'shift' => 'Night',
+        ]);
+
+        $this->actingAs($user)->get('/portal/attendance')
+            ->assertOk()
+            ->assertSee('10h 00m')
+            ->assertSee('0h 45m');
+    }
+
+    public function test_admin_overnight_checkout_counts_working_hours(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        [, $emp] = $this->member();
+        $day = today()->subDays(3);
+
+        $this->actingAs($admin)->post('/attendances', [
+            'employee_id' => $emp->id,
+            'attendance_date' => $day->toDateString(),
+            'check_in' => $day->copy()->setTime(19, 1)->format('Y-m-d\TH:i'),
+            'check_out' => $day->copy()->setTime(6, 0)->format('Y-m-d\TH:i'),
+            'status' => 'Present',
+        ]);
+
+        $this->assertSame(659, (int) Attendance::first()->working_minutes);
+    }
 }
