@@ -218,10 +218,9 @@
 
                     <p class="font-semibold">
 
-                        @if($todayAttendance && $todayAttendance->working_minutes)
+                        @if($todayAttendance && $todayAttendance->check_in)
 
-                            {{ floor($todayAttendance->working_minutes / 60) }}h
-                            {{ $todayAttendance->working_minutes % 60 }}m
+                            {{ \App\Models\Attendance::hm($todayAttendance->liveWorkingMinutes()) }}
 
                         @else
 

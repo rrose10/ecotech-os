@@ -88,8 +88,24 @@
 
                 <p class="mt-2 font-semibold">
                     @if($todayAttendance)
-                        {{ floor(($todayAttendance->working_minutes ?? 0) / 60) }}h
-                        {{ ($todayAttendance->working_minutes ?? 0) % 60 }}m
+                        {{ \App\Models\Attendance::hm($todayAttendance->liveWorkingMinutes()) }}
+                        @unless($todayAttendance->check_out)
+                            <span class="text-xs font-normal text-slate-500">({{ __("so far") }})</span>
+                        @endunless
+                    @else
+                        --
+                    @endif
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-slate-500">{{ __("Break") }}</p>
+
+                <p class="mt-2 font-semibold">
+                    @if($todayAttendance && $todayAttendance->break_minutes)
+                        {{ \App\Models\Attendance::hm((int) $todayAttendance->break_minutes) }}
+                    @elseif($todayAttendance && $todayAttendance->break_start && !$todayAttendance->break_end)
+                        {{ __("On break") }}
                     @else
                         --
                     @endif
@@ -156,6 +172,10 @@
                         </th>
 
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
+                            {{ __("Break") }}
+                        </th>
+
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-slate-500">
                             {{ __("Hours") }}
                         </th>
 
@@ -198,8 +218,11 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ floor(($attendance->working_minutes ?? 0)/60) }}h
-                                {{ ($attendance->working_minutes ?? 0)%60 }}m
+                                {{ $attendance->break_minutes ? \App\Models\Attendance::hm((int) $attendance->break_minutes) : '--' }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                {{ \App\Models\Attendance::hm($attendance->liveWorkingMinutes()) }}
                             </td>
 
                             <td class="px-6 py-4">

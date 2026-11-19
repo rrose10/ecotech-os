@@ -85,7 +85,12 @@ class AttendanceController extends Controller
             $late = Attendance::lateMinutes($shiftStart, $in);
         }
 
-        if ($in && $out && $out->gt($in)) {
+        if ($in && $out) {
+            // Night shift: a check-out at or before the check-in is the next morning.
+            if ($out->lte($in)) {
+                $out = $out->copy()->addDay();
+            }
+
             $working = max(0, Attendance::minutesBetween($in, $out) - $breakMinutes);
         }
 
@@ -193,20 +198,7 @@ class AttendanceController extends Controller
 
         $oldData = $attendance->toArray();
 
-        $in  = $request->filled('check_in') ? Carbon::parse($request->check_in) : null;
-        $out = $request->filled('check_out') ? Carbon::parse($request->check_out) : null;
-
-        $working = $request->working_minutes ?? 0;
-        $late    = $request->late_minutes ?? 0;
-
-        if ($in) {
-            $shiftStart = Attendance::shiftStartFor(Attendance::shiftDateFor($in));
-            $late = Attendance::lateMinutes($shiftStart, $in);
-        }
-
-        if ($in && $out && $out->gt($in)) {
-            $working = max(0, Attendance::minutesBetween($in, $out) - (int) $attendance->break_minutes);
-        }
+        [$working, $late] = $this->minutes($request, (int) $attendance->break_minutes);
 
         $attendance->update([
 
