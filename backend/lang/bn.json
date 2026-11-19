@@ -149,5 +149,7 @@
     "Telegram disconnected.": "টেলিগ্রাম সংযোগ বিচ্ছিন্ন হয়েছে।",
     "Your shift ends in 5 minutes. Please check out.": "শিফট শেষ হতে ৫ মিনিট বাকি। চেক-আউট করতে ভুলবেন না।",
     "Dinner break starts in 5 minutes. Please press Start break.": "৫ মিনিট পরে ডিনার ব্রেক। ব্রেক শুরু করতে ভুলবেন না।",
-    "A new quote appears every hour.": "প্রতি ঘণ্টায় নতুন একটি উক্তি দেখা যায়।"
+    "A new quote appears every hour.": "প্রতি ঘণ্টায় নতুন একটি উক্তি দেখা যায়।",
+    "Last Month Report": "গত মাসের রিপোর্ট",
+    "Late Minutes": "দেরির মিনিট"
 }
