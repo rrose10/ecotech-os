@@ -48,4 +48,21 @@ class PortalDisplayTest extends TestCase
 
         $this->actingAs($user)->get('/portal/salary')->assertOk()->assertSee('12,000.00');
     }
+
+    public function test_dashboard_monthly_summary_counts_this_months_days(): void
+    {
+        [$user, $emp] = $this->member();
+        $first = now()->startOfMonth();
+
+        foreach ([['Present', 0], ['Present', 1], ['Late', 2], ['Absent', 3]] as [$status, $offset]) {
+            Attendance::create([
+                'employee_id' => $emp->id, 'attendance_date' => $first->copy()->addDays($offset)->toDateString(),
+                'working_minutes' => 0, 'late_minutes' => 0, 'status' => $status, 'shift' => 'Night',
+            ]);
+        }
+
+        $this->actingAs($user)->get('/portal/dashboard')
+            ->assertOk()
+            ->assertViewHas('attendanceSummary', fn ($s) => $s->present_days === 2 && $s->late_days === 1 && $s->absent_days === 1);
+    }
 }

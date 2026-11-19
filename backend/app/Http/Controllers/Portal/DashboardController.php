@@ -18,6 +18,7 @@ class DashboardController extends Controller
 
         $todayAttendance = null;
         $leaveBalances = collect();
+        $attendanceSummary = null;
 
 
         if ($employee) {
@@ -36,6 +37,23 @@ class DashboardController extends Controller
                 ->where('employee_id', $employee->id)
                 ->where('year', now()->year)
                 ->get();
+
+            // This month's attendance (shift date inside the current month)
+            $monthly = Attendance::where('employee_id', $employee->id)
+                ->whereBetween('attendance_date', [
+                    now()->startOfMonth()->toDateString(),
+                    now()->endOfMonth()->toDateString(),
+                ])
+                ->selectRaw("SUM(status = 'Present') as present_days")
+                ->selectRaw("SUM(status = 'Late') as late_days")
+                ->selectRaw("SUM(status = 'Absent') as absent_days")
+                ->first();
+
+            $attendanceSummary = (object) [
+                'present_days' => (int) ($monthly->present_days ?? 0),
+                'late_days'    => (int) ($monthly->late_days ?? 0),
+                'absent_days'  => (int) ($monthly->absent_days ?? 0),
+            ];
 
         }
 
@@ -75,6 +93,7 @@ class DashboardController extends Controller
                 'todayAttendance',
                 'leaveBalances',
                 'latestNotices',
+                'attendanceSummary',
                 'dailyQuote'
             )
         );
