@@ -96,6 +96,7 @@ class PortalDisplayTest extends TestCase
         ]);
 
         $this->assertSame(659, (int) Attendance::first()->working_minutes);
+    }
 
     public function test_dashboard_shows_last_month_report(): void
     {
