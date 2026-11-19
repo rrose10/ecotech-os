@@ -363,6 +363,51 @@
 
     </div>
 
+
+    {{-- Last Month Report --}}
+
+    @if($lastMonth)
+    <div class="bg-white rounded-2xl border border-slate-200 p-6">
+
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-slate-900">
+                {{ __("Last Month Report") }}
+            </h2>
+            <span class="text-sm text-slate-500">{{ $lastMonth->label }}</span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+
+            <div>
+                <p class="text-slate-500 text-sm">{{ __("Present") }}</p>
+                <p class="text-2xl font-bold text-green-600 mt-1">{{ $lastMonth->present_days }} {{ __("Days") }}</p>
+            </div>
+
+            <div>
+                <p class="text-slate-500 text-sm">{{ __("Late") }}</p>
+                <p class="text-2xl font-bold text-orange-500 mt-1">{{ $lastMonth->late_days }} {{ __("Days") }}</p>
+            </div>
+
+            <div>
+                <p class="text-slate-500 text-sm">{{ __("Absent") }}</p>
+                <p class="text-2xl font-bold text-red-600 mt-1">{{ $lastMonth->absent_days }} {{ __("Days") }}</p>
+            </div>
+
+            <div>
+                <p class="text-slate-500 text-sm">{{ __("Working Hours") }}</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">{{ $lastMonth->work_hours }} h</p>
+            </div>
+
+            <div>
+                <p class="text-slate-500 text-sm">{{ __("Late Minutes") }}</p>
+                <p class="text-2xl font-bold text-slate-900 mt-1">{{ $lastMonth->late_minutes }} min</p>
+            </div>
+
+        </div>
+
+    </div>
+    @endif
+
         {{-- Latest Notices --}}
     <div class="bg-white rounded-2xl border border-slate-200 p-6">
 

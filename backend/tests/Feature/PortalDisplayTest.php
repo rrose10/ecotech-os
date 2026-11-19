@@ -96,5 +96,25 @@ class PortalDisplayTest extends TestCase
         ]);
 
         $this->assertSame(659, (int) Attendance::first()->working_minutes);
+
+    public function test_dashboard_shows_last_month_report(): void
+    {
+        [$user, $emp] = $this->member();
+        $prev = now()->subMonthNoOverflow()->startOfMonth();
+
+        Attendance::create([
+            'employee_id' => $emp->id, 'attendance_date' => $prev->toDateString(),
+            'working_minutes' => 480, 'late_minutes' => 20, 'status' => 'Late', 'shift' => 'Night',
+        ]);
+        Attendance::create([
+            'employee_id' => $emp->id, 'attendance_date' => $prev->copy()->addDay()->toDateString(),
+            'working_minutes' => 420, 'late_minutes' => 0, 'status' => 'Present', 'shift' => 'Night',
+        ]);
+
+        $this->actingAs($user)->get('/portal/dashboard')
+            ->assertOk()
+            ->assertSee('Last Month Report')
+            ->assertViewHas('lastMonth', fn ($m) => $m->present_days === 1 && $m->late_days === 1
+                && $m->work_hours == 15.0 && $m->late_minutes === 20);
     }
 }
