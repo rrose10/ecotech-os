@@ -19,6 +19,7 @@ class DashboardController extends Controller
         $todayAttendance = null;
         $leaveBalances = collect();
         $attendanceSummary = null;
+        $lastMonth = null;
 
 
         if ($employee) {
@@ -53,6 +54,31 @@ class DashboardController extends Controller
                 'present_days' => (int) ($monthly->present_days ?? 0),
                 'late_days'    => (int) ($monthly->late_days ?? 0),
                 'absent_days'  => (int) ($monthly->absent_days ?? 0),
+            ];
+
+
+            // Last month's report
+            $prev = now()->subMonthNoOverflow();
+
+            $last = Attendance::where('employee_id', $employee->id)
+                ->whereBetween('attendance_date', [
+                    $prev->copy()->startOfMonth()->toDateString(),
+                    $prev->copy()->endOfMonth()->toDateString(),
+                ])
+                ->selectRaw("SUM(status = 'Present') as present_days")
+                ->selectRaw("SUM(status = 'Late') as late_days")
+                ->selectRaw("SUM(status = 'Absent') as absent_days")
+                ->selectRaw("COALESCE(SUM(working_minutes), 0) as work_minutes")
+                ->selectRaw("COALESCE(SUM(late_minutes), 0) as late_minutes")
+                ->first();
+
+            $lastMonth = (object) [
+                'label'        => $prev->format('F Y'),
+                'present_days' => (int) ($last->present_days ?? 0),
+                'late_days'    => (int) ($last->late_days ?? 0),
+                'absent_days'  => (int) ($last->absent_days ?? 0),
+                'work_hours'   => round(((int) ($last->work_minutes ?? 0)) / 60, 1),
+                'late_minutes' => (int) ($last->late_minutes ?? 0),
             ];
 
         }
@@ -94,6 +120,7 @@ class DashboardController extends Controller
                 'leaveBalances',
                 'latestNotices',
                 'attendanceSummary',
+                'lastMonth',
                 'dailyQuote'
             )
         );
