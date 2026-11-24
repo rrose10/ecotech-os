@@ -143,12 +143,17 @@ class CheckoutReminderTest extends TestCase
         $admin = User::factory()->create(['role' => 'super_admin']);
         $base = ['company_name' => 'EcoTech'];
 
-        Http::fake(['*getMe*' => Http::response(['ok' => false], 401)]);
+        $tokenIsGood = false;
+        Http::fake(['*getMe*' => function () use (&$tokenIsGood) {
+            return $tokenIsGood
+                ? Http::response(['ok' => true, 'result' => ['username' => 'eco_bot']])
+                : Http::response(['ok' => false], 401);
+        }]);
         $this->actingAs($admin)->put('/settings', $base + ['telegram_bot_token' => 'bad'])
             ->assertSessionHasErrors('telegram_bot_token');
         $this->assertNull(Telegram::token());
 
-        Http::fake(['*getMe*' => Http::response(['ok' => true, 'result' => ['username' => 'eco_bot']])]);
+        $tokenIsGood = true;
         $this->put('/settings', $base + ['telegram_bot_token' => 'good'])->assertSessionHasNoErrors();
         Setting::flush();
         $this->assertSame('good', Telegram::token());

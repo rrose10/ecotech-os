@@ -75,4 +75,16 @@ class LateGraceTest extends TestCase
         ]);
         $this->assertSame(30, (int) Attendance::latest('id')->first()->late_minutes);
     }
+
+    public function test_portal_checkout_counts_the_whole_night_shift(): void
+    {
+        $a = $this->checkInAt('2026-11-10 19:30:00');
+        $user = User::first();
+
+        Carbon::setTestNow(Carbon::parse('2026-11-11 06:00:00'));
+        $this->actingAs($user)->post('/portal/attendance/check-out');
+
+        // 19:30 -> 06:00 next morning = 10h 30m
+        $this->assertSame(630, (int) $a->fresh()->working_minutes);
+    }
 }
