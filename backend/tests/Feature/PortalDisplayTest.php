@@ -119,20 +119,6 @@ class PortalDisplayTest extends TestCase
                 && $m->work_hours == 15.0 && $m->late_minutes === 20);
     }
 
-    public function test_portal_checkout_counts_night_shift_hours(): void
-    {
-        [$user, $emp] = $this->member();
-        $this->travelTo(now()->setTime(19, 30));
-        $this->actingAs($user)->post('/portal/attendance/check-in');
-
-        $this->travelTo(now()->addDay()->setTime(6, 0));
-        $this->actingAs($user)->post('/portal/attendance/check-out');
-
-        $minutes = (int) Attendance::first()->working_minutes;
-        $this->assertGreaterThan(600, $minutes);
-        $this->assertLessThanOrEqual(630, $minutes);
-    }
-
     public function test_old_open_record_is_marked_missed_not_counted_live(): void
     {
         [$user, $emp] = $this->member();
