@@ -118,4 +118,30 @@ class PortalDisplayTest extends TestCase
             ->assertViewHas('lastMonth', fn ($m) => $m->present_days === 1 && $m->late_days === 1
                 && $m->work_hours == 15.0 && $m->late_minutes === 20);
     }
+
+    public function test_portal_checkout_counts_night_shift_hours(): void
+    {
+        [$user, $emp] = $this->member();
+        $this->travelTo(now()->setTime(19, 30));
+        $this->actingAs($user)->post('/portal/attendance/check-in');
+
+        $this->travelTo(now()->addDay()->setTime(6, 0));
+        $this->actingAs($user)->post('/portal/attendance/check-out');
+
+        $minutes = (int) Attendance::first()->working_minutes;
+        $this->assertGreaterThan(600, $minutes);
+        $this->assertLessThanOrEqual(630, $minutes);
+    }
+
+    public function test_old_open_record_is_marked_missed_not_counted_live(): void
+    {
+        [$user, $emp] = $this->member();
+        Attendance::create([
+            'employee_id' => $emp->id, 'attendance_date' => today()->subDays(2)->toDateString(),
+            'check_in' => '19:10:00', 'working_minutes' => 0, 'late_minutes' => 11,
+            'status' => 'Late', 'shift' => 'Night',
+        ]);
+
+        $this->actingAs($user)->get('/portal/attendance')->assertOk()->assertSee('Missed');
+    }
 }

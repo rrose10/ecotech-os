@@ -214,7 +214,11 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ $attendance->check_out?->format('h:i A') ?? '--' }}
+                                @if($attendance->missedCheckout())
+                                    <span class="text-red-500">{{ __("Missed") }}</span>
+                                @else
+                                    {{ $attendance->check_out?->format('h:i A') ?? '--' }}
+                                @endif
                             </td>
 
                             <td class="px-6 py-4">
@@ -222,14 +226,13 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                {{ \App\Models\Attendance::hm($attendance->liveWorkingMinutes()) }}
+                                {{ $attendance->missedCheckout() ? '--' : \App\Models\Attendance::hm($attendance->liveWorkingMinutes()) }}
                             </td>
 
                             <td class="px-6 py-4">
                                 @if($attendance->late_minutes)
 
-                                    {{ floor($attendance->late_minutes / 60) }}h
-                                    {{ round($attendance->late_minutes % 60) }}m
+                                    {{ \App\Models\Attendance::hm((int) $attendance->late_minutes) }}
 
                                 @else
 

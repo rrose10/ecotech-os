@@ -202,7 +202,7 @@ class AttendanceController extends Controller
 
         $now = Carbon::now();
 
-        $totalMinutes   = Attendance::minutesBetween($attendance->check_in, $now);
+        $totalMinutes   = Attendance::minutesBetween($attendance->checkInAt(), $now);
         $breakMinutes   = (int) ($attendance->break_minutes ?? 0);
         $workingMinutes = max(0, $totalMinutes - $breakMinutes);
 
