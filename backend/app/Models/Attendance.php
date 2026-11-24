@@ -131,7 +131,10 @@ class Attendance extends Model
             return null;
         }
 
-        return Carbon::parse($this->attendance_date->format('Y-m-d') . ' ' . $this->check_in->format('H:i:s'));
+        $in = Carbon::parse($this->attendance_date->format('Y-m-d') . ' ' . $this->check_in->format('H:i:s'));
+
+        // Before 6 AM we are still inside the shift that started the day before.
+        return $in->hour < self::SHIFT_END_HOUR ? $in->addDay() : $in;
     }
 
     public function checkOutAt(): ?Carbon
@@ -146,25 +149,36 @@ class Attendance extends Model
         return ($in && $out->lte($in)) ? $out->addDay() : $out;
     }
 
+    /** Checked in but never checked out, and the shift is long over. */
+    public function missedCheckout(): bool
+    {
+        if (!$this->check_in || $this->check_out) {
+            return false;
+        }
+
+        $in = $this->checkInAt();
+
+        return $in && $in->lt(Carbon::now()->subHours(18));
+    }
+
     /**
      * Net working minutes: the saved value once checked out, otherwise the
      * time worked so far (since check-in, minus any dinner break).
      */
     public function liveWorkingMinutes(): int
     {
-        if ($this->check_out || !$this->check_in) {
+        if ($this->check_out) {
             return (int) $this->working_minutes;
+        }
+
+        if (!$this->check_in || $this->missedCheckout()) {
+            return 0;
         }
 
         $in = $this->checkInAt();
 
         if (!$in) {
             return 0;
-        }
-
-        // A check-in before noon belongs to the early hours after midnight.
-        if ($in->hour < 12) {
-            $in->addDay();
         }
 
         $break = (int) $this->break_minutes;
