@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmployeeLoan;
+use App\Models\LoanSkip;
+use App\Models\Payroll;
 use App\Models\Employee;
 use App\Models\BankAccount;
 use App\Models\Expense;
@@ -225,6 +227,7 @@ class EmployeeLoanController extends Controller
             'bankAccount',
             'expense',
             'creator',
+            'skips',
         ]);
 
         return view(
@@ -445,5 +448,102 @@ class EmployeeLoanController extends Controller
             ]);
 
         }
+    }
+
+    /**
+     * Do not collect the installment of one month. The last installment
+     * moves one month later; balance and paid installments stay the same.
+     */
+    public function skipMonth(Request $request, EmployeeLoan $employeeLoan)
+    {
+        $data = $request->validate([
+            'month'  => 'required|integer|between:1,12',
+            'year'   => 'required|integer|min:2024|max:2100',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $month = (int) $data['month'];
+        $year  = (int) $data['year'];
+        $at    = $year * 12 + $month;
+
+        if ($employeeLoan->status !== 'Active') {
+            return back()->withErrors(['error' => 'Only an active loan can skip a month.']);
+        }
+
+        if ($at < $employeeLoan->start_year * 12 + $employeeLoan->start_month
+            || $at > $employeeLoan->end_year * 12 + $employeeLoan->end_month) {
+            return back()->withErrors(['error' => 'Pick a month between the loan start and its last installment.']);
+        }
+
+        if ($employeeLoan->skips()->where('month', $month)->where('year', $year)->exists()) {
+            return back()->withErrors(['error' => 'That month is already skipped.']);
+        }
+
+        $paid = Payroll::where('employee_id', $employeeLoan->employee_id)
+            ->where('month', $month)->where('year', $year)->where('status', 'Paid')->exists();
+
+        if ($paid) {
+            return back()->withErrors(['error' => 'Payroll for that month is already Paid, so its installment was collected.']);
+        }
+
+        $pending = Payroll::where('employee_id', $employeeLoan->employee_id)
+            ->where('month', $month)->where('year', $year)->where('status', 'Pending')->exists();
+
+        DB::transaction(function () use ($employeeLoan, $month, $year, $data) {
+            LoanSkip::create([
+                'employee_loan_id' => $employeeLoan->id,
+                'month'            => $month,
+                'year'             => $year,
+                'reason'           => $data['reason'] ?? null,
+                'created_by'       => Auth::id(),
+            ]);
+
+            $this->shiftEnd($employeeLoan, 1);
+
+            ActivityLogger::log(
+                'Employee Loan', 'Skipped',
+                'Skipped ' . sprintf('%02d/%d', $month, $year) . ' installment for loan #' . $employeeLoan->id,
+                null, $employeeLoan->fresh()->toArray()
+            );
+        });
+
+        $message = 'Installment skipped. The last installment moved one month later.';
+
+        if ($pending) {
+            $message .= ' A Pending payroll exists for that month: open it and save again so the loan deduction is recalculated.';
+        }
+
+        return back()->with('success', $message);
+    }
+
+    /** Collect that month's installment again. */
+    public function undoSkip(EmployeeLoan $employeeLoan, LoanSkip $skip)
+    {
+        abort_unless($skip->employee_loan_id === $employeeLoan->id, 404);
+
+        $paid = Payroll::where('employee_id', $employeeLoan->employee_id)
+            ->where('month', $skip->month)->where('year', $skip->year)->where('status', 'Paid')->exists();
+
+        if ($paid) {
+            return back()->withErrors(['error' => 'Payroll for that month is already Paid without this installment, so the skip cannot be undone.']);
+        }
+
+        DB::transaction(function () use ($employeeLoan, $skip) {
+            $skip->delete();
+            $this->shiftEnd($employeeLoan, -1);
+        });
+
+        return back()->with('success', 'Skip removed. That month will collect the installment again.');
+    }
+
+    /** Move the loan's last installment month by +1 / -1 month. */
+    private function shiftEnd(EmployeeLoan $loan, int $months): void
+    {
+        $at = $loan->end_year * 12 + ($loan->end_month - 1) + $months;
+
+        $loan->update([
+            'end_month' => $at % 12 + 1,
+            'end_year'  => intdiv($at, 12),
+        ]);
     }
 }
