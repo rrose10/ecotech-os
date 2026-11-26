@@ -270,6 +270,11 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
         |--------------------------------------------------------------------------
         */
 
+        Route::post('employee-loans/{employee_loan}/skip', [EmployeeLoanController::class, 'skipMonth'])
+            ->name('employee-loans.skip');
+        Route::delete('employee-loans/{employee_loan}/skips/{skip}', [EmployeeLoanController::class, 'undoSkip'])
+            ->name('employee-loans.skip.undo');
+
         Route::resource(
             'employee-loans',
             EmployeeLoanController::class

@@ -153,6 +153,90 @@
 
             </div>
 
+            {{-- Skip a month --}}
+            <div class="mt-8 border-t pt-6">
+
+                <h3 class="text-lg font-bold mb-1">Skip a month</h3>
+                <p class="text-sm text-gray-500 mb-4">
+                    No installment is collected in the chosen month. The last installment moves one month later
+                    (now {{ DateTime::createFromFormat('!m', $employeeLoan->end_month)->format('F') }} {{ $employeeLoan->end_year }}).
+                </p>
+
+                @if($errors->any())
+                    <div class="mb-4 rounded-lg bg-red-100 border border-red-300 text-red-700 px-4 py-3">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
+                @if(session('success'))
+                    <div class="mb-4 rounded-lg bg-green-100 border border-green-300 text-green-700 px-4 py-3">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if($employeeLoan->status === 'Active')
+                <form method="POST" action="{{ route('employee-loans.skip', $employeeLoan) }}" class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                    @csrf
+
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Month</label>
+                        <select name="month" class="w-full rounded-lg border-gray-300">
+                            @foreach(range(1, 12) as $m)
+                                <option value="{{ $m }}" @selected($m == now()->month)>
+                                    {{ DateTime::createFromFormat('!m', $m)->format('F') }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Year</label>
+                        <input type="number" name="year" value="{{ now()->year }}" class="w-full rounded-lg border-gray-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm text-gray-600 mb-1">Reason (optional)</label>
+                        <input type="text" name="reason" maxlength="255" class="w-full rounded-lg border-gray-300">
+                    </div>
+
+                    <button class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-lg">
+                        Skip this month
+                    </button>
+                </form>
+                @endif
+
+                @if($employeeLoan->skips->isNotEmpty())
+                    <table class="min-w-full border mt-6 text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-2 border text-left">Skipped month</th>
+                                <th class="px-4 py-2 border text-left">Reason</th>
+                                <th class="px-4 py-2 border"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($employeeLoan->skips as $skip)
+                                <tr>
+                                    <td class="px-4 py-2 border">
+                                        {{ DateTime::createFromFormat('!m', $skip->month)->format('F') }} {{ $skip->year }}
+                                    </td>
+                                    <td class="px-4 py-2 border">{{ $skip->reason ?? '--' }}</td>
+                                    <td class="px-4 py-2 border text-center">
+                                        <form method="POST" action="{{ route('employee-loans.skip.undo', [$employeeLoan, $skip]) }}"
+                                              onsubmit="return confirm('Collect this installment again?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="px-3 py-1 rounded bg-gray-600 text-white">Undo</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endif
+
+            </div>
+
         </div>
 
     </div>

@@ -116,10 +116,10 @@ class PayrollController extends Controller
             ->whereNull('payroll_id')
             ->sum('amount');
 
-        // Future Loan Module
-        $loanAmount = EmployeeLoan::where('employee_id', $employee->id)
-            ->where('status', 'Active')
-            ->sum('monthly_installment');
+        // Loan installments due this month (skipped months are left out)
+        $loanAmount = ($request->month && $request->year)
+            ? $this->eligibleLoans($employee->id, (int) $request->month, (int) $request->year)->sum('monthly_installment')
+            : 0;
 
         $netSalary = max(
             0,
@@ -186,9 +186,8 @@ class PayrollController extends Controller
             ->whereNull('payroll_id')
             ->sum('amount');
 
-        // Future Loan Module
-        $loanAmount = EmployeeLoan::where('employee_id', $employee->id)
-            ->where('status', 'Active')
+        // Loan installments due this month (skipped months are left out)
+        $loanAmount = $this->eligibleLoans($employee->id, (int) $request->month, (int) $request->year)
             ->sum('monthly_installment');
 
         // Net Salary
@@ -261,27 +260,8 @@ class PayrollController extends Controller
                 ]);
 
 
-                // Update employee loan
-            EmployeeLoan::where('employee_id', $employee->id)
-                ->where('status', 'Active')
-                ->get()
-                ->each(function ($loan) {
-
-                    
-
-                    $loan->paid_installments += 1;
-                    $loan->remaining_balance -= $loan->monthly_installment;
-
-                    if ($loan->remaining_balance <= 0) {
-                        $loan->remaining_balance = 0;
-                        $loan->status = 'Closed';
-                    }
-
-                    
-                    
-
-                    $loan->save();
-                    });
+            // Collect this month's loan installments
+            $this->applyLoanInstallments($employee->id, (int) $request->month, (int) $request->year);
         }
 
                    
@@ -777,6 +757,7 @@ class PayrollController extends Controller
     {
         return EmployeeLoan::where('employee_id', $employeeId)
             ->where('status', 'Active')
+            ->whereDoesntHave('skips', fn ($q) => $q->where('month', $month)->where('year', $year))
             ->where(function ($query) use ($month, $year) {
                 $query->where('start_year', '<', $year)
                     ->orWhere(function ($q) use ($month, $year) {

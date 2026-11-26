@@ -65,4 +65,10 @@ class EmployeeLoan extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    /** Months the admin chose not to collect an installment. */
+    public function skips()
+    {
+        return $this->hasMany(LoanSkip::class)->orderBy('year')->orderBy('month');
+    }
 }
