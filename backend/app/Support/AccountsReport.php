@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\BankAccount;
 use App\Models\Expense;
+use App\Models\FundTransfer;
 use App\Models\Income;
 use App\Models\EmployeeLoan;
 use App\Models\LoanSkip;
@@ -334,6 +335,26 @@ class AccountsReport
             $this->row([['Total', 385, 'left', true], [$this->money($accounts->sum('current_balance')), 130, 'right', true]], 0.93);
         }
 
+        // Transfers
+        $transfers = FundTransfer::with(['fromAccount', 'toAccount'])
+            ->whereYear('transfer_date', $year)->whereMonth('transfer_date', $month)
+            ->orderBy('transfer_date')->get();
+        $this->y += 10;
+        $this->heading('Transfers between accounts (not income or expense)');
+        $this->row([['Date', 55, 'left', true], ['From', 130, 'left', true], ['To', 130, 'left', true],
+            ['Tk', 90, 'right', true], ['Note', 110, 'left', true]], 0.9);
+        foreach ($transfers as $t) {
+            $this->row([
+                [$t->transfer_date->format('d M'), 55], [$t->fromAccount->account_name ?? '-', 130],
+                [$t->toAccount->account_name ?? '-', 130], [$this->money($t->amount), 90, 'right'], [$t->remarks ?? '', 110],
+            ]);
+        }
+        if ($transfers->isEmpty()) {
+            $this->note('No transfers this month.');
+        } else {
+            $this->note('Total moved: Tk ' . $this->money($transfers->sum('amount')));
+        }
+
         // Details
         $this->newPage();
         $this->heading('Income entries');
@@ -478,6 +499,13 @@ class AccountsReport
         $this->row([['Loans given', 330], [(string) $loans->count(), 185, 'right']]);
         $this->row([['Total lent', 330], [$this->money($loans->sum('loan_amount')), 185, 'right']]);
         $this->row([['Still to collect', 330, 'left', true], [$this->money($loans->sum('remaining_balance')), 185, 'right', true]], 0.93);
+        $this->y += 10;
+
+        // Transfers
+        $transferRows = FundTransfer::query()->when($year, fn ($q) => $q->whereYear('transfer_date', $year))->get();
+        $this->heading('Transfers between accounts ' . $suffix);
+        $this->row([['Number of transfers', 330], [(string) $transferRows->count(), 185, 'right']]);
+        $this->row([['Total moved between accounts (not income or expense)', 330], [$this->money($transferRows->sum('amount')), 185, 'right']]);
         $this->y += 10;
 
         // Banks
