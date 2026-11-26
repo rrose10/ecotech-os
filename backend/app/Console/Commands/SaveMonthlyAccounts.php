@@ -29,6 +29,9 @@ class SaveMonthlyAccounts extends Command
         $filled = AccountsReport::saveAll(false);
         $this->info("Created {$filled} missing monthly PDF file(s).");
 
+        // Yearly PDFs (this year so far, last year, and any year without a PDF)
+        $this->info('Saved ' . AccountsReport::saveYears(false) . ' yearly PDF file(s).');
+
         // Always refresh the all-time PDF
         $this->info('Saved ' . AccountsReport::saveAllTime());
 

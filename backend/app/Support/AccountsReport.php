@@ -47,8 +47,8 @@ class AccountsReport
         return $path;
     }
 
-    /** Save every finished month that has any income, expense or payroll. Returns how many. */
-    public static function saveAll(bool $overwrite = true): int
+    /** First month with any income, expense or payroll (null when there is no data). */
+    private static function firstMonth(): ?Carbon
     {
         $dates = array_filter([
             Income::min('income_date'),
@@ -56,17 +56,28 @@ class AccountsReport
             Payroll::query()->selectRaw('MIN(year * 100 + month) as ym')->value('ym'),
         ]);
 
-        self::saveAllTime();
-
         if (!$dates) {
-            return 0;
+            return null;
         }
 
-        $first = collect($dates)->map(function ($d) {
+        return collect($dates)->map(function ($d) {
             return is_numeric($d) && (int) $d > 190000
                 ? Carbon::create(intdiv((int) $d, 100), (int) $d % 100, 1)
                 : Carbon::parse($d)->startOfMonth();
         })->min();
+    }
+
+    /** Save every finished month that has data. Returns how many were written. */
+    public static function saveAll(bool $overwrite = true): int
+    {
+        self::saveAllTime();
+        self::saveYears($overwrite);
+
+        $first = self::firstMonth();
+
+        if (!$first) {
+            return 0;
+        }
 
         $cursor = $first->copy();
         $last   = now()->subMonthNoOverflow()->startOfMonth();
@@ -84,6 +95,55 @@ class AccountsReport
         }
 
         return $count;
+    }
+
+    public static function yearFileName(int $year): string
+    {
+        return sprintf('accounts-year-%04d.pdf', $year);
+    }
+
+    /** Create and store the PDF of one year. Returns the file path. */
+    public static function saveYear(int $year): string
+    {
+        File::ensureDirectoryExists(self::directory());
+
+        $path = self::directory() . '/' . self::yearFileName($year);
+        File::put($path, self::buildYear($year));
+
+        return $path;
+    }
+
+    /**
+     * Yearly PDFs from the first year with data up to this year. With
+     * $overwrite false, a year that already has a PDF is kept as it is,
+     * except the current and the previous year (they can still change).
+     */
+    public static function saveYears(bool $overwrite = true): int
+    {
+        $first = self::firstMonth();
+
+        if (!$first) {
+            return 0;
+        }
+
+        $count = 0;
+
+        for ($year = $first->year; $year <= now()->year; $year++) {
+            $recent = $year >= now()->subMonthNoOverflow()->year;
+            $exists = is_file(self::directory() . '/' . self::yearFileName($year));
+
+            if ($overwrite || $recent || !$exists) {
+                self::saveYear($year);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    public static function buildYear(int $year): string
+    {
+        return (new self())->renderPeriod($year);
     }
 
     /** Saved PDFs, newest month first: [['file' => ..., 'label' => 'November 2026', 'size' => bytes]]. */
@@ -109,6 +169,17 @@ class AccountsReport
 
         $list = $files->all();
 
+        $years = collect(File::files(self::directory()))
+            ->filter(fn ($f) => preg_match('/^accounts-year-(\d{4})\.pdf$/', $f->getFilename()))
+            ->map(function ($f) {
+                preg_match('/^accounts-year-(\d{4})\.pdf$/', $f->getFilename(), $m);
+
+                return ['file' => $f->getFilename(), 'label' => 'Year ' . $m[1], 'size' => $f->getSize()];
+            })
+            ->sortByDesc('file')->values()->all();
+
+        $list = array_merge($years, $list);
+
         $all = self::directory() . '/' . self::ALL_TIME_FILE;
         if (is_file($all)) {
             array_unshift($list, ['file' => self::ALL_TIME_FILE, 'label' => 'All time (everything so far)', 'size' => filesize($all)]);
@@ -130,7 +201,7 @@ class AccountsReport
 
     public static function buildAllTime(): string
     {
-        return (new self())->renderAllTime();
+        return (new self())->renderPeriod(null);
     }
 
     public static function build(int $month, int $year): string
@@ -297,24 +368,29 @@ class AccountsReport
         return $this->pdf->output();
     }
 
-    private function renderAllTime(): string
+    private function renderPeriod(?int $year): string
     {
-        $this->pdf = new SimplePdf('EcoTech accounts - all time');
+        $suffix = $year ? "($year)" : '(all time)';
+        $this->pdf = new SimplePdf($year ? "EcoTech accounts - {$year}" : 'EcoTech accounts - all time');
         $this->y   = self::TOP;
 
-        $incomes  = Income::with('incomeCategory')->get(['id', 'income_category_id', 'income_date', 'amount_bdt', 'amount_usd']);
-        $expenses = Expense::with('expenseCategory')->get(['id', 'expense_category_id', 'expense_date', 'amount']);
-        $payrolls = Payroll::all();
+        $incomes  = Income::with('incomeCategory')
+            ->when($year, fn ($q) => $q->whereYear('income_date', $year))
+            ->get(['id', 'income_category_id', 'income_date', 'amount_bdt', 'amount_usd']);
+        $expenses = Expense::with('expenseCategory')
+            ->when($year, fn ($q) => $q->whereYear('expense_date', $year))
+            ->get(['id', 'expense_category_id', 'expense_date', 'amount']);
+        $payrolls = Payroll::query()->when($year, fn ($q) => $q->where('year', $year))->get();
 
         $incomeBdt = (float) $incomes->sum('amount_bdt');
         $incomeUsd = (float) $incomes->sum('amount_usd');
         $expenseTotal = (float) $expenses->sum('amount');
 
         $this->pdf->box(self::LEFT, $this->y, self::RIGHT - self::LEFT, 34, 0.12);
-        $this->pdf->text(self::LEFT + 10, $this->y + 22, 'EcoTech - All-time Accounts', 16, true);
-        $this->pdf->text(self::RIGHT - 10, $this->y + 22, 'Up to ' . now()->format('d M Y'), 11, true, 'right');
+        $this->pdf->text(self::LEFT + 10, $this->y + 22, $year ? 'EcoTech - Yearly Accounts' : 'EcoTech - All-time Accounts', 16, true);
+        $this->pdf->text(self::RIGHT - 10, $this->y + 22, $year ? (string) $year : 'Up to ' . now()->format('d M Y'), 11, true, 'right');
         $this->y += 34 + 8;
-        $this->pdf->text(self::LEFT, $this->y + 8, 'Everything recorded so far. Amounts are in Taka (Tk) unless marked USD.', 8);
+        $this->pdf->text(self::LEFT, $this->y + 8, ($year ? "All of {$year}" : 'Everything recorded so far') . '. Created ' . now()->format('d M Y') . '. Amounts are in Taka (Tk) unless marked USD.', 8);
         $this->y += 24;
 
         $this->heading('Summary');
@@ -355,15 +431,18 @@ class AccountsReport
         }
         $this->y += 10;
 
-        $this->heading('Year by year');
-        $this->row([['Year', 135, 'left', true], ['Income (Tk)', 130, 'right', true], ['Expenses (Tk)', 130, 'right', true], ['Net (Tk)', 120, 'right', true]], 0.9);
-        foreach ($years as $y => $v) {
-            $this->row([[(string) $y, 135], [$this->money($v['in']), 130, 'right'], [$this->money($v['out']), 130, 'right'], [$this->money($v['in'] - $v['out']), 120, 'right']]);
+        if (!$year) {
+            $this->heading('Year by year');
+            $this->row([['Year', 135, 'left', true], ['Income (Tk)', 130, 'right', true], ['Expenses (Tk)', 130, 'right', true], ['Net (Tk)', 120, 'right', true]], 0.9);
+            foreach ($years as $y => $v) {
+                $this->row([[(string) $y, 135], [$this->money($v['in']), 130, 'right'], [$this->money($v['out']), 130, 'right'], [$this->money($v['in'] - $v['out']), 120, 'right']]);
+            }
+            $this->y += 10;
+
         }
-        $this->y += 10;
 
         // Categories
-        $this->heading('Income by category (all time)');
+        $this->heading('Income by category ' . $suffix);
         $this->row([['Category', 260, 'left', true], ['Tk', 130, 'right', true], ['USD', 125, 'right', true]], 0.9);
         $groups = $incomes->groupBy(fn ($i) => $i->incomeCategory->name ?? 'Uncategorised')
             ->map(fn ($g) => ['bdt' => (float) $g->sum('amount_bdt'), 'usd' => (float) $g->sum('amount_usd')])
@@ -373,7 +452,7 @@ class AccountsReport
         }
         $this->y += 10;
 
-        $this->heading('Expenses by category (all time)');
+        $this->heading('Expenses by category ' . $suffix);
         $this->row([['Category', 385, 'left', true], ['Tk', 130, 'right', true]], 0.9);
         $groups = $expenses->groupBy(fn ($e) => $e->expenseCategory->name ?? 'Uncategorised')
             ->map(fn ($g) => (float) $g->sum('amount'))->sortDesc();
@@ -384,7 +463,7 @@ class AccountsReport
 
         // Payroll
         $paid = $payrolls->where('status', 'Paid');
-        $this->heading('Payroll (all time)');
+        $this->heading('Payroll ' . $suffix);
         $this->row([['Paid payrolls', 330], [(string) $paid->count(), 185, 'right']]);
         $this->row([['Gross salary paid', 330], [$this->money($paid->sum('total_salary')), 185, 'right']]);
         $this->row([['Advances deducted', 330], [$this->money($paid->sum('advance_amount')), 185, 'right']]);
@@ -412,7 +491,7 @@ class AccountsReport
             $this->row([['Total', 385, 'left', true], [$this->money($accounts->sum('current_balance')), 130, 'right', true]], 0.93);
         }
 
-        $this->pdf->setFooter('EcoTech OS - All-time accounts - Page {p} of {n}');
+        $this->pdf->setFooter($year ? "EcoTech OS - Accounts {$year} - Page {p} of {n}" : 'EcoTech OS - All-time accounts - Page {p} of {n}');
 
         return $this->pdf->output();
     }

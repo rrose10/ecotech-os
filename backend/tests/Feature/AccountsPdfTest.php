@@ -136,17 +136,39 @@ class AccountsPdfTest extends TestCase
         $this->get('/reports/accounts-pdf/saved/accounts-all-time.pdf')->assertOk();
     }
 
-    public function test_nightly_command_fills_missing_months_and_keeps_existing_ones(): void
+    public function test_monthly_command_saves_month_year_and_all_time_and_keeps_old_files(): void
     {
         $this->seedMonth();
         $this->artisan('reports:monthly')->assertExitCode(0);
 
         $dir = AccountsReport::directory();
         $this->assertFileExists($dir . '/accounts-2026-10.pdf');
+        $this->assertFileExists($dir . '/accounts-year-2026.pdf');
         $this->assertFileExists($dir . '/accounts-all-time.pdf');
 
         file_put_contents($dir . '/accounts-2026-10.pdf', 'MARKER');
         AccountsReport::saveAll(false);
         $this->assertSame('MARKER', file_get_contents($dir . '/accounts-2026-10.pdf'));   // not overwritten
+    }
+
+    public function test_yearly_pdf_covers_only_that_year(): void
+    {
+        $this->seedMonth();
+        $bank = BankAccount::first();
+        Income::create([
+            'income_category_id' => IncomeCategory::first()->id, 'bank_account_id' => $bank->id, 'title' => 'Old year order',
+            'amount_bdt' => 99000, 'amount_usd' => 0, 'income_date' => '2025-06-01', 'payment_method' => 'Bank',
+        ]);
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+
+        $body = $this->get('/reports/accounts-pdf?yearly=1&year=2026')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Yearly Accounts', $body);
+        $this->assertStringContainsString('50,000.00', $body);
+        $this->assertStringNotContainsString('99,000.00', $body);
+
+        $this->artisan('reports:monthly')->assertExitCode(0);
+        $this->get('/reports')->assertOk()->assertSee('Year 2026');
+        $this->get('/reports/accounts-pdf/saved/accounts-year-2026.pdf')->assertOk();
     }
 }
