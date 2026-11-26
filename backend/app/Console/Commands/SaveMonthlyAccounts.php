@@ -24,6 +24,7 @@ class SaveMonthlyAccounts extends Command
         $year  = (int) ($this->option('year') ?: $last->year);
 
         $this->info('Saved ' . AccountsReport::save($month, $year));
+        $this->info('Saved ' . AccountsReport::saveAllTime());
 
         return self::SUCCESS;
     }

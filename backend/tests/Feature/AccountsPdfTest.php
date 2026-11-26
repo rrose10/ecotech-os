@@ -103,4 +103,36 @@ class AccountsPdfTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => 'employee']));
         $this->get('/reports/accounts-pdf?month=10&year=2026')->assertForbidden();
     }
+
+    public function test_all_time_pdf_adds_up_every_month(): void
+    {
+        $this->seedMonth();
+        $bank = BankAccount::first();
+        Income::create([
+            'income_category_id' => IncomeCategory::first()->id, 'bank_account_id' => $bank->id, 'title' => 'Later order',
+            'amount_bdt' => 20000, 'amount_usd' => 0, 'income_date' => '2026-09-02', 'payment_method' => 'Bank',
+        ]);
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+
+        $response = $this->get('/reports/accounts-pdf?all=1');
+
+        $response->assertOk();
+        $body = $response->getContent();
+        $this->assertStringContainsString('70,000.00', $body);   // 50,000 + 20,000 income
+        $this->assertStringContainsString('58,000.00', $body);   // net after 12,000 expense
+        $this->assertStringContainsString('September 2026', $body);
+        $this->assertStringContainsString('October 2026', $body);
+    }
+
+    public function test_saved_all_time_file_is_listed_and_served(): void
+    {
+        $this->seedMonth();
+        $this->artisan('reports:monthly', ['--all' => true])->assertExitCode(0);
+
+        $this->assertFileExists(AccountsReport::directory() . '/accounts-all-time.pdf');
+
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+        $this->get('/reports')->assertOk()->assertSee('All time');
+        $this->get('/reports/accounts-pdf/saved/accounts-all-time.pdf')->assertOk();
+    }
 }

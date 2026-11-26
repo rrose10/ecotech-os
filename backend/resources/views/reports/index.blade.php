@@ -26,7 +26,7 @@
         <h2 class="text-xl font-bold mb-1">Monthly accounts (PDF)</h2>
         <p class="text-gray-600 mb-4">
             Income, expenses, payroll, loans and bank balances of one month.
-            Last month's PDF is saved automatically on the 1st of every month.
+            Last month's PDF and the all-time PDF are saved automatically on the 1st of every month.
         </p>
 
         <form method="GET" action="{{ route('reports.accounts.pdf') }}" class="flex flex-wrap items-center gap-2 mb-4">
@@ -37,6 +37,7 @@
             </select>
             <input type="number" name="year" value="{{ now()->year }}" min="2000" max="2100" class="border rounded p-2 w-28">
             <button class="bg-green-600 text-white px-4 py-2 rounded">Download PDF</button>
+            <a href="{{ route('reports.accounts.pdf', ['all' => 1]) }}" class="border px-4 py-2 rounded">Download all-time PDF</a>
         </form>
 
         <form method="POST" action="{{ route('reports.accounts.save-all') }}" class="mb-6">
