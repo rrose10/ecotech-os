@@ -32,22 +32,23 @@ if ! command -v rclone >/dev/null 2>&1; then
 fi
 
 if [ "$1" = "--authorize" ]; then
-  pkill -f "rclone authorize" 2>/dev/null || true
-  rm -f /tmp/gdrive-auth.out
-  rclone authorize drive > /tmp/gdrive-auth.out 2>&1 &
-  RPID=$!
+  OUT=/var/tmp/gdrive-auth.out
+  : > "$OUT"
+  # run rclone in the background; its output (link, then the token) goes to $OUT
+  ( rclone authorize drive >> "$OUT" 2>&1 & )
+  sleep 2
 
   LOCAL=""
   i=0
   while [ $i -lt 20 ] && [ -z "$LOCAL" ]; do
-    sleep 1
-    LOCAL=$(grep -o 'http://127.0.0.1:53682/auth?state=[A-Za-z0-9_-]*' /tmp/gdrive-auth.out | head -1)
+    LOCAL=$(grep -o 'http://127.0.0.1:53682/auth?state=[A-Za-z0-9_-]*' "$OUT" 2>/dev/null | head -1 || true)
+    [ -n "$LOCAL" ] || sleep 1
     i=$((i+1))
   done
-  [ -n "$LOCAL" ] || { cat /tmp/gdrive-auth.out; echo "rclone did not start."; kill $RPID 2>/dev/null; exit 1; }
+  [ -n "$LOCAL" ] || { echo "rclone did not start. Its output:"; cat "$OUT"; pkill -x rclone 2>/dev/null; exit 1; }
 
   GURL=$(curl -s -o /dev/null -w '%{redirect_url}' "$LOCAL")
-  [ -n "$GURL" ] || { echo "Could not get the Google sign-in link."; kill $RPID 2>/dev/null; exit 1; }
+  [ -n "$GURL" ] || { echo "Could not get the Google sign-in link."; pkill -x rclone 2>/dev/null; exit 1; }
 
   echo
   echo "STEP A: copy this whole link, open it in your PC browser, sign in to Google and press Allow:"
@@ -64,10 +65,11 @@ if [ "$1" = "--authorize" ]; then
   curl -s -o /dev/null "$BACK" || true
 
   i=0
-  while [ $i -lt 30 ] && ! grep -q access_token /tmp/gdrive-auth.out; do sleep 1; i=$((i+1)); done
-  kill $RPID 2>/dev/null || true
-  grep access_token /tmp/gdrive-auth.out | head -1 > "$TOKEN_FILE"
-  rm -f /tmp/gdrive-auth.out
+  while [ $i -lt 30 ] && ! grep -q access_token "$OUT"; do sleep 1; i=$((i+1)); done
+  pkill -x rclone 2>/dev/null || true
+  grep access_token "$OUT" | head -1 > "$TOKEN_FILE" || true
+  [ -s "$TOKEN_FILE" ] || { echo "No sign-in result received. rclone said:"; cat "$OUT"; }
+  rm -f "$OUT"
 fi
 
 [ -s "$TOKEN_FILE" ] || { echo "Token file $TOKEN_FILE is missing or empty."; exit 1; }
