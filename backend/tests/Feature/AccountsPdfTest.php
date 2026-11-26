@@ -103,4 +103,72 @@ class AccountsPdfTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => 'employee']));
         $this->get('/reports/accounts-pdf?month=10&year=2026')->assertForbidden();
     }
+
+    public function test_all_time_pdf_adds_up_every_month(): void
+    {
+        $this->seedMonth();
+        $bank = BankAccount::first();
+        Income::create([
+            'income_category_id' => IncomeCategory::first()->id, 'bank_account_id' => $bank->id, 'title' => 'Later order',
+            'amount_bdt' => 20000, 'amount_usd' => 0, 'income_date' => '2026-09-02', 'payment_method' => 'Bank',
+        ]);
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+
+        $response = $this->get('/reports/accounts-pdf?all=1');
+
+        $response->assertOk();
+        $body = $response->getContent();
+        $this->assertStringContainsString('70,000.00', $body);   // 50,000 + 20,000 income
+        $this->assertStringContainsString('58,000.00', $body);   // net after 12,000 expense
+        $this->assertStringContainsString('September 2026', $body);
+        $this->assertStringContainsString('October 2026', $body);
+    }
+
+    public function test_saved_all_time_file_is_listed_and_served(): void
+    {
+        $this->seedMonth();
+        $this->artisan('reports:monthly', ['--all' => true])->assertExitCode(0);
+
+        $this->assertFileExists(AccountsReport::directory() . '/accounts-all-time.pdf');
+
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+        $this->get('/reports')->assertOk()->assertSee('All time');
+        $this->get('/reports/accounts-pdf/saved/accounts-all-time.pdf')->assertOk();
+    }
+
+    public function test_monthly_command_saves_month_year_and_all_time_and_keeps_old_files(): void
+    {
+        $this->seedMonth();
+        $this->artisan('reports:monthly')->assertExitCode(0);
+
+        $dir = AccountsReport::directory();
+        $this->assertFileExists($dir . '/accounts-2026-10.pdf');
+        $this->assertFileExists($dir . '/accounts-year-2026.pdf');
+        $this->assertFileExists($dir . '/accounts-all-time.pdf');
+
+        file_put_contents($dir . '/accounts-2026-10.pdf', 'MARKER');
+        AccountsReport::saveAll(false);
+        $this->assertSame('MARKER', file_get_contents($dir . '/accounts-2026-10.pdf'));   // not overwritten
+    }
+
+    public function test_yearly_pdf_covers_only_that_year(): void
+    {
+        $this->seedMonth();
+        $bank = BankAccount::first();
+        Income::create([
+            'income_category_id' => IncomeCategory::first()->id, 'bank_account_id' => $bank->id, 'title' => 'Old year order',
+            'amount_bdt' => 99000, 'amount_usd' => 0, 'income_date' => '2025-06-01', 'payment_method' => 'Bank',
+        ]);
+        $this->actingAs(User::factory()->create(['role' => 'super_admin']));
+
+        $body = $this->get('/reports/accounts-pdf?yearly=1&year=2026')->assertOk()->getContent();
+
+        $this->assertStringContainsString('Yearly Accounts', $body);
+        $this->assertStringContainsString('50,000.00', $body);
+        $this->assertStringNotContainsString('99,000.00', $body);
+
+        $this->artisan('reports:monthly')->assertExitCode(0);
+        $this->get('/reports')->assertOk()->assertSee('Year 2026');
+        $this->get('/reports/accounts-pdf/saved/accounts-year-2026.pdf')->assertOk();
+    }
 }

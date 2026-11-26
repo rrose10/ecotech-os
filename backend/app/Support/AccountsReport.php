@@ -29,6 +29,8 @@ class AccountsReport
         return storage_path('app/backups/reports');
     }
 
+    public const ALL_TIME_FILE = 'accounts-all-time.pdf';
+
     public static function fileName(int $month, int $year): string
     {
         return sprintf('accounts-%04d-%02d.pdf', $year, $month);
@@ -45,8 +47,8 @@ class AccountsReport
         return $path;
     }
 
-    /** Save every finished month that has any income, expense or payroll. Returns how many. */
-    public static function saveAll(): int
+    /** First month with any income, expense or payroll (null when there is no data). */
+    private static function firstMonth(): ?Carbon
     {
         $dates = array_filter([
             Income::min('income_date'),
@@ -55,26 +57,93 @@ class AccountsReport
         ]);
 
         if (!$dates) {
-            return 0;
+            return null;
         }
 
-        $first = collect($dates)->map(function ($d) {
+        return collect($dates)->map(function ($d) {
             return is_numeric($d) && (int) $d > 190000
                 ? Carbon::create(intdiv((int) $d, 100), (int) $d % 100, 1)
                 : Carbon::parse($d)->startOfMonth();
         })->min();
+    }
+
+    /** Save every finished month that has data. Returns how many were written. */
+    public static function saveAll(bool $overwrite = true): int
+    {
+        self::saveAllTime();
+        self::saveYears($overwrite);
+
+        $first = self::firstMonth();
+
+        if (!$first) {
+            return 0;
+        }
 
         $cursor = $first->copy();
         $last   = now()->subMonthNoOverflow()->startOfMonth();
         $count  = 0;
 
         while ($cursor->lte($last)) {
-            self::save($cursor->month, $cursor->year);
-            $count++;
+            $exists = is_file(self::directory() . '/' . self::fileName($cursor->month, $cursor->year));
+
+            if ($overwrite || !$exists) {
+                self::save($cursor->month, $cursor->year);
+                $count++;
+            }
+
             $cursor->addMonthNoOverflow();
         }
 
         return $count;
+    }
+
+    public static function yearFileName(int $year): string
+    {
+        return sprintf('accounts-year-%04d.pdf', $year);
+    }
+
+    /** Create and store the PDF of one year. Returns the file path. */
+    public static function saveYear(int $year): string
+    {
+        File::ensureDirectoryExists(self::directory());
+
+        $path = self::directory() . '/' . self::yearFileName($year);
+        File::put($path, self::buildYear($year));
+
+        return $path;
+    }
+
+    /**
+     * Yearly PDFs from the first year with data up to this year. With
+     * $overwrite false, a year that already has a PDF is kept as it is,
+     * except the current and the previous year (they can still change).
+     */
+    public static function saveYears(bool $overwrite = true): int
+    {
+        $first = self::firstMonth();
+
+        if (!$first) {
+            return 0;
+        }
+
+        $count = 0;
+
+        for ($year = $first->year; $year <= now()->year; $year++) {
+            $recent = $year >= now()->subMonthNoOverflow()->year;
+            $exists = is_file(self::directory() . '/' . self::yearFileName($year));
+
+            if ($overwrite || $recent || !$exists) {
+                self::saveYear($year);
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    public static function buildYear(int $year): string
+    {
+        return (new self())->renderPeriod($year);
     }
 
     /** Saved PDFs, newest month first: [['file' => ..., 'label' => 'November 2026', 'size' => bytes]]. */
@@ -98,7 +167,41 @@ class AccountsReport
             ->sortByDesc('file')
             ->values();
 
-        return $files->all();
+        $list = $files->all();
+
+        $years = collect(File::files(self::directory()))
+            ->filter(fn ($f) => preg_match('/^accounts-year-(\d{4})\.pdf$/', $f->getFilename()))
+            ->map(function ($f) {
+                preg_match('/^accounts-year-(\d{4})\.pdf$/', $f->getFilename(), $m);
+
+                return ['file' => $f->getFilename(), 'label' => 'Year ' . $m[1], 'size' => $f->getSize()];
+            })
+            ->sortByDesc('file')->values()->all();
+
+        $list = array_merge($years, $list);
+
+        $all = self::directory() . '/' . self::ALL_TIME_FILE;
+        if (is_file($all)) {
+            array_unshift($list, ['file' => self::ALL_TIME_FILE, 'label' => 'All time (everything so far)', 'size' => filesize($all)]);
+        }
+
+        return $list;
+    }
+
+    /** Create and store the all-time PDF. Returns the file path. */
+    public static function saveAllTime(): string
+    {
+        File::ensureDirectoryExists(self::directory());
+
+        $path = self::directory() . '/' . self::ALL_TIME_FILE;
+        File::put($path, self::buildAllTime());
+
+        return $path;
+    }
+
+    public static function buildAllTime(): string
+    {
+        return (new self())->renderPeriod(null);
     }
 
     public static function build(int $month, int $year): string
@@ -261,6 +364,134 @@ class AccountsReport
         }
 
         $this->pdf->setFooter("EcoTech OS - Accounts {$label} - Page {p} of {n}");
+
+        return $this->pdf->output();
+    }
+
+    private function renderPeriod(?int $year): string
+    {
+        $suffix = $year ? "($year)" : '(all time)';
+        $this->pdf = new SimplePdf($year ? "EcoTech accounts - {$year}" : 'EcoTech accounts - all time');
+        $this->y   = self::TOP;
+
+        $incomes  = Income::with('incomeCategory')
+            ->when($year, fn ($q) => $q->whereYear('income_date', $year))
+            ->get(['id', 'income_category_id', 'income_date', 'amount_bdt', 'amount_usd']);
+        $expenses = Expense::with('expenseCategory')
+            ->when($year, fn ($q) => $q->whereYear('expense_date', $year))
+            ->get(['id', 'expense_category_id', 'expense_date', 'amount']);
+        $payrolls = Payroll::query()->when($year, fn ($q) => $q->where('year', $year))->get();
+
+        $incomeBdt = (float) $incomes->sum('amount_bdt');
+        $incomeUsd = (float) $incomes->sum('amount_usd');
+        $expenseTotal = (float) $expenses->sum('amount');
+
+        $this->pdf->box(self::LEFT, $this->y, self::RIGHT - self::LEFT, 34, 0.12);
+        $this->pdf->text(self::LEFT + 10, $this->y + 22, $year ? 'EcoTech - Yearly Accounts' : 'EcoTech - All-time Accounts', 16, true);
+        $this->pdf->text(self::RIGHT - 10, $this->y + 22, $year ? (string) $year : 'Up to ' . now()->format('d M Y'), 11, true, 'right');
+        $this->y += 34 + 8;
+        $this->pdf->text(self::LEFT, $this->y + 8, ($year ? "All of {$year}" : 'Everything recorded so far') . '. Created ' . now()->format('d M Y') . '. Amounts are in Taka (Tk) unless marked USD.', 8);
+        $this->y += 24;
+
+        $this->heading('Summary');
+        $this->row([['Total income (Tk)', 330], [$this->money($incomeBdt), 185, 'right']]);
+        $this->row([['Total income (USD)', 330], ['USD ' . $this->money($incomeUsd), 185, 'right']]);
+        $this->row([['Total expenses (Tk)', 330], [$this->money($expenseTotal), 185, 'right']]);
+        $this->row([['Net result (Tk)', 330, 'left', true], [$this->money($incomeBdt - $expenseTotal), 185, 'right', true]], 0.93);
+        $this->y += 10;
+
+        // Month by month
+        $byMonth = [];
+        foreach ($incomes as $i) {
+            $k = Carbon::parse($i->income_date)->format('Y-m');
+            $byMonth[$k]['in'] = ($byMonth[$k]['in'] ?? 0) + (float) $i->amount_bdt;
+        }
+        foreach ($expenses as $e) {
+            $k = Carbon::parse($e->expense_date)->format('Y-m');
+            $byMonth[$k]['out'] = ($byMonth[$k]['out'] ?? 0) + (float) $e->amount;
+        }
+        ksort($byMonth);
+
+        $this->heading('Month by month');
+        $this->row([['Month', 135, 'left', true], ['Income (Tk)', 130, 'right', true], ['Expenses (Tk)', 130, 'right', true], ['Net (Tk)', 120, 'right', true]], 0.9);
+        $years = [];
+        foreach ($byMonth as $ym => $v) {
+            $in = $v['in'] ?? 0;
+            $out = $v['out'] ?? 0;
+            $this->row([
+                [Carbon::createFromFormat('!Y-m', $ym)->format('F Y'), 135], [$this->money($in), 130, 'right'],
+                [$this->money($out), 130, 'right'], [$this->money($in - $out), 120, 'right'],
+            ]);
+            $y = substr($ym, 0, 4);
+            $years[$y]['in'] = ($years[$y]['in'] ?? 0) + $in;
+            $years[$y]['out'] = ($years[$y]['out'] ?? 0) + $out;
+        }
+        if (!$byMonth) {
+            $this->note('No income or expense entries yet.');
+        }
+        $this->y += 10;
+
+        if (!$year) {
+            $this->heading('Year by year');
+            $this->row([['Year', 135, 'left', true], ['Income (Tk)', 130, 'right', true], ['Expenses (Tk)', 130, 'right', true], ['Net (Tk)', 120, 'right', true]], 0.9);
+            foreach ($years as $y => $v) {
+                $this->row([[(string) $y, 135], [$this->money($v['in']), 130, 'right'], [$this->money($v['out']), 130, 'right'], [$this->money($v['in'] - $v['out']), 120, 'right']]);
+            }
+            $this->y += 10;
+
+        }
+
+        // Categories
+        $this->heading('Income by category ' . $suffix);
+        $this->row([['Category', 260, 'left', true], ['Tk', 130, 'right', true], ['USD', 125, 'right', true]], 0.9);
+        $groups = $incomes->groupBy(fn ($i) => $i->incomeCategory->name ?? 'Uncategorised')
+            ->map(fn ($g) => ['bdt' => (float) $g->sum('amount_bdt'), 'usd' => (float) $g->sum('amount_usd')])
+            ->sortByDesc('bdt');
+        foreach ($groups as $name => $v) {
+            $this->row([[$name, 260], [$this->money($v['bdt']), 130, 'right'], [$this->money($v['usd']), 125, 'right']]);
+        }
+        $this->y += 10;
+
+        $this->heading('Expenses by category ' . $suffix);
+        $this->row([['Category', 385, 'left', true], ['Tk', 130, 'right', true]], 0.9);
+        $groups = $expenses->groupBy(fn ($e) => $e->expenseCategory->name ?? 'Uncategorised')
+            ->map(fn ($g) => (float) $g->sum('amount'))->sortDesc();
+        foreach ($groups as $name => $v) {
+            $this->row([[$name, 385], [$this->money($v), 130, 'right']]);
+        }
+        $this->y += 10;
+
+        // Payroll
+        $paid = $payrolls->where('status', 'Paid');
+        $this->heading('Payroll ' . $suffix);
+        $this->row([['Paid payrolls', 330], [(string) $paid->count(), 185, 'right']]);
+        $this->row([['Gross salary paid', 330], [$this->money($paid->sum('total_salary')), 185, 'right']]);
+        $this->row([['Advances deducted', 330], [$this->money($paid->sum('advance_amount')), 185, 'right']]);
+        $this->row([['Loan installments deducted', 330], [$this->money($paid->sum('loan_amount')), 185, 'right']]);
+        $this->row([['Net salary paid', 330, 'left', true], [$this->money($paid->sum('net_salary')), 185, 'right', true]], 0.93);
+        $this->row([['Pending payrolls', 330], [(string) ($payrolls->count() - $paid->count()), 185, 'right']]);
+        $this->y += 10;
+
+        // Loans
+        $loans = EmployeeLoan::all();
+        $this->heading('Team loans (all time)');
+        $this->row([['Loans given', 330], [(string) $loans->count(), 185, 'right']]);
+        $this->row([['Total lent', 330], [$this->money($loans->sum('loan_amount')), 185, 'right']]);
+        $this->row([['Still to collect', 330, 'left', true], [$this->money($loans->sum('remaining_balance')), 185, 'right', true]], 0.93);
+        $this->y += 10;
+
+        // Banks
+        $this->heading('Bank and cash balances (as of ' . now()->format('d M Y') . ')');
+        $this->row([['Account', 385, 'left', true], ['Balance (Tk)', 130, 'right', true]], 0.9);
+        $accounts = BankAccount::orderBy('account_name')->get();
+        foreach ($accounts as $a) {
+            $this->row([[$a->account_name . ($a->is_active ? '' : ' (inactive)'), 385], [$this->money($a->current_balance), 130, 'right']]);
+        }
+        if ($accounts->isNotEmpty()) {
+            $this->row([['Total', 385, 'left', true], [$this->money($accounts->sum('current_balance')), 130, 'right', true]], 0.93);
+        }
+
+        $this->pdf->setFooter($year ? "EcoTech OS - Accounts {$year} - Page {p} of {n}" : 'EcoTech OS - All-time accounts - Page {p} of {n}');
 
         return $this->pdf->output();
     }

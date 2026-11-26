@@ -22,6 +22,22 @@ class ReportController extends Controller
     /** Download the accounts PDF of one month (created on the spot). */
     public function accountsPdf(Request $request)
     {
+        if ($request->boolean('all')) {
+            return response(AccountsReport::buildAllTime(), 200, [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . AccountsReport::ALL_TIME_FILE . '"',
+            ]);
+        }
+
+        if ($request->boolean('yearly')) {
+            $year = min(max((int) $request->query('year', now()->year), 2000), 2100);
+
+            return response(AccountsReport::buildYear($year), 200, [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . AccountsReport::yearFileName($year) . '"',
+            ]);
+        }
+
         [$month, $year] = $this->period($request);
 
         return response(AccountsReport::build($month, $year), 200, [
@@ -41,7 +57,7 @@ class ReportController extends Controller
 
     public function savedAccounts(string $file)
     {
-        abort_unless(preg_match('/^accounts-\d{4}-\d{2}\.pdf$/', $file), 404);
+        abort_unless($file === AccountsReport::ALL_TIME_FILE || preg_match('/^accounts-(\d{4}-\d{2}|year-\d{4})\.pdf$/', $file), 404);
 
         $path = AccountsReport::directory() . '/' . $file;
         abort_unless(is_file($path), 404);
