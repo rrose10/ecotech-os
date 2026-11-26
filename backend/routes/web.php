@@ -336,6 +336,9 @@ Route::middleware(['auth', 'role:super_admin,admin'])->group(function () {
         Route::get('/finance', [\App\Http\Controllers\ReportController::class, 'finance'])->name('finance');
         Route::get('/attendance', [\App\Http\Controllers\ReportController::class, 'attendance'])->name('attendance');
         Route::get('/payroll', [\App\Http\Controllers\ReportController::class, 'payroll'])->name('payroll');
+        Route::get('/accounts-pdf', [\App\Http\Controllers\ReportController::class, 'accountsPdf'])->name('accounts.pdf');
+        Route::post('/accounts-pdf/save-all', [\App\Http\Controllers\ReportController::class, 'saveAllAccounts'])->name('accounts.save-all');
+        Route::get('/accounts-pdf/saved/{file}', [\App\Http\Controllers\ReportController::class, 'savedAccounts'])->name('accounts.saved');
     });
 });
 

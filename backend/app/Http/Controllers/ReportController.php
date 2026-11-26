@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\Payroll;
+use App\Support\AccountsReport;
 use App\Support\SimpleXlsx;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -15,7 +16,37 @@ class ReportController extends Controller
 {
     public function index()
     {
-        return view('reports.index');
+        return view('reports.index', ['savedAccounts' => AccountsReport::saved()]);
+    }
+
+    /** Download the accounts PDF of one month (created on the spot). */
+    public function accountsPdf(Request $request)
+    {
+        [$month, $year] = $this->period($request);
+
+        return response(AccountsReport::build($month, $year), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . AccountsReport::fileName($month, $year) . '"',
+        ]);
+    }
+
+    /** Create and store a PDF for every past month. */
+    public function saveAllAccounts()
+    {
+        $count = AccountsReport::saveAll();
+
+        return redirect()->route('reports.index')
+            ->with('success', "Saved {$count} monthly PDF file(s).");
+    }
+
+    public function savedAccounts(string $file)
+    {
+        abort_unless(preg_match('/^accounts-\d{4}-\d{2}\.pdf$/', $file), 404);
+
+        $path = AccountsReport::directory() . '/' . $file;
+        abort_unless(is_file($path), 404);
+
+        return response()->download($path, $file, ['Content-Type' => 'application/pdf']);
     }
 
     public function finance(Request $request)
