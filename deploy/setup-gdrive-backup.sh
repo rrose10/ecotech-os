@@ -32,11 +32,40 @@ if ! command -v rclone >/dev/null 2>&1; then
 fi
 
 if [ "$1" = "--authorize" ]; then
+  pkill -f "rclone authorize" 2>/dev/null || true
+  rm -f /tmp/gdrive-auth.out
+  rclone authorize drive > /tmp/gdrive-auth.out 2>&1 &
+  RPID=$!
+
+  LOCAL=""
+  i=0
+  while [ $i -lt 20 ] && [ -z "$LOCAL" ]; do
+    sleep 1
+    LOCAL=$(grep -o 'http://127.0.0.1:53682/auth?state=[A-Za-z0-9_-]*' /tmp/gdrive-auth.out | head -1)
+    i=$((i+1))
+  done
+  [ -n "$LOCAL" ] || { cat /tmp/gdrive-auth.out; echo "rclone did not start."; kill $RPID 2>/dev/null; exit 1; }
+
+  GURL=$(curl -s -o /dev/null -w '%{redirect_url}' "$LOCAL")
+  [ -n "$GURL" ] || { echo "Could not get the Google sign-in link."; kill $RPID 2>/dev/null; exit 1; }
+
   echo
-  echo "Open the link below in your PC browser (the one that starts with http://127.0.0.1:53682),"
-  echo "sign in to Google and press Allow. Then come back to this window."
+  echo "STEP A: copy this whole link, open it in your PC browser, sign in to Google and press Allow:"
   echo
-  rclone authorize drive 2>&1 | tee /tmp/gdrive-auth.out
+  echo "$GURL"
+  echo
+  echo "STEP B: the browser will then show an error page (This site can't be reached)."
+  echo "        That is expected. Copy the full address from the browser's address bar"
+  echo "        (it starts with http://127.0.0.1:53682/?state=...) and paste it below."
+  echo
+  printf "Paste the address here and press Enter: "
+  read -r BACK < /dev/tty
+  BACK=$(printf '%s' "$BACK" | tr -d ' "\r')
+  curl -s -o /dev/null "$BACK" || true
+
+  i=0
+  while [ $i -lt 30 ] && ! grep -q access_token /tmp/gdrive-auth.out; do sleep 1; i=$((i+1)); done
+  kill $RPID 2>/dev/null || true
   grep access_token /tmp/gdrive-auth.out | head -1 > "$TOKEN_FILE"
   rm -f /tmp/gdrive-auth.out
 fi
