@@ -1,10 +1,12 @@
 #!/bin/sh
 # Copies the accounts PDFs (backups/reports) to Google Drive with rclone, twice a day.
-# Usage (as root, on the NAS):  sh deploy/setup-gdrive-backup.sh /tmp/gdrive-token.json
-# The token file comes from "rclone authorize drive" run on the PC (see gdrive-setup.bat).
+# Usage (as root, on the NAS):
+#   sh deploy/setup-gdrive-backup.sh --authorize     (asks you to open a Google link in your browser)
+#   sh deploy/setup-gdrive-backup.sh /tmp/gdrive-token.json   (token made elsewhere with "rclone authorize drive")
 set -e
 
-TOKEN_FILE="${1:-/tmp/gdrive-token.json}"
+TOKEN_FILE=/tmp/gdrive-token.json
+[ -n "$1" ] && [ "$1" != "--authorize" ] && TOKEN_FILE="$1"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ROOT/backups/reports"
 CONF=/etc/ecotech-rclone.conf
@@ -27,6 +29,16 @@ if ! command -v rclone >/dev/null 2>&1; then
   else
     apt-get update -qq && apt-get install -y -qq rclone
   fi
+fi
+
+if [ "$1" = "--authorize" ]; then
+  echo
+  echo "Open the link below in your PC browser (the one that starts with http://127.0.0.1:53682),"
+  echo "sign in to Google and press Allow. Then come back to this window."
+  echo
+  rclone authorize drive 2>&1 | tee /tmp/gdrive-auth.out
+  grep access_token /tmp/gdrive-auth.out | head -1 > "$TOKEN_FILE"
+  rm -f /tmp/gdrive-auth.out
 fi
 
 [ -s "$TOKEN_FILE" ] || { echo "Token file $TOKEN_FILE is missing or empty."; exit 1; }
