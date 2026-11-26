@@ -9,7 +9,7 @@ class SaveMonthlyAccounts extends Command
 {
     protected $signature = 'reports:monthly {--month=} {--year=} {--all : Save every past month}';
 
-    protected $description = 'Save the monthly accounts PDF (default: last month) in storage/app/backups/reports';
+    protected $description = 'Save accounts PDFs: last month, any missing older month, and the all-time one (storage/app/backups/reports)';
 
     public function handle(): int
     {
@@ -24,6 +24,12 @@ class SaveMonthlyAccounts extends Command
         $year  = (int) ($this->option('year') ?: $last->year);
 
         $this->info('Saved ' . AccountsReport::save($month, $year));
+
+        // Any older month that has no PDF yet (first run creates the whole history)
+        $filled = AccountsReport::saveAll(false);
+        $this->info("Created {$filled} missing monthly PDF file(s).");
+
+        // Always refresh the all-time PDF
         $this->info('Saved ' . AccountsReport::saveAllTime());
 
         return self::SUCCESS;

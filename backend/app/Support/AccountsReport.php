@@ -48,7 +48,7 @@ class AccountsReport
     }
 
     /** Save every finished month that has any income, expense or payroll. Returns how many. */
-    public static function saveAll(): int
+    public static function saveAll(bool $overwrite = true): int
     {
         $dates = array_filter([
             Income::min('income_date'),
@@ -73,8 +73,13 @@ class AccountsReport
         $count  = 0;
 
         while ($cursor->lte($last)) {
-            self::save($cursor->month, $cursor->year);
-            $count++;
+            $exists = is_file(self::directory() . '/' . self::fileName($cursor->month, $cursor->year));
+
+            if ($overwrite || !$exists) {
+                self::save($cursor->month, $cursor->year);
+                $count++;
+            }
+
             $cursor->addMonthNoOverflow();
         }
 

@@ -26,7 +26,7 @@
         <h2 class="text-xl font-bold mb-1">Monthly accounts (PDF)</h2>
         <p class="text-gray-600 mb-4">
             Income, expenses, payroll, loans and bank balances of one month.
-            Last month's PDF and the all-time PDF are saved automatically on the 1st of every month.
+            Saved automatically every night on the NAS: one PDF per month, and one all-time PDF that is always up to date.
         </p>
 
         <form method="GET" action="{{ route('reports.accounts.pdf') }}" class="flex flex-wrap items-center gap-2 mb-4">

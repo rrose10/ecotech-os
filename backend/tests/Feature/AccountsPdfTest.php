@@ -135,4 +135,18 @@ class AccountsPdfTest extends TestCase
         $this->get('/reports')->assertOk()->assertSee('All time');
         $this->get('/reports/accounts-pdf/saved/accounts-all-time.pdf')->assertOk();
     }
+
+    public function test_nightly_command_fills_missing_months_and_keeps_existing_ones(): void
+    {
+        $this->seedMonth();
+        $this->artisan('reports:monthly')->assertExitCode(0);
+
+        $dir = AccountsReport::directory();
+        $this->assertFileExists($dir . '/accounts-2026-10.pdf');
+        $this->assertFileExists($dir . '/accounts-all-time.pdf');
+
+        file_put_contents($dir . '/accounts-2026-10.pdf', 'MARKER');
+        AccountsReport::saveAll(false);
+        $this->assertSame('MARKER', file_get_contents($dir . '/accounts-2026-10.pdf'));   // not overwritten
+    }
 }
