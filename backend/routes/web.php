@@ -291,6 +291,10 @@ Route::middleware(['auth', 'role:super_admin,admin,hr'])->group(function () {
             BankAccountController::class
         );
 
+        // Money moved between our own accounts (bank -> cash in hand ...)
+        Route::resource('fund-transfers', \App\Http\Controllers\FundTransferController::class)
+            ->except(['show']);
+
         /*
         |--------------------------------------------------------------------------
         | Payment Reminders
