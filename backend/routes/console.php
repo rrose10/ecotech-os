@@ -12,6 +12,9 @@ Artisan::command('inspire', function () {
 // Daily database backup at 02:00 (Asia/Dhaka)
 Schedule::command('db:backup')->dailyAt('02:00');
 
+// The 1st of every month: save last month's accounts as a PDF
+Schedule::command('reports:monthly')->monthlyOn(1, '03:00');
+
 // Birthday / work-anniversary wishes on the notice board every morning
 Schedule::command('notices:celebrations')->dailyAt('08:00');
 

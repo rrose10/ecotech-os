@@ -14,6 +14,9 @@ copy_to() {
   dest="\$1/ecotech-backups"
   mkdir -p "\$dest"
   cp -u "\$SRC"/*.sql "\$SRC"/*.tar.gz "\$dest/" 2>/dev/null || true
+  # monthly accounts PDFs
+  mkdir -p "\$dest/reports"
+  cp -u "\$SRC"/reports/*.pdf "\$dest/reports/" 2>/dev/null || true
   # keep the 60 newest copies per destination (database dumps and upload archives separately)
   ls -1t "\$dest"/*.sql 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
   ls -1t "\$dest"/*.tar.gz 2>/dev/null | tail -n +61 | while read f; do rm -f "\$f"; done
